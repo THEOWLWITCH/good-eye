@@ -34,7 +34,7 @@
       name: name, emoji: emoji || AVATARS[0], code: code,
       kind: kind === 'adult' ? 'adult' : 'child',
       createdAt: new Date().toISOString(),
-      settings: DA.settings.normalize({}),
+      settings: DA.settings.normalize(kind === 'adult' ? {} : { copilotVoice: true }),
       best: null,
       pinned: [],
       notes: ''

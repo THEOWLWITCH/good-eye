@@ -549,6 +549,21 @@
     <div class="row wrap"><button id="eyeInfoBtn" class="linkish">מה זה, ומתי זה לא עובד?</button><button id="eyeOff" class="danger">כיבוי</button></div>
   </div>
 
+  <!-- ============ NAVIGATOR (guide) ============ -->
+  <div id="copilot" class="copilot" role="dialog" aria-live="polite" aria-label="הנווט">
+    <div class="cp-owl" aria-hidden="true">🦉</div>
+    <div class="cp-body">
+      <div class="cp-name">ינשוף, הנווט</div>
+      <p id="copilotText" class="cp-text"></p>
+      <div id="copilotButtons" class="cp-buttons"></div>
+    </div>
+    <div class="cp-tools">
+      <button id="copilotSpeak" class="small" title="להקריא">🔊</button>
+      <button id="copilotClose" class="small" title="להסתיר">✕</button>
+    </div>
+  </div>
+  <button id="copilotMini" class="copilot-mini" title="הנווט" style="display:none">🦉</button>
+
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <a href="#main-content" class="skip-link" id="skipLink">דילוג לתוכן</a>
 
@@ -678,10 +693,11 @@
   <script src="js/core/device.js"></script>
   <script src="js/instruments/grid.js"></script>
   <script src="js/vision/eyes.js"></script>
-  <script>window.DA.VERSION = '1.0.4';</script>
+  <script>window.DA.VERSION = '1.1.0';</script>
   <script src="js/ui/common.js"></script>
   <script src="js/ui/drawer.js"></script>
   <script src="js/ui/cockpit.js"></script>
+  <script src="js/ui/copilot.js"></script>
   <script src="js/ui/eyepanel.js"></script>
   <script src="js/screens/calibrate.js"></script>
   <script src="js/screens/home.js"></script>

@@ -43,6 +43,7 @@
     if (cur === 'read') DA.screens.read.refresh(preview);
     if (cur === 'hub') DA.screens.hub.enter();
     renderHeader();
+    DA.copilot.update();
   }
 
   function show(name) {
@@ -57,6 +58,7 @@
     DA.screens[name].enter();
     glassesNotes();
     smallScreenNotes();
+    setTimeout(function () { DA.copilot.update(); }, 60);
     root.scrollTo(0, 0);
     var scr = $('screen-' + name); if (scr && document.activeElement && document.activeElement.tagName === 'BODY') scr.focus({ preventScroll: true });
   }
@@ -87,6 +89,7 @@
 
     DA.drawer.init(ctx);
     DA.eyePanel.init(ctx);
+    DA.copilot.init(ctx);
     SCREENS.forEach(function (s) { DA.screens[s].init(ctx); });
     var p0 = ctx.profile(); DA.eyes.setUsualDistance(p0 && p0.settings.refDistanceCm);
     profiles.sync();

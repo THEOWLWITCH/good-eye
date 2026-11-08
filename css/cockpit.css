@@ -193,3 +193,36 @@ button.pf:hover:not(:disabled) { border-color: var(--cyan); }
 /* which device for what */
 .device-tip { background: rgba(156, 123, 255, .12); border: 1px solid rgba(156, 123, 255, .5); border-radius: 12px; padding: 8px 12px; font-size: 15px; margin: 16px 0 0; }
 .device-note { background: rgba(255, 176, 0, .12); border: 1px solid rgba(255, 176, 0, .5); border-radius: 12px; padding: 8px 12px; font-size: 14px; margin: 10px 0; }
+
+/* ---------- navigator (Yanshufi the owl) ---------- */
+.copilot {
+  position: fixed; bottom: 16px; inset-inline-start: 16px; z-index: 35; max-width: min(460px, calc(100vw - 32px));
+  display: none; gap: 12px; align-items: flex-start; padding: 14px 14px 14px 16px; border-radius: 22px;
+  background: linear-gradient(180deg, #1e3c80, #142b5e); border: 2px solid var(--cyan); color: var(--text);
+  box-shadow: 0 0 26px rgba(56, 214, 255, .35), 0 12px 40px rgba(0, 0, 0, .45);
+}
+.copilot.show { display: flex; animation: cpIn .35s ease-out; }
+@keyframes cpIn { from { transform: translateY(20px); opacity: 0; } to { transform: none; opacity: 1; } }
+.cp-owl { font-size: 54px; line-height: 1; animation: cpBob 2.6s ease-in-out infinite; }
+@keyframes cpBob { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-4px) rotate(3deg); } }
+.cp-body { flex: 1; min-width: 0; }
+.cp-name { font-size: 13px; color: var(--cyan); font-weight: 700; }
+.cp-text { margin: 4px 0 10px; font-size: 18px; line-height: 1.45; }
+.cp-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
+.cp-buttons button { font-size: 16px; padding: 8px 14px; border-radius: 14px; }
+.cp-tools { display: flex; flex-direction: column; gap: 6px; }
+.cp-tools button { width: 34px; height: 34px; padding: 0; border-radius: 50%; }
+.copilot-mini {
+  position: fixed; bottom: 16px; inset-inline-start: 16px; z-index: 35; width: 62px; height: 62px; border-radius: 50%;
+  font-size: 34px; padding: 0; border: 2px solid var(--cyan); background: #1e3c80; box-shadow: 0 0 18px rgba(56, 214, 255, .4);
+}
+.guide-target { position: relative; animation: guidePulse 1.6s ease-in-out infinite; }
+@keyframes guidePulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(255, 176, 0, .0); } 50% { box-shadow: 0 0 0 6px rgba(255, 176, 0, .55), 0 0 28px rgba(255, 176, 0, .5); } }
+@media (prefers-reduced-motion: reduce) { .cp-owl, .guide-target, .copilot.show { animation: none; } }
+@media (max-width: 760px) {
+  .copilot { inset-inline: 8px; bottom: 8px; max-width: none; padding: 10px 12px; }
+  .cp-owl { font-size: 40px; }
+  .cp-text { font-size: 16px; }
+}
+/* keep the reading area and answers free: the navigator sits above the bottom bars */
+body[data-screen="read"] .copilot { bottom: 72px; }

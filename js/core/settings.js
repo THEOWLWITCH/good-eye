@@ -71,6 +71,8 @@
     cvi: false,            // simple & focused mode (CVI): one bright colour, uncluttered, two answers, gentle motion, more time
     syllables: false,      // colour syllables in alternating colours (approximate; pointed Hebrew and English)
     dictionary: true,      // double-tap a word for a picture and to hear it
+    copilot: true,         // show the navigator (Yanshufi the owl) with short guidance
+    copilotVoice: false,   // the navigator reads its guidance aloud
     // eye tracking (standalone version only)
     eyesKeepAngle: false,  // keep letters the same size for the eye when the reader moves closer/farther
     refDistanceCm: null    // viewing distance at which fontSize was chosen/learned

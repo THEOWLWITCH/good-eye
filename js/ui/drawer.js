@@ -9,6 +9,10 @@
   var ctx, previewLens, work;
 
   var GROUPS = [
+    { title: T('🦉 הנווט'), items: [
+      { k: 'copilot', label: T('להציג את הנווט, שמסביר כל צעד'), type: 'check' },
+      { k: 'copilotVoice', label: T('הנווט מקריא את ההסבר בקול'), type: 'check' }
+    ] },
     { title: T('טקסט'), items: [
       { k: 'fontSize', label: T('גודל אותיות'), type: 'range', min: 12, max: 96, step: 1, fmt: function (v) { return v + 'px'; } },
       { k: 'font', label: T('גופן'), type: 'select', options: function () { return DA.settings.FONTS.map(function (f) { return [f.id, f.label]; }); } },
