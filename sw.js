@@ -5,7 +5,7 @@
  *  - Libraries, fonts and the face model from CDNs: cached the first time they are used.
  *  - Never caches sync requests (/api/).
  */
-var VERSION = 'f5ed55f66d';
+var VERSION = '696049d0be';
 var APP_CACHE = 'good-eye-app-' + VERSION;
 var LIB_CACHE = 'good-eye-libs-v1';
 var FILES = [

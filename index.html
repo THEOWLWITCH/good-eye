@@ -171,6 +171,11 @@
         <button id="calEyes" class="eye-switch" data-short></button>
       </div>
     </header>
+    <div id="calTogether" class="together-note" style="display:none">
+      <span class="together-icon"><i data-icon="adult"></i></span>
+      <p>עושים את זה <b>יחד עם מבוגר</b>. המבוגר יושב לידך ועוזר: מזכיר לכסות עין אחת, ואם צריך גורר את הנקודות לפי מה שאת/ה אומר/ת. אפשר לעצור בכל רגע, והכול נשמר.</p>
+      <button id="calTogetherOk" class="small">הבנתי</button>
+    </div>
 
     <div class="layout">
       <aside class="panel" id="panel">
@@ -382,6 +387,7 @@
           <button id="learnNextYes" class="primary">כן, לפעמים ← לכיול עיוות (כ־10 דקות)</button>
           <button id="learnNextNo">לא ← אפשר לצאת לקרוא 📖</button>
         </div>
+        <p id="learnNextPro" class="pro-note" style="display:none"></p>
         <p id="learnNextHasCal" class="muted small" style="display:none">✓ יש לך כבר כיול עיוות, והמשחק בדק אם הוא עוזר. אפשר לחדש אותו מתא הטייס.</p>
       </div>
       <details class="end-details"><summary>מה גילינו? (פירוט)</summary><div id="learnEndSummary"></div></details>
@@ -773,7 +779,7 @@
   <script src="js/core/device.js"></script>
   <script src="js/instruments/grid.js"></script>
   <script src="js/vision/eyes.js"></script>
-  <script>window.DA.VERSION = '1.3.0';</script>
+  <script>window.DA.VERSION = '1.3.1';</script>
   <script src="js/ui/icons.js"></script>
   <script src="js/ui/common.js"></script>
   <script src="js/ui/drawer.js"></script>

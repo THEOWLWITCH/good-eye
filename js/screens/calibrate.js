@@ -557,6 +557,12 @@
   function enter() {
     visible = true;
     var prof = ctx.profile();
+    // young pilots calibrate together with an adult
+    var tog = document.getElementById('calTogether');
+    if (tog) {
+      tog.style.display = prof && prof.kind !== 'adult' ? '' : 'none';
+      document.getElementById('calTogetherOk').onclick = function () { tog.style.display = 'none'; setTimeout(function () { grid.resize(); }, 0); };
+    }
     var calm = !!(prof && prof.settings.calm);
     grid.setSettings({ soft: calm });
     if (calm && grid.settings.density > 7) grid.setSettings({ density: 7 });

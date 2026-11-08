@@ -337,3 +337,12 @@ button.huge { font-size: 22px; padding: 18px 40px; }
 .title-badge { display: inline-grid; place-items: center; width: 52px; height: 52px; border-radius: 16px; vertical-align: middle; margin-inline-end: 6px;
   background: linear-gradient(135deg, #5ad8ff, #4be3a4); color: #06101f; box-shadow: 0 8px 24px rgba(90,216,255,.3); }
 .title-badge svg { width: 30px; height: 30px; stroke-width: 2; }
+
+/* ---- together with an adult / professional check ---- */
+.together-note { flex: none; display: flex; align-items: center; gap: 12px; margin: 8px 12px 0; padding: 10px 14px; border-radius: 16px;
+  background: linear-gradient(135deg, rgba(201,184,255,.16), rgba(255,122,182,.1)); box-shadow: inset 0 0 0 1px rgba(201,184,255,.35); }
+.together-note p { margin: 0; flex: 1; line-height: 1.5; font-size: 15px; }
+.together-icon { flex: none; width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; color: #140a24; background: linear-gradient(135deg, #c9b8ff, #ff7ab6); }
+.together-icon svg { width: 24px; height: 24px; }
+.pro-note { margin: 10px auto 0; max-width: 560px; font-size: 15px; line-height: 1.55; opacity: .9; padding-top: 10px; border-top: 1px solid rgba(255,255,255,.1); }
+@media (max-width: 560px) { .together-note { flex-wrap: wrap; } .together-note p { font-size: 14px; } }

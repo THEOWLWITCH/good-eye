@@ -761,12 +761,16 @@
     var la = sess.lines || {}, vals = Object.keys(la).map(function (k) { return la[k]; });
     var wavy = vals.indexOf('wavy') >= 0, missing = vals.indexOf('missing') >= 0;
     var straight = vals.length === 2 && vals.every(function (v) { return v === 'straight'; });
-    var q, nextSay;
+    var q, nextSay, young = ctx.profile().kind !== 'adult', pro = '';
     if (wavy || missing) {
       q = (wavy ? T('ראית קווים עקומים או גליים') : T('ראית שחסר חלק מהרשת')) + T(' בעין אחת לפחות. ') +
         (hasCal ? T('כדאי לחדש את כיול העיוות, כדי שהתיקון יתאים בדיוק.') : T('כדאי לעשות כיול עיוות: הוא מיישר את מה שנראה עקום, ומתאים את הטקסט בדיוק לעין שלך.')) +
-        (missing ? T(' ובשביל חלק שחסר, יש גם את "מפת נוחות" בכל הכלים.') : '');
-      nextSay = ' ' + q;
+        (missing ? T(' ובשביל חלק שחסר, יש גם את "מפת נוחות" בכל הכלים.') : '') +
+        (young ? ' ' + T('את הכיול עושים יחד עם מבוגר שיושב לידך ועוזר.') : '');
+      pro = young
+        ? T('וחשוב לספר על זה להורים, כדי שיבדקו את זה גם אצל רופא/ת עיניים או אופטומטריסט/ית.')
+        : T('כדאי לבדוק את זה גם אצל רופא/ת עיניים או אופטומטריסט/ית, במיוחד אם זה חדש או השתנה.');
+      nextSay = ' ' + q + ' ' + pro;
     } else if (straight) {
       q = T('הקווים נראו לך ישרים בשתי העיניים, אז אין צורך בכיול עיוות. אפשר לצאת לקרוא!');
       nextSay = ' ' + q;
@@ -775,11 +779,13 @@
       nextSay = hasCal ? '' : ' ' + T('ושאלה אחת לסיום: קווים ישרים נראים לך לפעמים עקומים, גליים או עם חלק חסר? אם כן, כדאי לעשות גם כיול עיוות.');
     }
     $('learnNextQ').textContent = q;
+    $('learnNextPro').textContent = pro;
+    $('learnNextPro').style.display = pro ? '' : 'none';
     $('learnNextQ').style.display = '';
     $('learnNextHasCal').style.display = 'none';
     var showCal = wavy || missing || (!straight && !hasCal);
     $('learnNextYes').style.display = showCal ? '' : 'none';
-    $('learnNextYes').textContent = wavy || missing ? (hasCal ? T('לחדש את כיול העיוות') : T('לכיול עיוות (כ־10 דקות)')) : T('כן, לפעמים ← לכיול עיוות (כ־10 דקות)');
+    $('learnNextYes').textContent = wavy || missing ? (hasCal ? T('לחדש את כיול העיוות') : young ? T('לכיול עיוות, יחד עם מבוגר (כ־10 דקות)') : T('לכיול עיוות (כ־10 דקות)')) : T('כן, לפעמים ← לכיול עיוות (כ־10 דקות)');
     $('learnNextNo').textContent = straight || wavy || missing ? T('לצאת לקרוא 📖') : T('לא ← אפשר לצאת לקרוא 📖');
     $('learnNextYes').onclick = function () { ctx.updateSettings(last.after); ctx.go('calibrate'); };
     $('learnNextNo').onclick = function () { ctx.updateSettings(last.after); ctx.store.setPref('read.intent', 'read'); ctx.go('read'); };
