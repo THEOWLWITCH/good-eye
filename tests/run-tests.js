@@ -1,7 +1,7 @@
 /* Node tests for the engine, history and storage modules.  Run:  node tests/run-tests.js */
 'use strict';
 var path = require('path');
-['js/engine/deformation.js', 'js/core/history.js', 'js/core/storage.js', 'js/core/settings.js', 'js/vision/eyes.js'].forEach(function (f) {
+['js/core/i18n-en.js', 'js/core/i18n.js', 'js/engine/deformation.js', 'js/core/history.js', 'js/core/storage.js', 'js/core/settings.js', 'js/vision/eyes.js'].forEach(function (f) {
   require(path.join(__dirname, '..', f));
 });
 var DA = globalThis.DA, DEF = DA.deformation;

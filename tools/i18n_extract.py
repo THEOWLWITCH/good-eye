@@ -102,7 +102,7 @@ class HtmlCollector(HTMLParser):
 
     def handle_starttag(self, tag, attrs):
         a = dict(attrs)
-        skip = 'data-noi18n' in a or (self.stack and self.stack[-1])
+        skip = bool('data-noi18n' in a or (self.stack and self.stack[-1]))
         if tag not in ('input', 'br', 'meta', 'link', 'img'):
             self.stack.append(skip)
         if skip:

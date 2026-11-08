@@ -15,6 +15,7 @@
     <button id="navHome" class="nav-home" title="חזרה">🏠</button>
     <div class="brand">👁️ <span>עין טובה</span> <small id="version"></small></div>
     <span id="cloudDot" class="cloud-dot" title=""></span>
+    <button id="langBtn" class="lang-btn" data-noi18n title="Language / שפה"></button>
     <button id="whoChip" class="who-chip" title="החלפת קורא"><span id="whoEmoji"></span> <span id="whoName"></span> ⇄</button>
   </header>
 
@@ -302,7 +303,7 @@
       <button id="drawerClose">✕</button>
     </div>
     <div id="drawerPreview" class="drawer-preview"><div class="lens-content">
-      <p dir="rtl">הילדה בונה ארמון בחול ליד הים. 123</p>
+      <p dir="rtl" data-noi18n>הילדה בונה ארמון בחול ליד הים. 123</p>
       <p dir="ltr">The cat drinks milk in the morning.</p>
       <div class="ab-pics"><span>🐢</span><span>⭐</span></div>
     </div></div>
@@ -414,6 +415,8 @@
     </form>
   </dialog>
 
+  <script src="js/core/i18n-en.js"></script>
+  <script src="js/core/i18n.js"></script>
   <script src="js/engine/deformation.js"></script>
   <script src="js/core/history.js"></script>
   <script src="js/core/storage.js"></script>
@@ -426,7 +429,7 @@
   <script src="js/content/stimuli.js"></script>
   <script src="js/instruments/grid.js"></script>
   <script src="js/vision/eyes.js"></script>
-  <script>window.DA.VERSION = '0.2.0';</script>
+  <script>window.DA.VERSION = '0.3.0';</script>
   <script src="js/ui/common.js"></script>
   <script src="js/ui/drawer.js"></script>
   <script src="js/ui/eyepanel.js"></script>

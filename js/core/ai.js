@@ -25,13 +25,13 @@
   }
 
   var LEVELS = {
-    g1: 'כיתה א׳ (קורא מתחיל: מילים קצרות ומוכרות, משפטים של 3–6 מילים)',
-    g2: 'כיתה ב׳ (משפטים פשוטים וקצרים)',
-    g3: 'כיתה ג׳', g4: 'כיתה ד׳', g5: 'כיתה ה׳', g6: 'כיתה ו׳',
-    teen: 'חטיבת ביניים', adult: 'מבוגרים'
+    g1: T('כיתה א׳ (קורא מתחיל: מילים קצרות ומוכרות, משפטים של 3–6 מילים)'),
+    g2: T('כיתה ב׳ (משפטים פשוטים וקצרים)'),
+    g3: T('כיתה ג׳'), g4: T('כיתה ד׳'), g5: T('כיתה ה׳'), g6: T('כיתה ו׳'),
+    teen: T('חטיבת ביניים'), adult: T('מבוגרים')
   };
-  var LENGTHS = { short: '40–70 מילים', medium: '100–160 מילים', long: '220–320 מילים' };
-  var KINDS = { story: 'סיפור קצר', facts: 'טקסט מידע מעניין', poem: 'שיר קצר וקליל', math: 'שאלות מילוליות בחשבון (3 שאלות, בלי פתרונות)', dialogue: 'שיחה בין שתי דמויות' };
+  var LENGTHS = { short: T('40–70 מילים'), medium: T('100–160 מילים'), long: T('220–320 מילים') };
+  var KINDS = { story: T('סיפור קצר'), facts: T('טקסט מידע מעניין'), poem: T('שיר קצר וקליל'), math: T('שאלות מילוליות בחשבון (3 שאלות, בלי פתרונות)'), dialogue: T('שיחה בין שתי דמויות') };
 
   function generate(o, onText, signal) {
     return get().then(function (sample) {
@@ -67,15 +67,15 @@
   function errorText(e) {
     var c = e && e.code;
     return ({
-      unavailable: 'האפשרות הזו זמינה רק בגרסה שב־claude.ai.',
-      not_granted: 'לא אושר שימוש ב־Claude בדף הזה.',
-      rate_limited: 'יותר מדי בקשות כרגע. נסו שוב בעוד רגע.',
-      session_expired: 'צריך להתחבר מחדש ל־claude.ai.',
-      image_rejected: 'התמונה לא התקבלה. נסו תמונה אחרת או קטנה יותר.',
-      images_unavailable: 'שליחת תמונות לא זמינה כאן.',
-      refused: 'הבקשה לא אושרה. נסו נושא אחר.',
-      cancelled: 'בוטל.'
-    })[c] || 'משהו השתבש (' + (c || 'שגיאה') + '). אפשר לנסות שוב.';
+      unavailable: T('האפשרות הזו זמינה רק בגרסה שב־claude.ai.'),
+      not_granted: T('לא אושר שימוש ב־Claude בדף הזה.'),
+      rate_limited: T('יותר מדי בקשות כרגע. נסו שוב בעוד רגע.'),
+      session_expired: T('צריך להתחבר מחדש ל־claude.ai.'),
+      image_rejected: T('התמונה לא התקבלה. נסו תמונה אחרת או קטנה יותר.'),
+      images_unavailable: T('שליחת תמונות לא זמינה כאן.'),
+      refused: T('הבקשה לא אושרה. נסו נושא אחר.'),
+      cancelled: T('בוטל.')
+    })[c] || T('משהו השתבש (') + (c || T('שגיאה')) + T('). אפשר לנסות שוב.');
   }
 
   DA.ai = { available: function () { return get().then(function (s) { return !!s; }); }, canImages: canImages, generate: generate, photoToText: photoToText, errorText: errorText, LEVELS: LEVELS, KINDS: KINDS };

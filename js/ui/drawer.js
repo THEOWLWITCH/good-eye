@@ -9,49 +9,49 @@
   var ctx, previewLens, work;
 
   var GROUPS = [
-    { title: 'טקסט', items: [
-      { k: 'fontSize', label: 'גודל אותיות', type: 'range', min: 12, max: 96, step: 1, fmt: function (v) { return v + 'px'; } },
-      { k: 'font', label: 'גופן', type: 'select', options: function () { return DA.settings.FONTS.map(function (f) { return [f.id, f.label]; }); } },
-      { k: 'bold', label: 'אותיות עבות', type: 'check' },
-      { k: 'letterSpacing', label: 'ריווח בין אותיות', type: 'range', min: -0.02, max: 0.4, step: 0.01, fmt: f2 },
-      { k: 'wordSpacing', label: 'ריווח בין מילים', type: 'range', min: 0, max: 1.2, step: 0.05, fmt: f2 },
-      { k: 'lineHeight', label: 'ריווח בין שורות', type: 'range', min: 1.1, max: 3, step: 0.05, fmt: f2 },
-      { k: 'lineChars', label: 'אורך שורה (תווים)', type: 'range', min: 15, max: 90, step: 1, fmt: String },
-      { k: 'nikud', label: 'טקסטים חדשים עם ניקוד', type: 'check' }
+    { title: T('טקסט'), items: [
+      { k: 'fontSize', label: T('גודל אותיות'), type: 'range', min: 12, max: 96, step: 1, fmt: function (v) { return v + 'px'; } },
+      { k: 'font', label: T('גופן'), type: 'select', options: function () { return DA.settings.FONTS.map(function (f) { return [f.id, f.label]; }); } },
+      { k: 'bold', label: T('אותיות עבות'), type: 'check' },
+      { k: 'letterSpacing', label: T('ריווח בין אותיות'), type: 'range', min: -0.02, max: 0.4, step: 0.01, fmt: f2 },
+      { k: 'wordSpacing', label: T('ריווח בין מילים'), type: 'range', min: 0, max: 1.2, step: 0.05, fmt: f2 },
+      { k: 'lineHeight', label: T('ריווח בין שורות'), type: 'range', min: 1.1, max: 3, step: 0.05, fmt: f2 },
+      { k: 'lineChars', label: T('אורך שורה (תווים)'), type: 'range', min: 15, max: 90, step: 1, fmt: String },
+      { k: 'nikud', label: T('טקסטים חדשים עם ניקוד'), type: 'check' }
     ] },
-    { title: 'צבעים וניגודיות', items: [
-      { k: 'theme', label: 'צבע רקע וטקסט', type: 'themes' },
-      { k: 'imageContrast', label: 'ניגודיות תמונות', type: 'range', min: 0.6, max: 2.2, step: 0.05, fmt: f2 },
-      { k: 'imageInvert', label: 'היפוך תמונות ברקע כהה', type: 'check' }
+    { title: T('צבעים וניגודיות'), items: [
+      { k: 'theme', label: T('צבע רקע וטקסט'), type: 'themes' },
+      { k: 'imageContrast', label: T('ניגודיות תמונות'), type: 'range', min: 0.6, max: 2.2, step: 0.05, fmt: f2 },
+      { k: 'imageInvert', label: T('היפוך תמונות ברקע כהה'), type: 'check' }
     ] },
-    { title: 'תיקון עיוות וחדות', items: [
-      { k: 'calibrationId', label: 'כיול רשת פעיל', type: 'select', options: calibrationOptions },
-      { k: 'warpStrength', label: 'עוצמת תיקון העיוות', type: 'range', min: 0, max: 1.5, step: 0.05, fmt: pct },
-      { k: 'sharpen', label: 'חידוד', type: 'range', min: 0, max: 1.5, step: 0.05, fmt: f2 },
-      { k: 'zoom', label: 'הגדלת תמונות ועמודים', type: 'range', min: 0.5, max: 4, step: 0.1, fmt: function (v) { return '×' + (+v).toFixed(1); } }
+    { title: T('תיקון עיוות וחדות'), items: [
+      { k: 'calibrationId', label: T('כיול רשת פעיל'), type: 'select', options: calibrationOptions },
+      { k: 'warpStrength', label: T('עוצמת תיקון העיוות'), type: 'range', min: 0, max: 1.5, step: 0.05, fmt: pct },
+      { k: 'sharpen', label: T('חידוד'), type: 'range', min: 0, max: 1.5, step: 0.05, fmt: f2 },
+      { k: 'zoom', label: T('הגדלת תמונות ועמודים'), type: 'range', min: 0.5, max: 4, step: 0.1, fmt: function (v) { return '×' + (+v).toFixed(1); } }
     ] },
-    { title: 'עזרי קריאה', items: [
-      { k: 'ruler', label: 'סרגל קריאה', type: 'select', options: function () { return [['off', 'כבוי'], ['band', 'פס מודגש'], ['mask', 'חלון (מחשיך את השאר)']]; } },
-      { k: 'lineMarker', label: 'סימון תחילת שורה', type: 'check' },
-      { k: 'shiftX', label: 'הזזת הטקסט לצדדים', type: 'range', min: -0.35, max: 0.35, step: 0.01, fmt: pct },
-      { k: 'shiftY', label: 'הזזת הטקסט למעלה/למטה', type: 'range', min: -0.35, max: 0.35, step: 0.01, fmt: pct },
-      { k: 'speechRate', label: 'מהירות הקראה', type: 'range', min: 0.5, max: 1.5, step: 0.05, fmt: f2 }
+    { title: T('עזרי קריאה'), items: [
+      { k: 'ruler', label: T('סרגל קריאה'), type: 'select', options: function () { return [['off', T('כבוי')], ['band', T('פס מודגש')], ['mask', T('חלון (מחשיך את השאר)')]]; } },
+      { k: 'lineMarker', label: T('סימון תחילת שורה'), type: 'check' },
+      { k: 'shiftX', label: T('הזזת הטקסט לצדדים'), type: 'range', min: -0.35, max: 0.35, step: 0.01, fmt: pct },
+      { k: 'shiftY', label: T('הזזת הטקסט למעלה/למטה'), type: 'range', min: -0.35, max: 0.35, step: 0.01, fmt: pct },
+      { k: 'speechRate', label: T('מהירות הקראה'), type: 'range', min: 0.5, max: 1.5, step: 0.05, fmt: f2 }
     ] },
-    { title: '👁️ מעקב עיניים (באתר העצמאי, לא חובה)', items: [
-      { k: 'eyesKeepAngle', label: 'לשמור על גודל אותיות קבוע לעין, גם כשמתקרבים או מתרחקים', type: 'check' }
+    { title: T('👁️ מעקב עיניים (באתר העצמאי, לא חובה)'), items: [
+      { k: 'eyesKeepAngle', label: T('לשמור על גודל אותיות קבוע לעין, גם כשמתקרבים או מתרחקים'), type: 'check' }
     ] }
   ];
   function f2(v) { return (+v).toFixed(2); }
   function pct(v) { return Math.round(v * 100) + '%'; }
 
   function calibrationOptions() {
-    var p = ctx.profile(), out = [['', '— ללא —']];
+    var p = ctx.profile(), out = [['', T('— ללא —')]];
     ctx.store.listTrials().forEach(function (s) {
       var t = ctx.store.getTrial(s.id);
       if (!t || !t.actions || !t.actions.length) return;
       if (t.profileId && p && t.profileId !== p.id) return;
       var d = new Date(s.savedAt);
-      out.push([s.id, (s.label || 'כיול') + ' · ' + d.toLocaleDateString('he-IL') + ' · ' + s.actions + ' תיקונים']);
+      out.push([s.id, (s.label || T('כיול')) + ' · ' + d.toLocaleDateString(DA.i18n.locale) + ' · ' + s.actions + T(' תיקונים')]);
     });
     return out;
   }
@@ -62,13 +62,13 @@
     $('drawerClose').onclick = close;
     $('drawerBest').onclick = function () {
       ctx.profiles.setBest(ctx.profile(), work);
-      DA.ui.toast('⭐ נשמר כ"המצב שלי" — אפשר לחזור אליו בלחיצה');
+      DA.ui.toast(T('⭐ נשמר כ"המצב שלי" — אפשר לחזור אליו בלחיצה'));
     };
     $('drawerPin').onclick = function () {
-      DA.ui.prompt('שם למצב הזה:', '').then(function (n) { if (n) { ctx.profiles.pin(ctx.profile(), n, work); DA.ui.toast('📌 נשמר: ' + n); } });
+      DA.ui.prompt(T('שם למצב הזה:'), '').then(function (n) { if (n) { ctx.profiles.pin(ctx.profile(), n, work); DA.ui.toast(T('📌 נשמר: ') + n); } });
     };
     $('drawerReset').onclick = function () {
-      DA.ui.ask('להחזיר את כל ההגדרות לברירת המחדל? (הכיול הפעיל נשאר)', 'איפוס').then(function (y) {
+      DA.ui.ask(T('להחזיר את כל ההגדרות לברירת המחדל? (הכיול הפעיל נשאר)'), T('איפוס')).then(function (y) {
         if (!y) return;
         var keep = work.calibrationId;
         work = DA.settings.normalize({ calibrationId: keep });
@@ -117,7 +117,7 @@
       cb.onchange = function () {
         work[it.k] = cb.checked;
         if (it.k === 'eyesKeepAngle' && cb.checked) {
-          if (!DA.eyes.state.running) { DA.ui.toast('צריך קודם להפעיל מעקב עיניים'); }
+          if (!DA.eyes.state.running) { DA.ui.toast(T('צריך קודם להפעיל מעקב עיניים')); }
           else if (DA.eyes.state.distanceCm) work.refDistanceCm = DA.eyes.state.distanceCm;
         }
         preview(true); commit();
@@ -138,7 +138,7 @@
         b.type = 'button';
         b.className = 'theme-swatch' + (t.id === v ? ' sel' : '');
         b.style.background = t.bg; b.style.color = t.fg;
-        b.title = t.label; b.textContent = 'אב';
+        b.title = t.label; b.textContent = T('אב');
         b.onclick = function () {
           work.theme = t.id;
           tb.querySelectorAll('.theme-swatch').forEach(function (x) { x.classList.remove('sel'); });

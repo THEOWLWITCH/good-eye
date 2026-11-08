@@ -24,8 +24,8 @@
     $('rGlasses').onchange = function () { ctx.updateSettings({ warpStrength: +this.value }); };
     $('rStar').onclick = function () {
       var p = ctx.profile();
-      if (p.best) { ctx.updateSettings(p.best.settings); DA.ui.toast('⭐ המצב שלי'); }
-      else DA.ui.toast('עוד אין "מצב שלי". אפשר לקבוע אחרי המשחק או בהגדרות.');
+      if (p.best) { ctx.updateSettings(p.best.settings); DA.ui.toast(T('⭐ המצב שלי')); }
+      else DA.ui.toast(T('עוד אין "מצב שלי". אפשר לקבוע אחרי המשחק או בהגדרות.'));
     };
     $('rTheme').onclick = cycleTheme;
     $('rRuler').onclick = function () {
@@ -37,6 +37,7 @@
     $('rSources').onclick = showSources;
     DA.eyePanel.bindSwitch($('rEyes'));
     $('rMode').onchange = function () { setMode(this.value); };
+    if (DA.i18n.dir === 'ltr') { $('segPrev').textContent = '←'; $('segNext').textContent = '→'; }
     $('segPrev').onclick = function () { stepSeg(-1); };
     $('segNext').onclick = function () { stepSeg(1); };
     $('segPlay').onclick = toggleRsvp;
@@ -44,7 +45,7 @@
     // sources
     $('srcPasteGo').onclick = function () {
       var t = $('srcPasteText').value.trim();
-      if (!t) { DA.ui.toast('הדביקו או כתבו טקסט'); return; }
+      if (!t) { DA.ui.toast(T('הדביקו או כתבו טקסט')); return; }
       openDoc({ type: 'text', text: t, title: '' });
     };
     $('srcFileBtn').onclick = function () { $('srcFile').click(); };
@@ -54,8 +55,13 @@
     $('srcCamBtn').onclick = startCamera;
     $('srcGenBtn').onclick = generate;
     $('srcSample').onclick = function () {
-      openDoc({ type: 'text', title: 'דוגמה', text: DA.stimuli.SENTENCES.map(function (s) { return s.he + '.'; }).join(' ') + '\n\n' +
-        DA.stimuli.SENTENCES.slice(0, 5).map(function (s) { return s.en + '.'; }).join(' ') + '\n\nחשבון: $3 + 4 = 7$ ו־$\\frac{1}{2} + \\frac{1}{4} = \\frac{3}{4}$' });
+      if (DA.i18n.content === 'en') {
+        openDoc({ type: 'text', title: T('דוגמה'), text: DA.stimuli.SENTENCES.map(function (s) { return s.en + '.'; }).join(' ') + '\n\n' +
+          'Math: $3 + 4 = 7$ and $\\frac{1}{2} + \\frac{1}{4} = \\frac{3}{4}$' });
+        return;
+      }
+      openDoc({ type: 'text', title: T('דוגמה'), text: DA.stimuli.SENTENCES.map(function (s) { return s.he + '.'; }).join(' ') + '\n\n' +
+        DA.stimuli.SENTENCES.slice(0, 5).map(function (s) { return s.en + '.'; }).join(' ') + T('\n\nחשבון: $3 + 4 = 7$ ו־$\\frac{1}{2} + \\frac{1}{4} = \\frac{3}{4}$') });
     };
     $('aiStop').onclick = function () { if (aiCtl) aiCtl.abort(); };
     var lastT = 0;
@@ -73,8 +79,8 @@
       if (ctx.current() !== 'read' || e.target.matches('input, textarea, select')) return;
       if (e.key === 'ArrowDown') { lens.moveRuler(1); e.preventDefault(); }
       else if (e.key === 'ArrowUp') { lens.moveRuler(-1); e.preventDefault(); }
-      else if (mode !== 'page' && e.key === 'ArrowLeft') stepSeg(1);
-      else if (mode !== 'page' && e.key === 'ArrowRight') stepSeg(-1);
+      else if (mode !== 'page' && e.key === 'ArrowLeft') stepSeg(DA.i18n.dir === 'rtl' ? 1 : -1);
+      else if (mode !== 'page' && e.key === 'ArrowRight') stepSeg(DA.i18n.dir === 'rtl' ? -1 : 1);
       else if (e.key === ' ' && mode === 'word') { toggleRsvp(); e.preventDefault(); }
     });
 
@@ -148,18 +154,18 @@
     } else if (/\.pdf$/.test(name) || type === 'application/pdf') {
       loadPdf(f);
     } else if (/\.docx$/.test(name)) {
-      busy('קורא את קובץ ה־Word…');
+      busy(T('קורא את קובץ ה־Word…'));
       f.arrayBuffer().then(function (buf) {
         return DA.loader.mammoth().then(function (m) { return m.extractRawText({ arrayBuffer: buf }); });
       }).then(function (r) { openDoc({ type: 'text', text: r.value, title: f.name }); })
-        .catch(function (e) { DA.ui.tell('לא הצלחתי לקרוא את הקובץ: ' + e.message); showSources(); });
+        .catch(function (e) { DA.ui.tell(T('לא הצלחתי לקרוא את הקובץ: ') + e.message); showSources(); });
     } else {
       f.text().then(function (t) { openDoc({ type: 'text', text: t, title: f.name }); });
     }
   }
 
   function loadPdf(f) {
-    busy('קורא את ה־PDF…');
+    busy(T('קורא את ה־PDF…'));
     var pdfLib;
     DA.loader.pdfjs().then(function (lib) { pdfLib = lib; return f.arrayBuffer(); })
       .then(function (buf) { return pdfLib.getDocument({ data: buf }).promise; })
@@ -184,7 +190,7 @@
           openDoc({ type: 'pages', pages: pages, text: text, title: f.name });
         });
       })
-      .catch(function (e) { DA.ui.tell('לא הצלחתי לקרוא את ה־PDF: ' + (e && e.message)); showSources(); });
+      .catch(function (e) { DA.ui.tell(T('לא הצלחתי לקרוא את ה־PDF: ') + (e && e.message)); showSources(); });
   }
 
   function busy(text) {
@@ -197,24 +203,24 @@
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { camFallback(); return; }
     navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 1920 } }, audio: false }).then(function (s) {
       stream = s;
-      doc = { type: 'camera', title: 'מצלמה' };
+      doc = { type: 'camera', title: T('מצלמה') };
       showView();
       $('readContent').innerHTML = '<div class="cam-wrap"><video id="camVideo" autoplay playsinline muted></video></div>';
       $('camVideo').srcObject = s;
-      $('readExtra').innerHTML = '<button id="camFreeze" class="big">📸 להקפיא</button>';
+      $('readExtra').innerHTML = T('<button id="camFreeze" class="big">📸 להקפיא</button>');
       $('camFreeze').onclick = freezeFrame;
       setMode('page');
     }).catch(camFallback);
   }
   function camFallback() {
-    DA.ui.tell('המצלמה החיה לא זמינה כאן (בתוך claude.ai היא חסומה). אפשר לצלם תמונה עם "📷 צילום" — היא תוצג עם כל התיקונים.');
+    DA.ui.tell(T('המצלמה החיה לא זמינה כאן (בתוך claude.ai היא חסומה). אפשר לצלם תמונה עם "📷 צילום" — היא תוצג עם כל התיקונים.'));
   }
   function freezeFrame() {
     var v = $('camVideo');
     if (!v) return;
     var c = document.createElement('canvas'); c.width = v.videoWidth; c.height = v.videoHeight;
     c.getContext('2d').drawImage(v, 0, 0);
-    c.toBlob(function (b) { stopCamera(); openDoc({ type: 'image', url: URL.createObjectURL(b), blob: b, title: 'צילום' }); }, 'image/jpeg', 0.92);
+    c.toBlob(function (b) { stopCamera(); openDoc({ type: 'image', url: URL.createObjectURL(b), blob: b, title: T('צילום') }); }, 'image/jpeg', 0.92);
   }
   function stopCamera() {
     if (stream) { stream.getTracks().forEach(function (t) { t.stop(); }); stream = null; }
@@ -223,16 +229,17 @@
   // ---------------- AI text ----------------
   function generate() {
     DA.ai.available().then(function (ok) {
-      if (!ok) { DA.ui.tell('כתיבת טקסטים חדשים זמינה בגרסה שב־claude.ai.'); return; }
+      if (!ok) { DA.ui.tell(T('כתיבת טקסטים חדשים זמינה בגרסה שב־claude.ai.')); return; }
       var s = ctx.profile().settings;
       $('genNikud').checked = !!s.nikud;
+      $('genLang').value = DA.i18n.content;
       $('genLevel').value = ctx.profile().kind === 'adult' ? 'adult' : 'g2';
       var dlg = $('genDialog');
       dlg.returnValue = '';
       dlg.onclose = function () {
         if (dlg.returnValue !== 'ok') return;
         var o = { level: $('genLevel').value, kind: $('genKind').value, topic: $('genTopic').value.trim(), lang: $('genLang').value, length: $('genLength').value, nikud: $('genNikud').checked };
-        runAi('כותב טקסט חדש…', function (onText, signal) { return DA.ai.generate(o, onText, signal); }, o);
+        runAi(T('כותב טקסט חדש…'), function (onText, signal) { return DA.ai.generate(o, onText, signal); }, o);
       };
       dlg.showModal();
     });
@@ -241,7 +248,7 @@
   function photoToText() {
     if (!doc || !doc.blob) return;
     var blob = doc.blob;
-    runAi('קורא את התמונה…', function (onText, signal) { return DA.ai.photoToText(blob, onText, signal); }, { from: 'photo' });
+    runAi(T('קורא את התמונה…'), function (onText, signal) { return DA.ai.photoToText(blob, onText, signal); }, { from: 'photo' });
   }
 
   function runAi(label, call, meta) {
@@ -270,8 +277,8 @@
     if (d.type === 'text') ctx.store.setPref('lastDoc.' + ctx.profile().id, { type: 'text', text: d.text, title: d.title || '' });
     showView();
     var extra = '';
-    if (d.type === 'image') extra = '<button id="toText" class="big">📝 להפוך לטקסט</button>';
-    if (d.type === 'pages') extra = '<label class="inline">תצוגה <select id="pagesAs"><option value="text">טקסט מסודר</option><option value="pages">עמודים כמו במקור</option></select></label>';
+    if (d.type === 'image') extra = T('<button id="toText" class="big">📝 להפוך לטקסט</button>');
+    if (d.type === 'pages') extra = T('<label class="inline">תצוגה <select id="pagesAs"><option value="text">טקסט מסודר</option><option value="pages">עמודים כמו במקור</option></select></label>');
     $('readExtra').innerHTML = extra;
     if ($('toText')) DA.ai.canImages().then(function (ok) { $('toText').style.display = ok ? '' : 'none'; $('toText').onclick = photoToText; });
     if ($('pagesAs')) $('pagesAs').onchange = function () { render(); };
@@ -357,7 +364,7 @@
   // ---------------- read aloud ----------------
   function speak() {
     var synth = root.speechSynthesis;
-    if (!synth) { DA.ui.toast('הקראה לא זמינה בדפדפן הזה'); return; }
+    if (!synth) { DA.ui.toast(T('הקראה לא זמינה בדפדפן הזה')); return; }
     if (synth.speaking) { synth.cancel(); return; }
     var text = mode === 'page' ? docText() : segs[segIdx];
     if (!text) return;
@@ -366,7 +373,7 @@
     u.lang = he ? 'he-IL' : 'en-US';
     var v = synth.getVoices().filter(function (x) { return x.lang && x.lang.toLowerCase().indexOf(he ? 'he' : 'en') === 0; })[0];
     if (v) u.voice = v;
-    else if (he) DA.ui.toast('לא נמצא קול בעברית במכשיר הזה');
+    else if (he) DA.ui.toast(T('לא נמצא קול בעברית במכשיר הזה'));
     u.rate = ctx.profile().settings.speechRate;
     synth.speak(u);
   }

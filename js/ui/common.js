@@ -12,15 +12,15 @@
     return new Promise(function (resolve) {
       var dlg = $('askDialog');
       $('askText').textContent = text;
-      $('askOk').textContent = okLabel || 'אישור';
-      $('askCancel').textContent = cancelLabel || 'ביטול';
+      $('askOk').textContent = okLabel || T('אישור');
+      $('askCancel').textContent = cancelLabel || T('ביטול');
       $('askCancel').style.display = cancelLabel === null ? 'none' : '';
       dlg.returnValue = '';
       dlg.onclose = function () { resolve(dlg.returnValue === 'ok'); };
       dlg.showModal();
     });
   }
-  function tell(text) { return ask(text, 'הבנתי', null); }
+  function tell(text) { return ask(text, T('הבנתי'), null); }
 
   /** Ask for a line of text in an in-page dialog. Resolves null on cancel. */
   function prompt(text, value) {
@@ -46,8 +46,8 @@
 
   function download(name, text, type) {
     if (downloads) {
-      downloads.save({ filename: name, data: text }).then(function () { toast('הקובץ נשמר: ' + name); }, function (err) {
-        if (err && err.code !== 'declined') tell('לא ניתן להוריד את הקובץ כאן (' + err.code + ').');
+      downloads.save({ filename: name, data: text }).then(function () { toast(T('הקובץ נשמר: ') + name); }, function (err) {
+        if (err && err.code !== 'declined') tell(T('לא ניתן להוריד את הקובץ כאן (') + err.code + ').');
       });
       return;
     }

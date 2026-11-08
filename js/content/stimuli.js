@@ -73,16 +73,16 @@
   var DIGIT_CONFUSE = { '3': '85', '8': '36', '5': '63', '6': '58', '9': '64', '4': '97', '2': '73', '7': '24' };
 
   var CATEGORIES = [
-    { id: 'digit', label: 'ספרה', icon: '🔢' },
-    { id: 'silhouette', label: 'צללית', icon: '👤' },
-    { id: 'line', label: 'ציור קווים', icon: '✏️' },
-    { id: 'color', label: 'ציור צבעוני', icon: '🎨' },
-    { id: 'letter-he', label: 'אות בעברית', icon: 'א' },
-    { id: 'letter-en', label: 'אות באנגלית', icon: 'A' },
-    { id: 'word-he', label: 'מילה בעברית', icon: '📝' },
-    { id: 'word-en', label: 'מילה באנגלית', icon: '🔤' },
-    { id: 'sentence-he', label: 'משפט בעברית', icon: '📖' },
-    { id: 'sentence-en', label: 'משפט באנגלית', icon: '📘' }
+    { id: 'digit', label: T('ספרה'), icon: '🔢' },
+    { id: 'silhouette', label: T('צללית'), icon: '👤' },
+    { id: 'line', label: T('ציור קווים'), icon: '✏️' },
+    { id: 'color', label: T('ציור צבעוני'), icon: '🎨' },
+    { id: 'letter-he', label: T('אות בעברית'), icon: 'א' },
+    { id: 'letter-en', label: T('אות באנגלית'), icon: 'A' },
+    { id: 'word-he', label: T('מילה בעברית'), icon: '📝' },
+    { id: 'word-en', label: T('מילה באנגלית'), icon: '🔤' },
+    { id: 'sentence-he', label: T('משפט בעברית'), icon: '📖' },
+    { id: 'sentence-en', label: T('משפט באנגלית'), icon: '📘' }
   ];
 
   function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }

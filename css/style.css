@@ -312,3 +312,8 @@ dialog.wide { width: min(640px, 94vw); max-height: 88vh; overflow-y: auto; }
 .eye-switch.on { background: #e8f8ee; border-color: #19a35b; color: #0a6b38; font-weight: 600; }
 .eye-switch.unsupported { color: #6d7a86; }
 .rb.eye-switch { font-size: 17px; }
+
+/* ---------- language ---------- */
+.lang-btn { margin-inline-start: auto; border-radius: 999px; padding: 4px 12px; font-size: 14px; }
+.lang-btn + .who-chip { margin-inline-start: 6px; }
+.cal-screen output { float: inline-end; }

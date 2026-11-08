@@ -13,7 +13,7 @@
       var s = document.createElement('script');
       s.src = src; s.async = true;
       s.onload = function () { resolve(); };
-      s.onerror = function () { delete cache[src]; reject(new Error('טעינה נכשלה: ' + src)); };
+      s.onerror = function () { delete cache[src]; reject(new Error(T('טעינה נכשלה: ') + src)); };
       document.head.appendChild(s);
     });
     return cache[src];

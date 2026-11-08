@@ -1,0 +1,485 @@
+1|Grade 1 (beginning reader: short familiar words, sentences of 3–6 words)
+2|Grade 2 (short simple sentences)
+3|Grade 3
+4|Grade 4
+5|Grade 5
+6|Grade 6
+7|Middle school
+8|Adults
+9|40–70 words
+10|100–160 words
+11|220–320 words
+12|Short story
+13|Interesting informational text
+14|Short light poem
+15|Math word problems (3 questions, no answers)
+16|Conversation between two characters
+17|This option is only available in the claude.ai version.
+18|Using Claude was not approved on this page.
+19|Too many requests right now. Try again in a moment.
+20|You need to sign in to claude.ai again.
+21|The picture was not accepted. Try another or smaller picture.
+22|Sending pictures is not available here.
+23|The request was declined. Try another topic.
+24|Cancelled.
+25|Something went wrong (
+26|error
+27|). You can try again.
+28|The server is not available yet — data is saved on this device for now.
+29|Connected — data is saved in the cloud.
+30|No cloud connection (
+31|). Data is saved on this device only.
+32|No permission to write to the cloud (needs "Editor" access). Data is saved on this device only.
+33|Cloud storage is full. Data is saved on this device — exporting JSON is recommended.
+34|Saving to the cloud failed (
+35|). Data is saved on this device.
+36|Loading failed:
+37|Rubik
+38|Assistant
+39|Rounded
+40|Atkinson (extra legible)
+41|Lexend (spacious)
+42|Serif (Frank Ruhl)
+43|Arial
+44|Black on white
+45|Black on cream
+46|Black on yellow
+47|Dark blue on light blue
+48|Black on light green
+49|Black on light gray
+50|White on black
+51|Yellow on black
+52|White on dark blue
+53|letter spacing
+54|distortion correction
+55|reading ruler
+56|Saved on this device
+57|Saved drag #
+58| px)
+59| — the drag was limited to prevent folding. Increase the radius for a bigger correction.
+60|The drag was limited to prevent folding — increase the influence radius for a bigger correction.
+61|Warning: the current drag folds the grid.
+62|Dragging… release when the line looks straight.
+63|No corrections
+64|Local area change: from ×
+65| to ×
+66| · largest shift:
+67| px
+68|⚠ Grid fold!
+69| — undoing the last action is recommended
+70|⚠ Strong local distortion (a larger radius is recommended) ·
+71|✓ Continuous, no folds ·
+72|ID: <b>
+73|Actions:
+74|<br>Repeat of:
+75|<span style="color:#b26a00">Unsaved changes</span>
+76|Saved ✓
+77|Not saved yet
+78|The last action was undone.
+79|The action was redone.
+80|Reset all corrections in this trial? (You can bring them back with "Undo")
+81|Reset
+82|The grid was reset. You can go back with "Undo".
+83|Saving failed (storage may be full). Export the data to JSON.
+84|Trial saved:
+85|This calibration will now be used to correct reading and the game for
+86|There are unsaved changes in this trial. Continue without saving?
+87|Continue without saving
+88|New repeat trial (same settings, no corrections).
+89|New trial started.
+90|Loaded trial
+91| actions.
+92| actions
+93| · confidence
+94| · repeat
+95|Open
+96|Delete
+97|Permanently delete trial
+98|? It cannot be restored (export to JSON first is recommended).
+99|<option value="">— none —</option>
+100|In blue: the corrected grid from trial
+101|No saved trials to export.
+102|Imported
+103| trials.
+104|Invalid file:
+105|Save the current trial first, then you can do a repeat trial.
+106|Restored the last calibration (
+107| actions).
+108|No reader found with this code
+109|🧑 Adult
+110|🧒 Child
+111|</span></button><button class="pc-del" title="Delete">✕</button>
+112|Add a new reader
+113|Let's start: who is the first reader?
+114|Register an adult
+115|Register a child
+116|Please type a name
+117|Hello
+118|! Your personal code is
+119|. Use it to find your profile quickly.
+120|Delete
+121|? Their settings, games and calibrations will be deleted too. This cannot be undone (except from a backup).
+122| was deleted
+123|Hello,
+124|Not set yet. After the game, or in the settings, you can set "My mode".
+125|👇 The first time, start with the <b>Matching game</b> (about 5 minutes). It learns what is clearest for you.
+126|Do you see wavy or bent lines? You can do a <b>Distortion calibration</b>. If not, go straight to <b>Reading</b>.
+127|All set. Choose <b>Read</b>, or play again to update your settings.
+128|✓ Calibrated. You can update it
+129|For people who see bent lines. Best with an adult
+130|Delete the mode "
+131|Applied:
+132|<span class="muted">We haven't played yet. The game will learn what is clearest for you.</span>
+133|⭐ Back to your mode
+134|Name for this mode (e.g. "Evening reading"):
+135|📌 Saved:
+136|Edit profile
+137|Restored
+138| readers,
+139| games and
+140| calibrations.
+141|Invalid backup file:
+142|Nice!
+143|Well done!
+144|Excellent!
+145|Champion!
+146|Great!
+147|Wow!
+148|Leave the game? What we learned so far will be saved.
+149|Exit
+150|Colors
+151|Font
+152|Spacing
+153|Line spacing
+154|Weight
+155|Sharpness
+156|Which side is clearer and more comfortable to read? Tap it 👆
+157|🤷 The same
+158|<div class="fix-dot" title="Look here"></div><div class="warp-view"><p class="ab-text big">
+159|<span class="muted">The distortion correction is calibrated for one eye: cover the other eye and look at the center. </span><br>
+160|This is picture <b id="warpNum">1</b> of 2. Press 🔁 to see the second one, then choose the clearer one.
+161|🔁 Switch
+162|👍 This one is clearer
+163|What is the sentence about? Choose a picture
+164|Which picture matches the word?
+165|What did you see? Choose the answer
+166|⭐ Saved as your mode
+167|Settings updated
+168|<b class="good">Smaller by
+169|<span class="bad">Larger by
+170|About the same
+171|<p>Distortion correction:
+172|chosen as clearer ✓
+173|did not help in this test
+174|not clear-cut
+175| · stopped in the middle
+176|<table class="sum"><tr><th>What we saw</th><th>Smallest size recognized — with my settings</th><th>Without</th><th>Improvement</th></tr>
+177|<p>👁️ Average viewing distance:
+178| cm
+179| · gaze at center
+180|% of the time
+181|<p class="bad">There were mistakes in the easy checks — maybe tiredness. It's worth playing again another day.</p>
+182|<p><b>Learned settings:</b>
+183|⭐ My mode
+184|No "My mode" yet. You can set it after the game or in the settings.
+185|Paste or type some text
+186|Example
+187|\n\nMath: $3 + 4 = 7$ and $\frac{1}{2} + \frac{1}{4} = \frac{3}{4}$
+188|Reading the Word file…
+189|Couldn't read the file:
+190|Reading the PDF…
+191|Couldn't read the PDF:
+192|Camera
+193|<button id="camFreeze" class="big">📸 Freeze</button>
+194|The live camera is not available here (it is blocked inside claude.ai). You can take a picture with "📷 Photo" — it will be shown with all the corrections.
+195|Photo
+196|Writing new texts is available in the claude.ai version.
+197|Writing a new text…
+198|Reading the picture…
+199|<button id="toText" class="big">📝 Turn into text</button>
+200|<label class="inline">View <select id="pagesAs"><option value="text">Reflowed text</option><option value="pages">Original pages</option></select></label>
+201|Read-aloud is not available in this browser
+202|No Hebrew voice found on this device
+203|OK
+204|Cancel
+205|Got it
+206|File saved:
+207|The file can't be downloaded here (
+208|Text
+209|Letter size
+210|Bold letters
+211|Letter spacing
+212|Word spacing
+213|Line spacing
+214|Line length (characters)
+215|New texts with nikud (Hebrew vowels)
+216|Colors and contrast
+217|Background and text color
+218|Picture contrast
+219|Invert pictures on a dark background
+220|Distortion correction and sharpness
+221|Active grid calibration
+222|Distortion correction strength
+223|Sharpening
+224|Enlarge pictures and pages
+225|Reading aids
+226|Off
+227|Highlighted band
+228|Window (darkens the rest)
+229|Mark the start of each line
+230|Move the text sideways
+231|Move the text up/down
+232|Read-aloud speed
+233|👁️ Eye tracking (standalone site, optional)
+234|Keep letters the same size for the eye, even when moving closer or farther
+235|— none —
+236|Calibration
+237| corrections
+238|⭐ Saved as "My mode" — you can return to it with one tap
+239|Name for this mode:
+240|Reset all settings to default? (The active calibration is kept)
+241|Turn on eye tracking first
+242|Ab
+243|<h3>👁️ Camera eye tracking — for a better fit</h3>
+244|<p>When it is on, the computer or phone camera helps the app understand <b>how you actually read</b>, not only what you choose in the game:</p>
+245|<li><b>📏 Distance from the screen</b>: estimated from the size of the iris (the colored part of the eye). Letter size then matches what the eye sees, even when sitting close or far.</li>
+246|<li><b>🔍 Leaning in</b>: someone who moves closer while reading probably needs bigger letters. The app will offer to enlarge them.</li>
+247|<li><b>🎯 Looking at the center</b>: during calibration and the distortion test it matters to look at the middle point. The camera notices when the gaze moves and asks to return to the center.</li>
+248|<li><b>😴 Tiredness and effort</b>: lots of blinking or squinting. This tells when to take a break, and when game results are less reliable.</li>
+249|<h4>⚠️ When it won't work, or works less well</h4>
+250|<p><b>It won't work at all:</b></p>
+251|<li>Inside claude.ai, which blocks the camera. It only works on the standalone Good Eye site.</li>
+252|<li>When there is no camera, or you haven't allowed the browser to use it.</li>
+253|<li>When the face isn't fully visible: out of the picture, head turned sideways, or a hand or mask covering the eyes.</li>
+254|<li>On a very old or slow device. Measuring will be slow or stop.</li>
+255|<p><b>It will work less well (the numbers are only an estimate):</b></p>
+256|<li><b>Lighting:</b> a dark room, strong light behind the head (a window), or shadow on the face.</li>
+257|<li><b>Glasses:</b> reflections in the lenses. Very strong glasses, such as magnifying glasses, change the size of the eye in the picture, so <b>the distance comes out wrong</b>. Calibrate the distance ("sit at 40 cm") wearing your reading glasses.</li>
+258|<li><b>Distance:</b> very close, under 20 cm, or very far, over a meter.</li>
+259|<li><b>Movement:</b> children who move a lot. Measuring smooths out the jitter but reacts slowly.</li>
+260|<li><b>Eye conditions:</b> nystagmus (shaking eyes) and squint confuse the "looking at the center" check. A drooping eyelid or half-closed eye makes blinks hard to detect. A very light iris, for example in albinism, is harder to recognize. In these cases rely mainly on the distance measurement, or turn it off.</li>
+261|<p><b>What an ordinary camera can never do:</b></p>
+262|<li>Know <b>exactly which word or letter you are looking at</b>. Accuracy is roughly "center or side".</li>
+263|<li>Move <b>the distortion correction together with your gaze</b>. That needs a dedicated eye tracker connected to the computer.</li>
+264|<li>Diagnose. This is <b>not a medical test</b> and not a replacement for an eye doctor.</li>
+265|<h4>🔒 Privacy</h4>
+266|<p>Everything happens on the device. <b>No picture or video is saved or sent anywhere</b>, only numbers such as distance and blink count. You can turn it off at any moment, and the browser will ask permission to use the camera.</p>
+267|Eye tracking only works on the standalone Good Eye site, not inside claude.ai, which blocks the camera.
+268|Not now
+269|Starting the camera…
+270|👁️ Eye tracking is on
+271|Couldn't start the camera (
+272|). Check that there is a camera and that the browser is allowed to use it.
+273|Close
+274|Sit so your eyes are exactly 40 cm from the screen (measure with a ruler), look at the screen and press "Measure". This improves the distance measurement on this device.
+275|Measure
+276|Measured ✓ — distance is now more accurate
+277|No face detected. Try again facing the camera.
+278|Look at the red dot in the center of the screen and press "Now".
+279|Now
+280|🎯 Saved. From now on we'll know when the gaze leaves the center
+281|No eyes detected. Try again.
+282|No face in view
+283|<div>📏 Distance: <b>
+284|<div>🎯 Gaze: <b>
+285|center not set
+286|at the center
+287|away from the center
+288|<div>😉 Blinks per minute: <b>
+289|measuring…
+290|<div>😑 Squinting: <b>
+291|yes
+292|no
+293|🔍 It looks like you moved closer to the screen. Make the letters
+294|Yes, enlarge
+295|Turn off eye tracking?
+296|Turn off
+297|👁️ Eye tracking: only on the standalone site
+298|👁️ On
+299|👁️ Eye tracking: on ✓ (tap to turn off)
+300|👁️ Off
+301|👁️ Eye tracking: off (tap to turn on)
+302|Camera eye tracking: optional, helps fit things more precisely
+303|Good Eye
+304|Back
+305|Switch reader
+306|👁️ Welcome to Good Eye
+307|Each reader registers once and plays a short game, and the app learns how to show them text and pictures as clearly as possible.
+308|Who's reading now?
+309|(tap the card)
+310|A game with pictures, numbers and words
+311|Letters, words and sentences, plus distortion calibration
+312|Already registered? Personal code
+313|Enter
+314|Save all data on this device to a file
+315|💾 Backup
+316|Load data from a backup file
+317|📥 Restore from backup
+318|· Personal code:
+319|Edit or delete
+320|What shall we do today?
+321|(choose one)
+322|Start here
+323|Matching game
+324|Let's find out together what is clearest for you (about 5 minutes)
+325|▶ Play
+326|Distortion calibration
+327|▶ Calibrate
+328|Read
+329|Text, file, picture or photo, with your settings
+330|▶ Read
+331|👁️ Camera eye tracking
+332|optional
+333|The camera measures the distance from the screen and the direction of gaze, to fit the display better. No picture is saved or sent.
+334|What is this, and when doesn't it work?
+335|⭐ Back to my mode
+336|📌 Save the current mode
+337|⚙️ Advanced settings
+338|Now:
+339|🧠 What we learned about you
+340|🎯 Distortion calibration — line grid
+341|(to be done with an adult)
+342|Calibration tool:
+343|4.1 Flexible line grid
+344|4.2 Dot array (stage 2)
+345|4.3 Shapes and angles (stage 2)
+346|4.4 Equal spacing (stage 3)
+347|4.5 Equal size (stage 3)
+348|Undo (Ctrl+Z)
+349|↶ Undo
+350|Redo (Ctrl+Y)
+351|↷ Redo
+352|Reset all corrections
+353|⟲ Reset
+354|Save the trial (Ctrl+S)
+355|💾 Save
+356|Full screen (F)
+357|⛶ Full screen
+358|Current trial
+359|Title
+360|e.g. 7×7 grid, morning
+361|New trial
+362|Repeat trial with the same settings, from scratch
+363|Repeat trial
+364|Stimulus
+365|Grid density
+366|Display
+367|Horizontal and vertical lines
+368|Horizontal lines only
+369|Vertical lines only
+370|Single line
+371|Horizontal
+372|Vertical
+373|Line no.
+374|Line width
+375|White lines on a black background
+376|Fixation point in the center
+377|Dragging
+378|Influence radius
+379|Keys:
+380|to change the radius
+381|Limit dragging to prevent folds
+382|Show the original grid (faint)
+383|Show the control points
+384|Viewing conditions
+385|Eye
+386|Right
+387|Left
+388|Both
+389|Distance from screen (cm)
+390|Head position
+391|Straight / tilted right...
+392|Lighting
+393|Daylight / bright room / dark...
+394|Gaze fixation
+395|Center / free...
+396|Saved trials
+397|Compare with trial
+398|Export JSON
+399|Export CSV
+400|Import JSON
+401|Grab a point on a line that looks bent and drag it until it looks straight.
+402|We'll show you letters, numbers, drawings and words. You just choose what you saw, or which is clearer. There are no wrong answers!
+403|▶️ Let's play (about 5 minutes)
+404|Tip: after a grid distortion calibration, the game also checks whether the correction helps.
+405|Options for adults
+406|Recognition test (threshold size, with and without the personal settings, alternating):
+407|Preferences to compare (two versions side by side):
+408|🎨 Colors
+409|🔤 Font
+410|↔️ Letter spacing
+411|↕️ Line spacing
+412|𝐁 Weight
+413|✨ Sharpness
+414|🎯 Distortion correction (with/without)
+415|Trials per test
+416|▶️ Start with these choices
+417|✕ Exit
+418|🏆 Well done!
+419|⭐ Save as my mode
+420|Just use it now
+421|Don't change
+422|What are we reading?
+423|Smaller letters
+424|Bigger letters
+425|Read aloud
+426|My mode
+427|Display mode
+428|📄 Page
+429|➡️ Sentence
+430|🔎 Word
+431|Advanced settings
+432|What shall we read today?
+433|✍️ Paste or type text
+434|Paste text here. Math can be written between $ signs
+435|Read ▶
+436|File
+437|Text, Word, PDF or picture
+438|Photograph a page with the phone
+439|Live camera
+440|Works outside claude.ai
+441|New text
+442|By level and topic
+443|Available in the claude.ai version
+444|⏳ Claude is writing…
+445|Stop
+446|⚙️ Reader settings
+447|The girl builds a castle in the sand by the sea. 123
+448|⭐ Set as my mode
+449|📌 Save mode with a name
+450|↺ Default
+451|👁️ Eye tracking: turn on and explanation
+452|Eye tracking
+453|👁️ Eye tracking
+454|Show the camera (here only, not saved)
+455|🎯 Set center
+456|📏 Distance calibration (40 cm)
+457|Save trial
+458|Confidence in the result (1–5)
+459|Notes
+460|Save
+461|Turn on ✓ (with an adult's approval)
+462|New reader
+463|Name
+464|Choose a character:
+465|🗑️ Delete reader
+466|✨ New text to read
+467|Level
+468|Grade 1
+469|Grade 2
+470|Type
+471|Story
+472|Interesting facts
+473|Poem
+474|Conversation
+475|Math questions
+476|Topic
+477|e.g. dinosaurs, football, space
+478|Language
+479|Hebrew
+480|Length
+481|Short
+482|Medium
+483|Long
+484|With nikud
+485|✨ Write

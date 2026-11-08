@@ -59,15 +59,15 @@
     history.commit(entries);
     logEvent('drag', { lineId: record.lineId, dx: record.dx, dy: record.dy, radius: record.radius });
     changed();
-    var msg = 'נשמרה פעולת גרירה #' + record.seq + ' (' + Math.round(record.distance * grid.S) + ' פיקסלים)';
-    setStatus(record.clamped ? msg + ' — הגרירה הוגבלה כדי למנוע קיפול. הגדילו את הרדיוס לתיקון גדול יותר.' : msg, record.clamped);
+    var msg = T('נשמרה פעולת גרירה #') + record.seq + ' (' + Math.round(record.distance * grid.S) + T(' פיקסלים)');
+    setStatus(record.clamped ? msg + T(' — הגרירה הוגבלה כדי למנוע קיפול. הגדילו את הרדיוס לתיקון גדול יותר.') : msg, record.clamped);
   }
 
   function onLive(op, clamped) {
     if (!op) return;
-    if (clamped) setStatus('הגרירה הוגבלה כדי למנוע קיפול — הגדילו את רדיוס ההשפעה לתיקון גדול יותר.', true);
-    else if (DEF.opMinDetBound(op) <= 0) setStatus('אזהרה: הגרירה הנוכחית יוצרת קיפול ברשת.', true);
-    else setStatus('גוררים… שחררו כשהקו נראה ישר.');
+    if (clamped) setStatus(T('הגרירה הוגבלה כדי למנוע קיפול — הגדילו את רדיוס ההשפעה לתיקון גדול יותר.'), true);
+    else if (DEF.opMinDetBound(op) <= 0) setStatus(T('אזהרה: הגרירה הנוכחית יוצרת קיפול ברשת.'), true);
+    else setStatus(T('גוררים… שחררו כשהקו נראה ישר.'));
   }
 
   // ---------- main update ----------
@@ -84,12 +84,12 @@
     var q = DEF.analyze(ops(), 41);
     lastQuality = q;
     var el = $('quality');
-    if (!ops().length) { el.textContent = 'אין תיקונים'; el.className = ''; return; }
-    var txt = 'שינוי שטח מקומי: בין ×' + q.minDet.toFixed(2) + ' ל-×' + q.maxDet.toFixed(2) +
-      ' · תזוזה מרבית: ' + Math.round(q.maxDisplacement * grid.S) + ' פיקסלים';
-    if (q.fold) { el.textContent = '⚠ קיפול ברשת! ' + txt + ' — מומלץ לבטל את הפעולה האחרונה'; el.className = 'bad'; }
-    else if (q.extreme) { el.textContent = '⚠ עיוות מקומי חזק (מומלץ רדיוס גדול יותר) · ' + txt; el.className = 'warn'; }
-    else { el.textContent = '✓ רציף, ללא קיפולים · ' + txt; el.className = 'ok'; }
+    if (!ops().length) { el.textContent = T('אין תיקונים'); el.className = ''; return; }
+    var txt = T('שינוי שטח מקומי: בין ×') + q.minDet.toFixed(2) + T(' ל-×') + q.maxDet.toFixed(2) +
+      T(' · תזוזה מרבית: ') + Math.round(q.maxDisplacement * grid.S) + T(' פיקסלים');
+    if (q.fold) { el.textContent = T('⚠ קיפול ברשת! ') + txt + T(' — מומלץ לבטל את הפעולה האחרונה'); el.className = 'bad'; }
+    else if (q.extreme) { el.textContent = T('⚠ עיוות מקומי חזק (מומלץ רדיוס גדול יותר) · ') + txt; el.className = 'warn'; }
+    else { el.textContent = T('✓ רציף, ללא קיפולים · ') + txt; el.className = 'ok'; }
   }
 
   function updateButtons() {
@@ -101,10 +101,10 @@
   function updateTrialInfo() {
     var saved = store.getTrial(trial.id);
     $('trialInfo').innerHTML =
-      'מזהה: <b>' + trial.id + '</b><br>' +
-      'פעולות: ' + history.present.length +
-      (trial.repeatOf ? '<br>חזרה על: ' + trial.repeatOf : '') +
-      '<br>' + (saved ? (dirty ? '<span style="color:#b26a00">שינויים שלא נשמרו</span>' : 'שמור ✓') : 'עדיין לא נשמר');
+      T('מזהה: <b>') + trial.id + '</b><br>' +
+      T('פעולות: ') + history.present.length +
+      (trial.repeatOf ? T('<br>חזרה על: ') + trial.repeatOf : '') +
+      '<br>' + (saved ? (dirty ? T('<span style="color:#b26a00">שינויים שלא נשמרו</span>') : T('שמור ✓')) : T('עדיין לא נשמר'));
     renderTrialList();
   }
 
@@ -178,13 +178,13 @@
   $('label').addEventListener('input', function () { trial.label = this.value; dirty = true; saveDraft(); updateTrialInfo(); });
 
   // ---------- actions ----------
-  function undo() { if (history.undo()) { logEvent('undo'); changed(); setStatus('בוטלה הפעולה האחרונה.'); } }
-  function redo() { if (history.redo()) { logEvent('redo'); changed(); setStatus('הפעולה שוחזרה.'); } }
+  function undo() { if (history.undo()) { logEvent('undo'); changed(); setStatus(T('בוטלה הפעולה האחרונה.')); } }
+  function redo() { if (history.redo()) { logEvent('redo'); changed(); setStatus(T('הפעולה שוחזרה.')); } }
   function reset() {
     if (!history.present.length) return;
-    ask('לאפס את כל התיקונים בניסיון הנוכחי? (אפשר להחזיר עם "ביטול פעולה")', 'איפוס').then(function (yes) {
+    ask(T('לאפס את כל התיקונים בניסיון הנוכחי? (אפשר להחזיר עם "ביטול פעולה")'), T('איפוס')).then(function (yes) {
       if (!yes) return;
-      history.reset([]); logEvent('reset'); changed(); setStatus('הרשת אופסה. אפשר לחזור עם "ביטול".');
+      history.reset([]); logEvent('reset'); changed(); setStatus(T('הרשת אופסה. אפשר לחזור עם "ביטול".'));
     });
   }
 
@@ -249,26 +249,26 @@
     try {
       store.saveTrial(t);
     } catch (e) {
-      tell('השמירה נכשלה (ייתכן שהאחסון מלא). ייצאו את הנתונים ל-JSON. ' + e.message);
+      tell(T('השמירה נכשלה (ייתכן שהאחסון מלא). ייצאו את הנתונים ל-JSON. ') + e.message);
       return;
     }
     DA.cloud.save('trials', t.id, t);
     dirty = false;
     saveDraft();
     updateTrialInfo();
-    setStatus('הניסיון נשמר: ' + t.id);
+    setStatus(T('הניסיון נשמר: ') + t.id);
     // the newest saved calibration becomes the reader's active warp correction
     var prof = ctx.profile();
     if (prof && t.actions.length) {
       prof.settings = DA.settings.normalize(Object.assign({}, prof.settings, { calibrationId: t.id }));
       ctx.profiles.save(prof);
-      DA.ui.toast('הכיול הזה ישמש עכשיו לתיקון בקריאה ובמשחק של ' + prof.name);
+      DA.ui.toast(T('הכיול הזה ישמש עכשיו לתיקון בקריאה ובמשחק של ') + prof.name);
     }
   });
 
   function confirmDiscard() {
     if (!dirty || !history.present.length) return Promise.resolve(true);
-    return ask('יש שינויים שלא נשמרו בניסיון הנוכחי. להמשיך בלי לשמור?', 'להמשיך בלי לשמור');
+    return ask(T('יש שינויים שלא נשמרו בניסיון הנוכחי. להמשיך בלי לשמור?'), T('להמשיך בלי לשמור'));
   }
 
   function startTrial(repeatOf) {
@@ -279,7 +279,7 @@
     $('label').value = '';
     logEvent('start', { settings: grid.settings, repeatOf: repeatOf || null });
     changed(true);
-    setStatus(repeatOf ? 'ניסיון חוזר חדש (אותן הגדרות, ללא תיקונים).' : 'ניסיון חדש התחיל.');
+    setStatus(repeatOf ? T('ניסיון חוזר חדש (אותן הגדרות, ללא תיקונים).') : T('ניסיון חדש התחיל.'));
   }
 
   function loadTrial(id) {
@@ -303,13 +303,13 @@
     dirty = false;
     logEvent('load');
     changed(true);
-    setStatus('נטען ניסיון ' + t.id + ' — ' + history.present.length + ' פעולות.');
+    setStatus(T('נטען ניסיון ') + t.id + ' — ' + history.present.length + T(' פעולות.'));
   }
 
   // ---------- trial list / compare ----------
   function fmtDate(iso) {
     var d = new Date(iso);
-    return d.toLocaleDateString('he-IL') + ' ' + d.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
+    return d.toLocaleDateString(DA.i18n.locale) + ' ' + d.toLocaleTimeString(DA.i18n.locale, { hour: '2-digit', minute: '2-digit' });
   }
 
   function renderTrialList() {
@@ -320,13 +320,13 @@
       row.className = 'trial-item' + (trial && s.id === trial.id ? ' active' : '');
       row.innerHTML = '<div class="meta"><b></b><span class="muted"></span></div>';
       row.querySelector('b').textContent = s.label || s.id;
-      row.querySelector('.muted').textContent = fmtDate(s.savedAt) + ' · ' + s.actions + ' פעולות' +
-        (s.confidence ? ' · ביטחון ' + s.confidence : '') + (s.repeatOf ? ' · חזרה' : '');
-      var open = document.createElement('button'); open.textContent = 'פתיחה';
+      row.querySelector('.muted').textContent = fmtDate(s.savedAt) + ' · ' + s.actions + T(' פעולות') +
+        (s.confidence ? T(' · ביטחון ') + s.confidence : '') + (s.repeatOf ? T(' · חזרה') : '');
+      var open = document.createElement('button'); open.textContent = T('פתיחה');
       open.onclick = function () { loadTrial(s.id); };
-      var del = document.createElement('button'); del.textContent = '✕'; del.className = 'danger'; del.title = 'מחיקה';
+      var del = document.createElement('button'); del.textContent = '✕'; del.className = 'danger'; del.title = T('מחיקה');
       del.onclick = function () {
-        ask('למחוק לצמיתות את הניסיון ' + (s.label || s.id) + '? לא ניתן לשחזר אותו (מומלץ לייצא קודם ל-JSON).', 'מחיקה').then(function (yes) {
+        ask(T('למחוק לצמיתות את הניסיון ') + (s.label || s.id) + T('? לא ניתן לשחזר אותו (מומלץ לייצא קודם ל-JSON).'), T('מחיקה')).then(function (yes) {
           if (!yes) return;
           store.deleteTrial(s.id); DA.cloud.remove('trials', s.id); updateTrialInfo();
         });
@@ -335,7 +335,7 @@
       box.appendChild(row);
     });
     var cmp = $('compare'), cur = cmp.value;
-    cmp.innerHTML = '<option value="">— ללא —</option>';
+    cmp.innerHTML = T('<option value="">— ללא —</option>');
     list.forEach(function (s) {
       if (trial && s.id === trial.id) return;
       var o = document.createElement('option');
@@ -353,20 +353,20 @@
   }
   $('compare').addEventListener('change', function () {
     applyCompare();
-    if (this.value) setStatus('בכחול: הרשת המתוקנת מהניסיון ' + this.value);
+    if (this.value) setStatus(T('בכחול: הרשת המתוקנת מהניסיון ') + this.value);
   });
 
   // ---------- export / import ----------
   $('exportJson').onclick = function () {
     var trials = store.allTrials();
-    if (!trials.length) { tell('אין ניסיונות שמורים לייצוא.'); return; }
+    if (!trials.length) { tell(T('אין ניסיונות שמורים לייצוא.')); return; }
     var bundle = DA.storage.exportBundle(trials, VERSION);
     bundle.profiles = ctx.profiles.list();
     download('da-trials-' + stamp() + '.json', JSON.stringify(bundle, null, 1), 'application/json');
   };
   $('exportCsv').onclick = function () {
     var trials = store.allTrials();
-    if (!trials.length) { tell('אין ניסיונות שמורים לייצוא.'); return; }
+    if (!trials.length) { tell(T('אין ניסיונות שמורים לייצוא.')); return; }
     download('da-actions-' + stamp() + '.csv', DA.storage.actionsCSV(trials), 'text/csv;charset=utf-8');
   };
   $('importJson').onclick = function () { $('importFile').click(); };
@@ -379,8 +379,8 @@
         var n = store.importBundle(data);
         (Array.isArray(data) ? data : data.trials || [data]).forEach(function (t) { if (t && t.id && store.getTrial(t.id)) DA.cloud.save('trials', t.id, t); });
         updateTrialInfo();
-        setStatus('יובאו ' + n + ' ניסיונות.');
-      } catch (e) { tell('קובץ לא תקין: ' + e.message); }
+        setStatus(T('יובאו ') + n + T(' ניסיונות.'));
+      } catch (e) { tell(T('קובץ לא תקין: ') + e.message); }
     };
     reader.readAsText(f);
     this.value = '';
@@ -393,7 +393,7 @@
   $('save').onclick = save;
   $('newTrial').onclick = function () { confirmDiscard().then(function (yes) { if (yes) startTrial(null); }); };
   $('repeatTrial').onclick = function () {
-    if (!store.getTrial(trial.id)) { tell('שמרו קודם את הניסיון הנוכחי, ואז אפשר לבצע ניסיון חוזר.'); return; }
+    if (!store.getTrial(trial.id)) { tell(T('שמרו קודם את הניסיון הנוכחי, ואז אפשר לבצע ניסיון חוזר.')); return; }
     confirmDiscard().then(function (yes) {
       if (!yes) return;
       var src = trial.id; startTrial(src); $('compare').value = ''; applyCompare();
@@ -460,7 +460,7 @@
         $('label').value = trial.label || '';
         dirty = !!draft.dirty;
         inner.changed(true);
-        if (history.present.length) inner.setStatus('שוחזר הכיול האחרון (' + history.present.length + ' פעולות).');
+        if (history.present.length) inner.setStatus(T('שוחזר הכיול האחרון (') + history.present.length + T(' פעולות).'));
       } else {
         inner.startTrial(null);
       }

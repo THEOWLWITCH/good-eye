@@ -18,7 +18,7 @@
     $('codeForm').addEventListener('submit', function (e) {
       e.preventDefault();
       var p = ctx.profiles.findByCode($('codeInput').value);
-      if (!p) { DA.ui.toast('לא מצאתי קורא עם הקוד הזה'); return; }
+      if (!p) { DA.ui.toast(T('לא מצאתי קורא עם הקוד הזה')); return; }
       $('codeInput').value = '';
       ctx.setProfile(p.id); ctx.go('hub');
     });
@@ -28,7 +28,7 @@
     ctx.profiles.onChange(function () { if (ctx.current() === 'home') renderHome(); });
   }
 
-  function kindLabel(p) { return p.kind === 'adult' ? '🧑 מבוגר/ת' : '🧒 ילד/ה'; }
+  function kindLabel(p) { return p.kind === 'adult' ? T('🧑 מבוגר/ת') : T('🧒 ילד/ה'); }
 
   function renderHome() {
     var list = ctx.profiles.list();
@@ -38,13 +38,13 @@
       var card = document.createElement('div');
       card.className = 'profile-card';
       card.innerHTML = '<button class="pc-open"><span class="avatar">' + esc(p.emoji) + '</span><span class="pname">' + esc(p.name) +
-        '</span><span class="pkind">' + kindLabel(p) + '</span></button><button class="pc-del" title="מחיקה">✕</button>';
+        '</span><span class="pkind">' + kindLabel(p) + T('</span></button><button class="pc-del" title="מחיקה">✕</button>');
       card.querySelector('.pc-open').onclick = function () { ctx.setProfile(p.id); ctx.go('hub'); };
       card.querySelector('.pc-del').onclick = function () { deleteProfile(p); };
       box.appendChild(card);
     });
     $('whoSection').style.display = list.length ? '' : 'none';
-    $('registerTitle').textContent = list.length ? 'להוסיף קורא חדש' : 'בואו נתחיל: מי הקורא הראשון?';
+    $('registerTitle').textContent = list.length ? T('להוסיף קורא חדש') : T('בואו נתחיל: מי הקורא הראשון?');
   }
 
   function newProfile(kind) {
@@ -52,17 +52,17 @@
     $('profileName').value = '';
     setKind(kind);
     renderEmojiPick(DA.AVATARS[Math.floor(Math.random() * DA.AVATARS.length)]);
-    $('profileDialogTitle').textContent = kind === 'adult' ? 'הרשמה של מבוגר/ת' : 'הרשמה של ילד/ה';
+    $('profileDialogTitle').textContent = kind === 'adult' ? T('הרשמה של מבוגר/ת') : T('הרשמה של ילד/ה');
     $('profileDelete').style.display = 'none';
     dlg.returnValue = '';
     dlg.onclose = function () {
       if (dlg.returnValue !== 'ok') return;
       var name = $('profileName').value.trim();
-      if (!name) { DA.ui.toast('צריך לכתוב שם'); return; }
+      if (!name) { DA.ui.toast(T('צריך לכתוב שם')); return; }
       var p = ctx.profiles.create(name, selectedEmoji, getKind());
       ctx.setProfile(p.id);
       ctx.go('hub');
-      DA.ui.tell('שלום ' + p.name + '! הקוד האישי שלך הוא ' + p.code + '. בעזרתו אפשר למצוא את הפרופיל במהירות.');
+      DA.ui.tell(T('שלום ') + p.name + T('! הקוד האישי שלך הוא ') + p.code + T('. בעזרתו אפשר למצוא את הפרופיל במהירות.'));
     };
     dlg.showModal();
     setTimeout(function () { $('profileName').focus(); }, 30);
@@ -77,7 +77,7 @@
   }
 
   function deleteProfile(p) {
-    DA.ui.ask('למחוק את ' + p.name + '? יימחקו גם ההגדרות, המשחקים והכיולים שלו/ה. אי אפשר לשחזר (אלא מגיבוי).', 'מחיקה').then(function (y) {
+    DA.ui.ask(T('למחוק את ') + p.name + T('? יימחקו גם ההגדרות, המשחקים והכיולים שלו/ה. אי אפשר לשחזר (אלא מגיבוי).'), T('מחיקה')).then(function (y) {
       if (!y) return;
       ctx.store.listTrials().forEach(function (s) {
         var t = ctx.store.getTrial(s.id);
@@ -86,7 +86,7 @@
       ctx.profiles.removeSessionsFor(p.id);
       ctx.profiles.remove(p.id);
       if (ctx.profiles.currentId() === p.id) ctx.setProfile(null);
-      DA.ui.toast(p.name + ' נמחק/ה');
+      DA.ui.toast(p.name + T(' נמחק/ה'));
       if (ctx.current() !== 'home') ctx.go('home'); else renderHome();
     });
   }
@@ -125,24 +125,24 @@
     var p = ctx.profile();
     if (!p) { ctx.go('home'); return; }
     $('hubAvatar').textContent = p.emoji;
-    $('hubHello').textContent = 'שלום, ' + p.name + '!';
+    $('hubHello').textContent = T('שלום, ') + p.name + '!';
     $('hubKind').textContent = kindLabel(p);
     $('hubCode').textContent = p.code;
     $('hubCurrent').textContent = DA.settings.describe(p.settings);
     $('bestBtn').disabled = !p.best;
-    $('bestInfo').textContent = p.best ? DA.settings.describe(p.best.settings) : 'עדיין לא נקבע. אחרי המשחק או בהגדרות אפשר לקבוע "המצב שלי".';
+    $('bestInfo').textContent = p.best ? DA.settings.describe(p.best.settings) : T('עדיין לא נקבע. אחרי המשחק או בהגדרות אפשר לקבוע "המצב שלי".');
 
     var sessions = ctx.profiles.sessionsFor(p.id);
     var hasCal = !!ctx.opsFor(p.settings);
     // guide the first steps
     var tip;
-    if (!sessions.length) tip = '👇 בפעם הראשונה מתחילים ב<b>משחק ההתאמה</b> (כ־5 דקות). הוא לומד מה הכי ברור לך.';
-    else if (p.kind === 'adult' && !hasCal) tip = 'רואים קווים עקומים או גלים? אפשר לעשות <b>כיול עיוות</b>. אם לא, אפשר לעבור ישר ל<b>קריאה</b>.';
-    else tip = 'הכול מוכן. בחרו <b>לקרוא</b>, או שחקו שוב כדי לעדכן את ההתאמה.';
+    if (!sessions.length) tip = T('👇 בפעם הראשונה מתחילים ב<b>משחק ההתאמה</b> (כ־5 דקות). הוא לומד מה הכי ברור לך.');
+    else if (p.kind === 'adult' && !hasCal) tip = T('רואים קווים עקומים או גלים? אפשר לעשות <b>כיול עיוות</b>. אם לא, אפשר לעבור ישר ל<b>קריאה</b>.');
+    else tip = T('הכול מוכן. בחרו <b>לקרוא</b>, או שחקו שוב כדי לעדכן את ההתאמה.');
     $('hubTip').innerHTML = tip;
     $('tileLearn').classList.toggle('first', !sessions.length);
     $('tileLearnBadge').style.display = sessions.length ? 'none' : '';
-    $('tileCalSub').textContent = hasCal ? '✓ יש כיול. אפשר לעדכן אותו' : 'למי שרואה קווים עקומים. עדיף עם מבוגר';
+    $('tileCalSub').textContent = hasCal ? T('✓ יש כיול. אפשר לעדכן אותו') : T('למי שרואה קווים עקומים. עדיף עם מבוגר');
 
     var box = $('pinnedList');
     box.innerHTML = '';
@@ -150,43 +150,43 @@
       var row = document.createElement('div');
       row.className = 'pinned-item';
       row.innerHTML = '<button class="apply">📌 ' + esc(st.name) + '</button><span class="muted">' + esc(DA.settings.describe(st.settings)) + '</span>';
-      var del = document.createElement('button'); del.className = 'danger small'; del.textContent = '✕'; del.title = 'מחיקה';
+      var del = document.createElement('button'); del.className = 'danger small'; del.textContent = '✕'; del.title = T('מחיקה');
       del.onclick = function () {
-        DA.ui.ask('למחוק את המצב "' + st.name + '"?', 'מחיקה').then(function (y) {
+        DA.ui.ask(T('למחוק את המצב "') + st.name + '"?', T('מחיקה')).then(function (y) {
           if (!y) return;
           p.pinned = p.pinned.filter(function (x) { return x.id !== st.id; });
           ctx.profiles.save(p);
         });
       };
-      row.querySelector('.apply').onclick = function () { ctx.updateSettings(st.settings); DA.ui.toast('הופעל: ' + st.name); };
+      row.querySelector('.apply').onclick = function () { ctx.updateSettings(st.settings); DA.ui.toast(T('הופעל: ') + st.name); };
       row.appendChild(del);
       box.appendChild(row);
     });
 
     var last = sessions[0];
-    $('hubLearned').innerHTML = last ? DA.screens.learn.summaryHtml(last) : '<span class="muted">עוד לא שיחקנו. המשחק ילמד מה הכי ברור לך.</span>';
+    $('hubLearned').innerHTML = last ? DA.screens.learn.summaryHtml(last) : T('<span class="muted">עוד לא שיחקנו. המשחק ילמד מה הכי ברור לך.</span>');
   }
 
   function restoreBest() {
     var p = ctx.profile();
     if (!p || !p.best) return;
     ctx.updateSettings(p.best.settings);
-    DA.ui.toast('⭐ חזרנו למצב שלך');
+    DA.ui.toast(T('⭐ חזרנו למצב שלך'));
   }
 
   function pinCurrent() {
     var p = ctx.profile();
-    DA.ui.prompt('שם למצב הזה (למשל "קריאה בערב"):', '').then(function (name) {
+    DA.ui.prompt(T('שם למצב הזה (למשל "קריאה בערב"):'), '').then(function (name) {
       if (!name) return;
       ctx.profiles.pin(p, name, p.settings);
-      DA.ui.toast('📌 נשמר: ' + name);
+      DA.ui.toast(T('📌 נשמר: ') + name);
     });
   }
 
   function editProfile() {
     var p = ctx.profile();
     var dlg = $('profileDialog');
-    $('profileDialogTitle').textContent = 'עריכת פרופיל';
+    $('profileDialogTitle').textContent = T('עריכת פרופיל');
     $('profileName').value = p.name;
     setKind(p.kind);
     renderEmojiPick(p.emoji);
@@ -220,9 +220,9 @@
       (b.profiles || []).forEach(function (p) { if (p && p.id && p.schema) { ctx.profiles.save(p); np++; } });
       (b.sessions || []).forEach(function (s) { if (s && s.id) { ctx.profiles.saveSession(s); ns++; } });
       nt = ctx.store.importBundle(b.trials || []);
-      DA.ui.tell('שוחזרו ' + np + ' קוראים, ' + ns + ' משחקים ו־' + nt + ' כיולים.');
+      DA.ui.tell(T('שוחזרו ') + np + T(' קוראים, ') + ns + T(' משחקים ו־') + nt + T(' כיולים.'));
       renderHome();
-    }).catch(function (e) { DA.ui.tell('קובץ גיבוי לא תקין: ' + e.message); });
+    }).catch(function (e) { DA.ui.tell(T('קובץ גיבוי לא תקין: ') + e.message); });
   }
 
   DA.screens.home = { init: homeInit, enter: renderHome, leave: function () {} };

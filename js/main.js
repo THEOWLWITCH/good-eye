@@ -66,6 +66,10 @@
   }
 
   function boot() {
+    DA.i18n.apply(document.body);
+    document.title = T('עין טובה');
+    $('langBtn').textContent = DA.i18n.lang === 'he' ? 'English' : 'עברית';
+    $('langBtn').onclick = function () { DA.i18n.setLang(DA.i18n.lang === 'he' ? 'en' : 'he'); };
     DA.settings.loadFonts();
     $('version').textContent = 'v' + DA.VERSION;
     $('whoChip').onclick = function () { ctx.go('home'); };
@@ -75,7 +79,7 @@
       el.title = msg; el.className = 'cloud-dot ' + (warn ? 'warn' : 'ok');
       var cs = $('cloudStatus'); if (cs) { cs.textContent = msg; cs.style.color = warn ? '#b26a00' : '#0a7a3f'; }
     });
-    if (!DA.cloud.available()) { $('cloudDot').title = 'שמירה במכשיר הזה'; $('cloudDot').className = 'cloud-dot local'; }
+    if (!DA.cloud.available()) { $('cloudDot').title = T('שמירה במכשיר הזה'); $('cloudDot').className = 'cloud-dot local'; }
 
     DA.drawer.init(ctx);
     DA.eyePanel.init(ctx);

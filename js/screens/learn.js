@@ -21,7 +21,7 @@
   var PLAIN = { font: 'arial', theme: 'white', letterSpacing: 0, wordSpacing: 0.05, lineHeight: 1.4, warpStrength: 0, sharpen: 0, bold: false, ruler: 'off', shiftX: 0, shiftY: 0, lineMarker: false };
 
   var START = { digit: 40, 'letter-he': 40, 'letter-en': 40, 'word-he': 34, 'word-en': 34, 'sentence-he': 26, 'sentence-en': 26, silhouette: 70, line: 70, color: 70 };
-  var PRAISE = ['יפה!', 'כל הכבוד!', 'מצוין!', 'אלוף!', 'נהדר!', 'וואו!'];
+  var PRAISE = [T('יפה!'), T('כל הכבוד!'), T('מצוין!'), T('אלוף!'), T('נהדר!'), T('וואו!')];
   
   // ---------------- tuners (preference) ----------------
   function Tournament(param, candidates, label) {
@@ -97,13 +97,13 @@
     DA.eyePanel.bindSwitch($('learnEyes'));
     $('learnExit').onclick = function () {
       if (!sess) { ctx.go('hub'); return; }
-      DA.ui.ask('לצאת מהמשחק? מה שכבר למדנו יישמר.', 'יציאה').then(function (y) { if (y) finish(true); });
+      DA.ui.ask(T('לצאת מהמשחק? מה שכבר למדנו יישמר.'), T('יציאה')).then(function (y) { if (y) finish(true); });
     };
     var box = $('catChecks');
     DA.stimuli.CATEGORIES.forEach(function (cat) {
       var l = document.createElement('label');
       l.className = 'chip';
-      l.innerHTML = '<input type="checkbox" value="' + cat.id + '"' + (['digit', 'line', 'word-he'].indexOf(cat.id) >= 0 ? ' checked' : '') + '> ' + cat.icon + ' ' + esc(cat.label);
+      l.innerHTML = '<input type="checkbox" value="' + cat.id + '"' + (defaultCats(false).indexOf(cat.id) >= 0 ? ' checked' : '') + '> ' + cat.icon + ' ' + esc(cat.label);
       box.appendChild(l);
     });
     document.addEventListener('keydown', function (e) {
@@ -122,7 +122,7 @@
     $('learnHasCal').style.display = ctx.opsFor(p.settings) ? 'none' : '';
     $('learnWhoAvatar').textContent = p.emoji;
     document.querySelectorAll('#catChecks input').forEach(function (i) {
-      var def = p.kind === 'adult' ? ['letter-he', 'word-he', 'sentence-he'] : ['digit', 'line', 'word-he'];
+      var def = defaultCats(p.kind === 'adult');
       i.checked = def.indexOf(i.value) >= 0;
     });
   }
@@ -131,8 +131,13 @@
   function quickPlan() {
     var adult = ctx.profile() && ctx.profile().kind === 'adult';
     return adult
-      ? { name: 'quick-adult', prefs: ['theme', 'font', 'letterSpacing', 'lineHeight', 'warp'], categories: ['letter-he', 'word-he', 'sentence-he'], maxTrials: 7 }
-      : { name: 'quick-child', prefs: ['theme', 'font', 'letterSpacing', 'warp'], categories: ['digit', 'line', 'word-he'], maxTrials: 6 };
+      ? { name: 'quick-adult', prefs: ['theme', 'font', 'letterSpacing', 'lineHeight', 'warp'], categories: defaultCats(true), maxTrials: 7 }
+      : { name: 'quick-child', prefs: ['theme', 'font', 'letterSpacing', 'warp'], categories: defaultCats(false), maxTrials: 6 };
+  }
+  /** Default recognition categories, in the interface language. */
+  function defaultCats(adult) {
+    var L = DA.i18n.content;
+    return adult ? ['letter-' + L, 'word-' + L, 'sentence-' + L] : ['digit', 'line', 'word-' + L];
   }
   function customPlan() {
     var cats = Array.prototype.map.call(document.querySelectorAll('#catChecks input:checked'), function (i) { return i.value; });
@@ -156,12 +161,12 @@
     var hasWarp = !!ctx.opsFor(work);
     queue = [];
     plan.prefs.forEach(function (k) {
-      if (k === 'theme') queue.push(new Tournament('theme', uniq([work.theme, 'cream', 'dark', 'yellow', 'white']).slice(0, 4), 'צבעים'));
-      if (k === 'font') queue.push(new Tournament('font', uniq([work.font, 'round', 'assistant', 'serif', 'rubik']).slice(0, 3), 'גופן')); // Hebrew-capable fonts only
-      if (k === 'letterSpacing') queue.push(new Search('letterSpacing', work.letterSpacing, 0.08, 0, 0.35, 3, 'ריווח'));
-      if (k === 'lineHeight') queue.push(new Search('lineHeight', work.lineHeight, 0.4, 1.2, 2.6, 3, 'ריווח שורות'));
-      if (k === 'bold') queue.push(new Tournament('bold', [work.bold, !work.bold], 'עובי'));
-      if (k === 'sharpen') queue.push(new Search('sharpen', work.sharpen, 0.5, 0, 1.5, 3, 'חדות'));
+      if (k === 'theme') queue.push(new Tournament('theme', uniq([work.theme, 'cream', 'dark', 'yellow', 'white']).slice(0, 4), T('צבעים')));
+      if (k === 'font') queue.push(new Tournament('font', uniq([work.font, 'round', 'assistant', 'serif', 'rubik']).slice(0, 3), T('גופן'))); // Hebrew-capable fonts only
+      if (k === 'letterSpacing') queue.push(new Search('letterSpacing', work.letterSpacing, 0.08, 0, 0.35, 3, T('ריווח')));
+      if (k === 'lineHeight') queue.push(new Search('lineHeight', work.lineHeight, 0.4, 1.2, 2.6, 3, T('ריווח שורות')));
+      if (k === 'bold') queue.push(new Tournament('bold', [work.bold, !work.bold], T('עובי')));
+      if (k === 'sharpen') queue.push(new Search('sharpen', work.sharpen, 0.5, 0, 1.5, 3, T('חדות')));
       if (k === 'warp' && hasWarp) queue.push({ warp: true, n: 0, votes: [], next: function () { return this.n < 2 ? { param: 'warp' } : null; } });
     });
     var stairs = [];
@@ -228,7 +233,7 @@
     step = { type: 'pref', tuner: tuner, c: c, swap: swap };
     stepStart = performance.now();
     stageLens.apply(work, ctx.opsFor(work));
-    var txt = DA.stimuli.sampleText('he');
+    var txt = DA.stimuli.sampleText(DA.i18n.content);
     var content = '<p class="ab-text">' + esc(txt) + '</p><div class="ab-pics">' + DA.stimuli.lineSvg('house', 56) + '<span>🐢</span><span>7</span></div>';
     var left = swap ? 'b' : 'a', right = swap ? 'a' : 'b';
     $('learnContent').innerHTML = '<div class="ab"><button class="ab-panel" data-v="' + right + '">' + content + '</button>' +
@@ -241,8 +246,8 @@
       lens.apply(DA.settings.normalize(Object.assign(s, { fontSize: Math.min(work.fontSize, 34), shiftX: 0, shiftY: 0, ruler: 'off' })), null);
       el.onclick = function () { choosePref(v); };
     });
-    $('learnPrompt').textContent = 'איזה צד יותר ברור ונעים לקריאה? גע בו 👆';
-    choices([{ html: '🤷 אותו דבר', cls: 'same', fn: function () { choosePref('same'); } }]);
+    $('learnPrompt').textContent = T('איזה צד יותר ברור ונעים לקריאה? גע בו 👆');
+    choices([{ html: T('🤷 אותו דבר'), cls: 'same', fn: function () { choosePref('same'); } }]);
   }
 
   function choosePref(v) {
@@ -260,13 +265,13 @@
     step = { type: 'warp', t: t, showing: 0, seen: [false, false], order: firstOn ? [1, 0] : [0, 1] };
     stepStart = performance.now();
     var txt = DA.stimuli.sampleText(t.n % 2 ? 'en' : 'he');
-    $('learnContent').innerHTML = '<div class="fix-dot" title="מביטים כאן"></div><div class="warp-view"><p class="ab-text big">' + esc(txt) + '</p>' +
+    $('learnContent').innerHTML = T('<div class="fix-dot" title="מביטים כאן"></div><div class="warp-view"><p class="ab-text big">') + esc(txt) + '</p>' +
       '<div class="ab-pics">' + DA.stimuli.lineSvg('house', 90) + DA.stimuli.lineSvg('star', 90) + '</div></div>';
-    $('learnPrompt').innerHTML = (t.n === 0 ? '<span class="muted">תיקון העיוות מכויל לעין אחת: כסו את העין השנייה והביטו במרכז. </span><br>' : '') + 'זו תמונה <b id="warpNum">1</b> מתוך 2. לחצו 🔁 כדי לראות את השנייה, ואז בחרו את הברורה יותר.';
+    $('learnPrompt').innerHTML = (t.n === 0 ? T('<span class="muted">תיקון העיוות מכויל לעין אחת: כסו את העין השנייה והביטו במרכז. </span><br>') : '') + T('זו תמונה <b id="warpNum">1</b> מתוך 2. לחצו 🔁 כדי לראות את השנייה, ואז בחרו את הברורה יותר.');
     choices([
-      { html: '🔁 להחליף', cls: 'flip', fn: flipWarp },
-      { html: '👍 זו יותר ברורה', cls: 'pick', fn: function () { chooseWarp(false); }, disabled: true },
-      { html: '🤷 אותו דבר', cls: 'same', fn: function () { chooseWarp(true); }, disabled: true }
+      { html: T('🔁 להחליף'), cls: 'flip', fn: flipWarp },
+      { html: T('👍 זו יותר ברורה'), cls: 'pick', fn: function () { chooseWarp(false); }, disabled: true },
+      { html: T('🤷 אותו דבר'), cls: 'same', fn: function () { chooseWarp(true); }, disabled: true }
     ]);
     showWarpVersion(0);
   }
@@ -301,8 +306,8 @@
     var size = isCatch ? Math.max(st.size * 2.5, START[st.category] * 1.5) : st.size;
     step = { type: 'recognize', st: st, trial: trial, size: size, isCatch: !!isCatch };
     $('learnContent').innerHTML = '<div class="stim-wrap">' + trial.html(Math.round(size)) + '</div>';
-    var q = st.category.indexOf('sentence') === 0 ? 'על מה המשפט? בחרו תמונה' :
-      st.category.indexOf('word') === 0 ? 'איזו תמונה מתאימה למילה?' : 'מה ראית? בחרו את התשובה';
+    var q = st.category.indexOf('sentence') === 0 ? T('על מה המשפט? בחרו תמונה') :
+      st.category.indexOf('word') === 0 ? T('איזו תמונה מתאימה למילה?') : T('מה ראית? בחרו את התשובה');
     $('learnPrompt').textContent = q;
     var buttons = trial.choices.map(function (o) {
       return { html: o.html, cls: 'answer' + (trial.kind === 'glyph' && o.html.length === 1 ? ' glyph' : ''), fn: function () { answerRecognize(o.key); } };
@@ -382,9 +387,9 @@
     $('learnApplyBest').onclick = function () {
       ctx.updateSettings(sess.after);
       ctx.profiles.setBest(ctx.profile(), sess.after);
-      DA.ui.toast('⭐ נשמר כמצב שלך'); ctx.go('hub');
+      DA.ui.toast(T('⭐ נשמר כמצב שלך')); ctx.go('hub');
     };
-    $('learnApply').onclick = function () { ctx.updateSettings(sess.after); DA.ui.toast('ההגדרות עודכנו'); ctx.go('hub'); };
+    $('learnApply').onclick = function () { ctx.updateSettings(sess.after); DA.ui.toast(T('ההגדרות עודכנו')); ctx.go('hub'); };
     $('learnKeep').onclick = function () { ctx.go('hub'); };
     var last = sess;
     sess = null;
@@ -400,14 +405,14 @@
       var r = s.recognition[k], c = r.corrected, pl = r.plain;
       var gain = c && pl && pl.threshold ? Math.round((pl.threshold - c.threshold) / pl.threshold * 100) : null;
       return '<tr><td>' + esc(CAT_LABEL[k] || k) + '</td><td>' + (c ? c.threshold + 'px' : '—') + '</td><td>' + (pl ? pl.threshold + 'px' : '—') + '</td><td>' +
-        (gain == null ? '—' : gain > 5 ? '<b class="good">קטן יותר ב-' + gain + '% ✓</b>' : gain < -5 ? '<span class="bad">גדול יותר ב-' + (-gain) + '%</span>' : 'בערך אותו דבר') + '</td></tr>';
+        (gain == null ? '—' : gain > 5 ? T('<b class="good">קטן יותר ב-') + gain + '% ✓</b>' : gain < -5 ? T('<span class="bad">גדול יותר ב-') + (-gain) + '%</span>' : T('בערך אותו דבר')) + '</td></tr>';
     }).join('');
-    var warp = s.warpVerdict ? '<p>תיקון העיוות: ' + ({ helps: 'נבחר כברור יותר ✓', 'does-not-help': 'לא עזר בבדיקה הזו', unclear: 'לא חד־משמעי' })[s.warpVerdict] + '</p>' : '';
-    return '<p class="muted">' + new Date(s.startedAt).toLocaleString('he-IL') + (s.early ? ' · הופסק באמצע' : '') + '</p>' +
-      (rows ? '<table class="sum"><tr><th>מה ראינו</th><th>הגודל הקטן ביותר שזוהה — עם ההגדרות שלי</th><th>בלי</th><th>שיפור</th></tr>' + rows + '</table>' : '') +
-      warp + (s.viewing && s.viewing.distanceCmMedian ? '<p>👁️ מרחק צפייה ממוצע: ' + s.viewing.distanceCmMedian + ' ס״מ' +
-        (s.viewing.gazeCenteredPct != null ? ' · מבט במרכז ' + s.viewing.gazeCenteredPct + '% מהזמן' : '') + '</p>' : '') + (s.attention != null && s.attention < 70 ? '<p class="bad">בבדיקות הקלות היו טעויות — ייתכן שהייתה עייפות. כדאי לחזור על המשחק ביום אחר.</p>' : '') +
-      '<p><b>ההגדרות שנלמדו:</b> ' + esc(DA.settings.describe(s.after || s.before)) + '</p>';
+    var warp = s.warpVerdict ? T('<p>תיקון העיוות: ') + ({ helps: T('נבחר כברור יותר ✓'), 'does-not-help': T('לא עזר בבדיקה הזו'), unclear: T('לא חד־משמעי') })[s.warpVerdict] + '</p>' : '';
+    return '<p class="muted">' + new Date(s.startedAt).toLocaleString(DA.i18n.locale) + (s.early ? T(' · הופסק באמצע') : '') + '</p>' +
+      (rows ? T('<table class="sum"><tr><th>מה ראינו</th><th>הגודל הקטן ביותר שזוהה — עם ההגדרות שלי</th><th>בלי</th><th>שיפור</th></tr>') + rows + '</table>' : '') +
+      warp + (s.viewing && s.viewing.distanceCmMedian ? T('<p>👁️ מרחק צפייה ממוצע: ') + s.viewing.distanceCmMedian + T(' ס״מ') +
+        (s.viewing.gazeCenteredPct != null ? T(' · מבט במרכז ') + s.viewing.gazeCenteredPct + T('% מהזמן') : '') + '</p>' : '') + (s.attention != null && s.attention < 70 ? T('<p class="bad">בבדיקות הקלות היו טעויות — ייתכן שהייתה עייפות. כדאי לחזור על המשחק ביום אחר.</p>') : '') +
+      T('<p><b>ההגדרות שנלמדו:</b> ') + esc(DA.settings.describe(s.after || s.before)) + '</p>';
   }
 
   DA.screens.learn = { init: init, enter: enter, leave: leave, summaryHtml: summaryHtml };

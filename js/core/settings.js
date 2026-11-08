@@ -8,13 +8,13 @@
   var DA = (root.DA = root.DA || {});
 
   var FONTS = [
-    { id: 'rubik', label: 'רוביק', family: "'Rubik', Arial, sans-serif" },
-    { id: 'assistant', label: 'אסיסטנט', family: "'Assistant', Arial, sans-serif" },
-    { id: 'round', label: 'עגול', family: "'Varela Round', 'Comic Neue', Arial, sans-serif" },
-    { id: 'atkinson', label: 'אטקינסון (קריא במיוחד)', family: "'Atkinson Hyperlegible', 'Rubik', Arial, sans-serif" },
-    { id: 'lexend', label: 'לקסנד (מרווח)', family: "'Lexend', 'Heebo', Arial, sans-serif" },
-    { id: 'serif', label: 'עם תגים (פרנק רוהל)', family: "'Frank Ruhl Libre', 'Noto Serif', Georgia, serif" },
-    { id: 'arial', label: 'אריאל', family: 'Arial, sans-serif' }
+    { id: 'rubik', label: T('רוביק'), family: "'Rubik', Arial, sans-serif" },
+    { id: 'assistant', label: T('אסיסטנט'), family: "'Assistant', Arial, sans-serif" },
+    { id: 'round', label: T('עגול'), family: "'Varela Round', 'Comic Neue', Arial, sans-serif" },
+    { id: 'atkinson', label: T('אטקינסון (קריא במיוחד)'), family: "'Atkinson Hyperlegible', 'Rubik', Arial, sans-serif" },
+    { id: 'lexend', label: T('לקסנד (מרווח)'), family: "'Lexend', 'Heebo', Arial, sans-serif" },
+    { id: 'serif', label: T('עם תגים (פרנק רוהל)'), family: "'Frank Ruhl Libre', 'Noto Serif', Georgia, serif" },
+    { id: 'arial', label: T('אריאל'), family: 'Arial, sans-serif' }
   ];
   var FONTS_CSS = 'https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&family=Assistant:wght@400;600;800' +
     '&family=Varela+Round&family=Comic+Neue:wght@400;700&family=Atkinson+Hyperlegible:wght@400;700' +
@@ -23,15 +23,15 @@
 
   // Colour themes: polarity + tint. fg/bg used for text; "reversed" also inverts images on request.
   var THEMES = [
-    { id: 'white', label: 'שחור על לבן', fg: '#000000', bg: '#ffffff' },
-    { id: 'cream', label: 'שחור על שמנת', fg: '#1a1a1a', bg: '#fbf3dc' },
-    { id: 'yellow', label: 'שחור על צהוב', fg: '#000000', bg: '#fff3a0' },
-    { id: 'blue', label: 'כחול כהה על תכלת', fg: '#0b1f4d', bg: '#dcebff' },
-    { id: 'green', label: 'שחור על ירוק בהיר', fg: '#0d1f0d', bg: '#dff3df' },
-    { id: 'gray', label: 'שחור על אפור בהיר', fg: '#000000', bg: '#e6e6e6' },
-    { id: 'dark', label: 'לבן על שחור', fg: '#ffffff', bg: '#000000', reversed: true },
-    { id: 'darkyellow', label: 'צהוב על שחור', fg: '#ffe94d', bg: '#000000', reversed: true },
-    { id: 'darkblue', label: 'לבן על כחול כהה', fg: '#ffffff', bg: '#0b2a5c', reversed: true }
+    { id: 'white', label: T('שחור על לבן'), fg: '#000000', bg: '#ffffff' },
+    { id: 'cream', label: T('שחור על שמנת'), fg: '#1a1a1a', bg: '#fbf3dc' },
+    { id: 'yellow', label: T('שחור על צהוב'), fg: '#000000', bg: '#fff3a0' },
+    { id: 'blue', label: T('כחול כהה על תכלת'), fg: '#0b1f4d', bg: '#dcebff' },
+    { id: 'green', label: T('שחור על ירוק בהיר'), fg: '#0d1f0d', bg: '#dff3df' },
+    { id: 'gray', label: T('שחור על אפור בהיר'), fg: '#000000', bg: '#e6e6e6' },
+    { id: 'dark', label: T('לבן על שחור'), fg: '#ffffff', bg: '#000000', reversed: true },
+    { id: 'darkyellow', label: T('צהוב על שחור'), fg: '#ffe94d', bg: '#000000', reversed: true },
+    { id: 'darkblue', label: T('לבן על כחול כהה'), fg: '#ffffff', bg: '#0b2a5c', reversed: true }
   ];
 
   var DEFAULTS = {
@@ -88,9 +88,9 @@
     s = normalize(s);
     return [
       s.fontSize + 'px', font(s.font).label, theme(s.theme).label,
-      s.letterSpacing > 0.06 ? 'ריווח אותיות ' + s.letterSpacing.toFixed(2) : null,
-      s.warpStrength > 0 && s.calibrationId ? 'תיקון עיוות ' + Math.round(s.warpStrength * 100) + '%' : null,
-      s.ruler !== 'off' ? 'סרגל קריאה' : null
+      s.letterSpacing > 0.06 ? T('ריווח אותיות ') + s.letterSpacing.toFixed(2) : null,
+      s.warpStrength > 0 && s.calibrationId ? T('תיקון עיוות ') + Math.round(s.warpStrength * 100) + '%' : null,
+      s.ruler !== 'off' ? T('סרגל קריאה') : null
     ].filter(Boolean).join(' · ');
   }
 

@@ -42,7 +42,7 @@
     return connect().then(function (ok) {
       if (!ok) return false;
       var first = true;
-      var timer = setTimeout(function () { statusFn('השרת עדיין לא זמין — הנתונים נשמרים בינתיים במכשיר הזה.', true); }, 10000);
+      var timer = setTimeout(function () { statusFn(T('השרת עדיין לא זמין — הנתונים נשמרים בינתיים במכשיר הזה.'), true); }, 10000);
       db.collection(collection).onSnapshot(function (snap) {
         snap.docChanges().forEach(function (ch) {
           if (ch.type === 'removed') handlers.remove && handlers.remove(ch.doc.id);
@@ -52,12 +52,12 @@
           first = false;
           clearTimeout(timer);
           handlers.ready && handlers.ready(snap.docs.map(function (d) { return d.id; }));
-          statusFn('מחובר — הנתונים נשמרים בענן.');
+          statusFn(T('מחובר — הנתונים נשמרים בענן.'));
         }
         handlers.changed && handlers.changed();
       }, function (err) {
         clearTimeout(timer);
-        statusFn('אין חיבור לענן (' + err.code + '). הנתונים נשמרים במכשיר בלבד.', true);
+        statusFn(T('אין חיבור לענן (') + err.code + T('). הנתונים נשמרים במכשיר בלבד.'), true);
       });
       return true;
     });
@@ -72,11 +72,11 @@
       return db.collection(collection).doc(id).set(slim(data)).then(function () { return true; }, function (err) {
         if (err && err.code === 'invalid_argument') {
           readOnly = true;
-          statusFn('אין הרשאת כתיבה לענן (צריך הרשאת "עורך"). הנתונים נשמרים במכשיר בלבד.', true);
+          statusFn(T('אין הרשאת כתיבה לענן (צריך הרשאת "עורך"). הנתונים נשמרים במכשיר בלבד.'), true);
         } else if (err && err.code === 'quota_exceeded') {
-          statusFn('האחסון בענן מלא. הנתונים נשמרים במכשיר — כדאי לייצא JSON.', true);
+          statusFn(T('האחסון בענן מלא. הנתונים נשמרים במכשיר — כדאי לייצא JSON.'), true);
         } else {
-          statusFn('השמירה בענן נכשלה (' + (err && err.code) + '). הנתונים נשמרים במכשיר.', true);
+          statusFn(T('השמירה בענן נכשלה (') + (err && err.code) + T('). הנתונים נשמרים במכשיר.'), true);
         }
         return false;
       });
