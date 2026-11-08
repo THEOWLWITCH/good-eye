@@ -195,7 +195,7 @@
     $('pfCalCheck').textContent = hasCal ? '✓' : '';
     DA.cockpit.render($('gauges'), DA.settings.normalize(p.settings), hasCal);
     $('tileLearnBadge').style.display = sessions.length ? 'none' : '';
-    $('tileCalSub').textContent = hasCal ? T('✓ יש כיול. אפשר לעדכן אותו') : T('למי שרואה קווים עקומים. עדיף עם מבוגר');
+    $('tileCalSub').textContent = hasCal ? T('✓ יש כיול. אפשר לעדכן אותו') : T('למי שרואה קווים עקומים או גלים');
 
     var box = $('pinnedList');
     box.innerHTML = '';

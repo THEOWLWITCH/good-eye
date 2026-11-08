@@ -178,3 +178,18 @@ button.pf:hover:not(:disabled) { border-color: var(--cyan); }
 .gauge { position: relative; }
 .gauge .g-icon { font-size: 26px; line-height: 1; margin-top: 2px; filter: drop-shadow(0 0 6px rgba(56, 214, 255, .45)); }
 .gauge svg { margin-top: -4px; }
+
+/* all tools on the instrument panel */
+.dash-sub { margin: 18px 0 8px; font-size: 17px; color: var(--text); }
+.tool-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.tool-btn { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 12px 8px; border-radius: 18px;
+  background: radial-gradient(circle at 50% 25%, #23428a, #12275a); border: 1px solid var(--line); min-height: 112px; text-align: center; }
+.tool-btn:hover:not(:disabled) { border-color: var(--cyan); box-shadow: 0 0 16px rgba(56, 214, 255, .3); }
+.tool-btn .tb-i { font-size: 34px; line-height: 1.1; filter: drop-shadow(0 0 6px rgba(56, 214, 255, .4)); }
+.tool-btn b { font-size: 15px; }
+.tool-btn small { font-size: 12px; color: var(--muted); }
+.flight-log { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+
+/* which device for what */
+.device-tip { background: rgba(156, 123, 255, .12); border: 1px solid rgba(156, 123, 255, .5); border-radius: 12px; padding: 8px 12px; font-size: 15px; margin: 16px 0 0; }
+.device-note { background: rgba(255, 176, 0, .12); border: 1px solid rgba(255, 176, 0, .5); border-radius: 12px; padding: 8px 12px; font-size: 14px; margin: 10px 0; }

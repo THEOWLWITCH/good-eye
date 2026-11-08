@@ -113,7 +113,7 @@
     run.ms = performance.now() - t0;
     state = 'errors';
     $('rtContent').innerHTML = '<p class="rt-wait">✍️</p>';
-    $('rtPrompt').textContent = T('למבוגר: כמה מילים נקראו לא נכון או דולגו?');
+    $('rtPrompt').textContent = T('למי שהקשיב: כמה מילים נקראו לא נכון או דולגו?');
     buttons([0, 1, 2, 3, 4, 5].map(function (n) { return { html: n === 5 ? '5+' : String(n), cls: 'answer', fn: function () { errors(n); } }; }));
   }
 

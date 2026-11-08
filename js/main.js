@@ -56,6 +56,7 @@
     DA.drawer.close();
     DA.screens[name].enter();
     glassesNotes();
+    smallScreenNotes();
     root.scrollTo(0, 0);
     var scr = $('screen-' + name); if (scr && document.activeElement && document.activeElement.tagName === 'BODY') scr.focus({ preventScroll: true });
   }
@@ -119,6 +120,15 @@
     var t = glassesText(ctx.profile());
     document.querySelectorAll('[data-glasses]').forEach(function (e) { e.textContent = t; e.style.display = t ? '' : 'none'; });
   }
+  /** On a small screen, say that calibration and measurements work better on a computer or tablet. */
+  function smallScreenNotes() {
+    // a phone-sized device (or a very narrow window): the device's screen, not just this window
+    var small = Math.min(root.screen.width, root.screen.height) < 600 || root.innerWidth < 520;
+    var t = small ? T('📱 המסך הזה קטן. לכיול, למשחק ולמדידות עדיף מחשב או טאבלט. אפשר להמשיך, אבל התוצאות יתאימו רק למכשיר הזה.') : '';
+    document.querySelectorAll('[data-small-screen]').forEach(function (e) { e.textContent = t; e.style.display = t ? '' : 'none'; });
+  }
+  root.addEventListener('resize', function () { smallScreenNotes(); });
+
   ctx.glasses = function () { var p = ctx.profile(); return p ? (p.glasses || 'unknown') : 'unknown'; };
 
   /** Screen-reader and keyboard support: labels for icon buttons, landmarks, skip link. */

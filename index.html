@@ -92,10 +92,11 @@
       <button id="tileSee" class="dest see"><span class="dest-ring"><span class="ti">👀</span></span><b>לראות</b><small>תמונה, צילום או מצלמה</small></button>
     </div>
 
+    <p class="device-tip">💻 <b>כיול, משחק ומדידות:</b> עדיף במחשב או בטאבלט, במרחק קבוע מהמסך. 📱 <b>קריאה, צילום ומצלמה:</b> נוחים גם בטלפון. לכל מכשיר עושים כיול משלו.</p>
     <h2 class="cp-h">✈️ בדיקות לפני ההמראה</h2>
     <div class="preflight">
       <button id="tileLearn" class="pf"><span class="pf-num">1</span><span class="ti">🎮</span><span class="pf-text"><b>משחק ההתאמה</b><small>נגלה ביחד מה הכי ברור לך (כ־5 דקות)</small></span><span id="tileLearnBadge" class="badge">מתחילים כאן</span><span id="pfLearnCheck" class="pf-check"></span></button>
-      <button id="tileCalibrate" class="pf"><span class="pf-num">2</span><span class="ti">🎯</span><span class="pf-text"><b>כיול עיוות</b><small id="tileCalSub">למי שרואה קווים עקומים. עדיף עם מבוגר</small></span><span id="pfCalCheck" class="pf-check"></span></button>
+      <button id="tileCalibrate" class="pf"><span class="pf-num">2</span><span class="ti">🎯</span><span class="pf-text"><b>כיול עיוות</b><small id="tileCalSub">למי שרואה קווים עקומים או גלים</small></span><span id="pfCalCheck" class="pf-check"></span></button>
       <div class="pf eye"><span class="pf-num">3</span><span class="ti">👁️</span><span class="pf-text"><b>מעקב עיניים</b><small>לא חובה · <button id="hubEyesInfo" class="linkish">מה זה?</button></small></span><button id="hubEyesToggle" class="eye-switch" data-short></button></div>
     </div>
 
@@ -105,43 +106,40 @@
       <div class="dash-actions">
         <button id="bestBtn" class="primary big">⭐ המצב שלי</button>
         <button id="pinBtn">📌 לשמור מצב</button>
-        <button id="settingsBtn">🎚️ כיוונון עדין</button>
+      </div>
+      <h3 class="dash-sub">🧰 כל הכלים</h3>
+      <div class="tool-grid">
+        <button id="settingsBtn" class="tool-btn"><span class="tb-i">🎚️</span><b>כיוונון עדין</b><small>כל ההגדרות</small></button>
+        <button id="hubReadTest" class="tool-btn"><span class="tb-i">⏱️</span><b>גודל קריאה נוח</b><small>קוראים משפטים בקול</small></button>
+        <button id="hubFieldTest" class="tool-btn"><span class="tb-i">🗺️</span><b>מפת נוחות</b><small>איפה הכי נוח לראות</small></button>
+        <button id="hubTools" class="tool-btn"><span class="tb-i">📐</span><b>כלי כיול</b><small>נקודות, מרווחים, גודל</small></button>
+        <button id="hubLab" class="tool-btn"><span class="tb-i">🔬</span><b>מעבדה</b><small>טשטוש, חידוד, תנועה</small></button>
+        <button id="hubCard" class="tool-btn"><span class="tb-i">📏</span><b>גודל המסך</b><small>כיול עם כרטיס</small></button>
+        <button id="hubHistShow" class="tool-btn"><span class="tb-i">📈</span><b>היסטוריה</b><small>גרפים לאורך זמן</small></button>
       </div>
       <p id="bestInfo" class="muted small"></p>
       <p class="muted small">עכשיו: <span id="hubCurrent"></span></p>
       <div id="pinnedList" class="pinned-list"></div>
     </div>
 
-    <details class="engine-room" id="engineRoom">
-      <summary>🔧 חדר המכונות <span class="muted small">(למבוגרים: מדידות, מעבדה, היסטוריה)</span></summary>
-      <div class="engine-grid">
-        <div class="card">
-          <h3>🧰 כלים נוספים להתאמה</h3>
-          <div class="tool-buttons">
-            <button id="hubReadTest">⏱️ גודל קריאה נוח</button>
-            <button id="hubFieldTest">🎯 מפת נוחות צפייה</button>
-            <button id="hubTools">📐 כלי כיול נוספים</button>
-            <button id="hubLab">🔬 מעבדת טשטוש וניגודיות</button>
-            <button id="hubCard">📏 כיול גודל מסך</button>
-          </div>
-        </div>
-        <div class="card">
-          <h3>📈 ההיסטוריה שלי <span class="tag">לא חובה</span></h3>
-          <p class="muted small">אם רוצים, התוצאות נשמרות לאורך זמן ומוצגות בגרפים פשוטים. בלי פרשנות ובלי אבחון.</p>
-          <div class="row wrap"><button id="hubHistToggle" class="eye-switch"></button><button id="hubHistShow">להציג</button></div>
-        </div>
-        <div class="card wide">
-          <h3>🧠 מה למדנו עליך</h3>
-          <div id="hubLearned"></div>
-        </div>
+    <h2 class="cp-h">📒 יומן הטיסה</h2>
+    <div class="flight-log">
+      <div class="card">
+        <h3>🧠 מה למדנו עליך</h3>
+        <div id="hubLearned"></div>
       </div>
-    </details>
+      <div class="card">
+        <h3>📈 היסטוריה</h3>
+        <p class="muted small">אם רוצים, התוצאות נשמרות לאורך זמן ומוצגות בגרפים פשוטים.</p>
+        <div class="row wrap"><button id="hubHistToggle" class="eye-switch"></button></div>
+      </div>
+    </div>
   </section>
 
   <!-- ============ CALIBRATE (grid) ============ -->
   <section id="screen-calibrate" class="screen cal-screen">
     <header class="cal-bar">
-      <div class="cal-title">🎯 כיול עיוות <span class="muted">(לביצוע עם מבוגר)</span></div>
+      <div class="cal-title">🎯 כיול עיוות <span class="muted">(אפשר לבד או עם מישהו שעוזר)</span></div>
       <label class="instrument">מכשיר כיול:
         <select id="instrument">
           <option value="flex-grid" selected>4.1 רשת קווים גמישה</option>
@@ -168,6 +166,7 @@
     <div class="layout">
       <aside class="panel" id="panel">
         <section>
+          <p class="device-note" data-small-screen></p>
           <p class="glasses-note" data-glasses></p>
           <h3>ניסיון נוכחי</h3>
           <div id="trialInfo" class="muted"></div>
@@ -279,6 +278,7 @@
       <button id="quickGame" class="primary huge">▶️ בואו נשחק (כ־5 דקות)</button>
       <p><button id="learnEyes" class="eye-switch"></button></p>
       <p class="glasses-note" data-glasses></p>
+      <p class="device-note" data-small-screen></p>
       <p id="learnHasCal" class="muted small">טיפ: אחרי כיול עיוות ברשת, המשחק יבדוק גם אם התיקון עוזר.</p>
       <details class="adult">
         <summary>אפשרויות למבוגר</summary>
@@ -395,6 +395,7 @@
       <aside class="panel">
         <section>
           <p class="glasses-note" data-glasses></p>
+          <p class="device-note" data-small-screen></p>
           <p id="tlHelp" class="hint"></p>
           <div data-tl="dots">
             <label>גודל המערך <select id="tlN"><option value="5">5×5</option><option value="7" selected>7×7</option></select></label>
@@ -428,8 +429,9 @@
   <!-- ============ LAB (spec 5.1, 6.1–6.5, 7.2) ============ -->
   <section id="screen-lab" class="screen">
     <h1 class="big-title">🔬 מעבדת טשטוש, ניגודיות ותנועה</h1>
-    <p class="muted">כלים מתקדמים להתאמה מדויקת, לעבודה עם מבוגר. התוצאות נשמרות אצל הקורא, וצורת הטשטוש ושיטת החידוד שנבחרו יכולות לחדד תמונות, צילומים ועמודי PDF בקריאה. אלה התאמות תצוגה, לא בדיקה של בריאות העין.</p>
+    <p class="muted">כלים להתאמה מדויקת. אפשר לנסות לבד או עם מישהו שעוזר. התוצאות נשמרות אצל הקורא, וצורת הטשטוש ושיטת החידוד שנבחרו יכולות לחדד תמונות, צילומים ועמודי PDF בקריאה. אלה התאמות תצוגה, לא בדיקה של בריאות העין.</p>
     <p class="glasses-note" data-glasses></p>
+    <p class="device-note" data-small-screen></p>
     <nav id="labTabs" class="lab-tabs"></nav>
     <div id="labBody" class="lab-body"></div>
   </section>
@@ -438,7 +440,7 @@
   <section id="screen-readtest" class="screen">
     <div id="rtSetup" class="learn-setup">
       <h1 class="big-title">⏱️ גודל קריאה נוח</h1>
-      <p class="lead">משפטים קצרים מופיעים בגדלים שהולכים וקטנים. קוראים כל משפט בקול, מהר ככל שנוח, ולוחצים "סיימתי". מבוגר מסמן כמה מילים נקראו לא נכון.</p>
+      <p class="lead">משפטים קצרים מופיעים בגדלים שהולכים וקטנים. קוראים כל משפט בקול, מהר ככל שנוח, ולוחצים "סיימתי". מי שמקשיב מסמן כמה מילים נקראו לא נכון.</p>
       <p class="muted">מתאים למי שכבר קורא משפטים (בערך מכיתה ב׳). לוקח כ־5 דקות. כך מוצאים את גודל האותיות הכי קטן שעדיין קוראים בו מהר ובנוחות.</p>
       <div class="setup-grid">
         <label>שפה <select id="rtLang"><option value="he">עברית</option><option value="en">English</option></select></label>
@@ -447,6 +449,7 @@
       <label class="check"><input type="checkbox" id="rtCompare"> להשוות גם בלי ההגדרות האישיות (עוד כ־5 דקות)</label>
       <p><span id="rtCalNote" class="muted small"></span> <button id="rtCard" class="linkish">📏 כיול גודל מסך</button></p>
       <p class="glasses-note" data-glasses></p>
+      <p class="device-note" data-small-screen></p>
       <button id="rtStart" class="primary huge">▶ להתחיל</button>
     </div>
     <div id="rtPlay" class="learn-play" style="display:none">
@@ -474,7 +477,7 @@
     <div id="ftSetup" class="learn-setup">
       <h1 class="big-title">🎯 מפת נוחות צפייה</h1>
       <p class="lead">מביטים כל הזמן בצלב האדום שבמרכז. נקודות קטנות יהבהבו מסביב. כל פעם שרואים נקודה, לוחצים על המסך או על מקש הרווח. לא מזיזים את המבט אל הנקודה!</p>
-      <p class="muted">כך רואים אם יש אזורים במסך שבהם קשה יותר לראות את הנקודות, ומתאימים לפי זה את מיקום הטקסט. לוקח כ־3 דקות. מתאים בעיקר למבוגרים ולילדים גדולים.</p>
+      <p class="muted">כך רואים אם יש אזורים במסך שבהם קשה יותר לראות את הנקודות, ומתאימים לפי זה את מיקום הטקסט. לוקח כ־3 דקות.</p>
       <div class="setup-grid">
         <label>איזו עין? <select id="ftEye"><option value="right">ימין (מכסים את השמאלית)</option><option value="left">שמאל (מכסים את הימנית)</option><option value="both">שתי העיניים</option></select></label>
         <label>מרחק מהמסך (ס״מ) <input id="ftDist" type="number" min="15" max="150"></label>
@@ -482,6 +485,7 @@
       </div>
       <p><span id="ftCalNote" class="muted small"></span> <button id="ftCard" class="linkish">📏 כיול גודל מסך</button></p>
       <p class="glasses-note" data-glasses></p>
+      <p class="device-note" data-small-screen></p>
       <button id="ftStart" class="primary huge">▶ להתחיל</button>
     </div>
     <div id="ftStage" class="ft-stage" style="display:none">
@@ -674,7 +678,7 @@
   <script src="js/core/device.js"></script>
   <script src="js/instruments/grid.js"></script>
   <script src="js/vision/eyes.js"></script>
-  <script>window.DA.VERSION = '1.0.3';</script>
+  <script>window.DA.VERSION = '1.0.4';</script>
   <script src="js/ui/common.js"></script>
   <script src="js/ui/drawer.js"></script>
   <script src="js/ui/cockpit.js"></script>

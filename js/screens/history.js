@@ -51,7 +51,6 @@
     if (!p) return;
     $('hubHistToggle').textContent = labelFor(p);
     $('hubHistToggle').classList.toggle('on', !!p.keepHistory);
-    $('hubHistShow').style.display = p.keepHistory ? '' : 'none';
   }
 
   function enter() { render(); }
