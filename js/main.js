@@ -108,7 +108,9 @@
       el.title = msg; el.className = 'cloud-dot ' + (warn ? 'warn' : 'ok');
       var cs = $('cloudStatus'); if (cs) { cs.textContent = msg; cs.style.color = warn ? '#b26a00' : '#0a7a3f'; }
     });
-    if (!DA.cloud.available()) { $('cloudDot').title = T('שמירה במכשיר הזה'); $('cloudDot').className = 'cloud-dot local'; }
+    var localDot = function () { $('cloudDot').title = T('שמירה במכשיר הזה'); $('cloudDot').className = 'cloud-dot local'; };
+    if (!DA.cloud.available()) localDot();
+    else DA.cloud.connect().then(function (ok) { if (!ok) localDot(); });   // claude.ai without a shared store: data stays on this device
 
     DA.drawer.init(ctx);
     DA.eyePanel.init(ctx);
