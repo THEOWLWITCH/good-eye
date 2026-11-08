@@ -1,0 +1,11 @@
+# עין טובה — standalone site (Netlify)
+[build]
+  publish = "."
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # camera only for this site (eye tracking + live lens); no microphone, no location
+    Permissions-Policy = "camera=(self), microphone=(), geolocation=()"
+    Referrer-Policy = "no-referrer"
+    X-Content-Type-Options = "nosniff"

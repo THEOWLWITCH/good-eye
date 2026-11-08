@@ -1,0 +1,110 @@
+/*
+ * DA — Personal display settings ("המשקפיים שלי").
+ * One settings object describes how ANY content (text, pictures, math, photos) is shown to a reader.
+ * It is learned in the learning game, fine-tuned by an adult, saved per profile, and applied by the Lens.
+ */
+(function (root) {
+  'use strict';
+  var DA = (root.DA = root.DA || {});
+
+  var FONTS = [
+    { id: 'rubik', label: 'רוביק', family: "'Rubik', Arial, sans-serif" },
+    { id: 'assistant', label: 'אסיסטנט', family: "'Assistant', Arial, sans-serif" },
+    { id: 'round', label: 'עגול', family: "'Varela Round', 'Comic Neue', Arial, sans-serif" },
+    { id: 'atkinson', label: 'אטקינסון (קריא במיוחד)', family: "'Atkinson Hyperlegible', 'Rubik', Arial, sans-serif" },
+    { id: 'lexend', label: 'לקסנד (מרווח)', family: "'Lexend', 'Heebo', Arial, sans-serif" },
+    { id: 'serif', label: 'עם תגים (פרנק רוהל)', family: "'Frank Ruhl Libre', 'Noto Serif', Georgia, serif" },
+    { id: 'arial', label: 'אריאל', family: 'Arial, sans-serif' }
+  ];
+  var FONTS_CSS = 'https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&family=Assistant:wght@400;600;800' +
+    '&family=Varela+Round&family=Comic+Neue:wght@400;700&family=Atkinson+Hyperlegible:wght@400;700' +
+    '&family=Lexend:wght@400;600&family=Heebo:wght@400;600;800&family=Frank+Ruhl+Libre:wght@400;700' +
+    '&family=Noto+Serif:wght@400;700&display=swap';
+
+  // Colour themes: polarity + tint. fg/bg used for text; "reversed" also inverts images on request.
+  var THEMES = [
+    { id: 'white', label: 'שחור על לבן', fg: '#000000', bg: '#ffffff' },
+    { id: 'cream', label: 'שחור על שמנת', fg: '#1a1a1a', bg: '#fbf3dc' },
+    { id: 'yellow', label: 'שחור על צהוב', fg: '#000000', bg: '#fff3a0' },
+    { id: 'blue', label: 'כחול כהה על תכלת', fg: '#0b1f4d', bg: '#dcebff' },
+    { id: 'green', label: 'שחור על ירוק בהיר', fg: '#0d1f0d', bg: '#dff3df' },
+    { id: 'gray', label: 'שחור על אפור בהיר', fg: '#000000', bg: '#e6e6e6' },
+    { id: 'dark', label: 'לבן על שחור', fg: '#ffffff', bg: '#000000', reversed: true },
+    { id: 'darkyellow', label: 'צהוב על שחור', fg: '#ffe94d', bg: '#000000', reversed: true },
+    { id: 'darkblue', label: 'לבן על כחול כהה', fg: '#ffffff', bg: '#0b2a5c', reversed: true }
+  ];
+
+  var DEFAULTS = {
+    // text
+    fontSize: 28,          // px
+    font: 'rubik',
+    bold: false,
+    letterSpacing: 0.02,   // em
+    wordSpacing: 0.1,      // em
+    lineHeight: 1.6,
+    lineChars: 45,         // max characters per line
+    nikud: false,          // prefer pointed Hebrew in generated texts
+    // colour & contrast
+    theme: 'white',
+    imageContrast: 1,      // 1 = unchanged
+    imageInvert: false,    // invert pictures in dark themes
+    // geometry & sharpness
+    warpStrength: 1,       // 0 = off, 1 = full personal grid correction
+    calibrationId: null,   // which saved grid trial supplies the warp
+    sharpen: 0,            // 0..1.5
+    zoom: 1,               // extra magnification for pictures/pages
+    // reading aids
+    ruler: 'off',          // off | band | mask
+    lineMarker: false,     // coloured bar at the start of each line (field loss)
+    shiftX: 0, shiftY: 0,  // move content within the view (eccentric viewing), fraction of view
+    speechRate: 0.9,
+    // eye tracking (standalone version only)
+    eyesKeepAngle: false,  // keep letters the same size for the eye when the reader moves closer/farther
+    refDistanceCm: null    // viewing distance at which fontSize was chosen/learned
+  };
+
+  var RANGES = {
+    fontSize: [12, 120], letterSpacing: [-0.02, 0.4], wordSpacing: [0, 1.2], lineHeight: [1.1, 3],
+    lineChars: [15, 90], imageContrast: [0.6, 2.2], warpStrength: [0, 1.5], sharpen: [0, 1.5],
+    zoom: [0.5, 4], shiftX: [-0.35, 0.35], shiftY: [-0.35, 0.35], speechRate: [0.5, 1.5]
+  };
+
+  function normalize(s) {
+    var out = Object.assign({}, DEFAULTS, s || {});
+    Object.keys(RANGES).forEach(function (k) {
+      var r = RANGES[k], v = Number(out[k]);
+      out[k] = isNaN(v) ? DEFAULTS[k] : Math.min(r[1], Math.max(r[0], v));
+    });
+    if (!FONTS.some(function (f) { return f.id === out.font; })) out.font = DEFAULTS.font;
+    if (!THEMES.some(function (t) { return t.id === out.theme; })) out.theme = DEFAULTS.theme;
+    return out;
+  }
+
+  function font(id) { return FONTS.filter(function (f) { return f.id === id; })[0] || FONTS[0]; }
+  function theme(id) { return THEMES.filter(function (t) { return t.id === id; })[0] || THEMES[0]; }
+
+  /** Short human summary, for pinned states and reports. */
+  function describe(s) {
+    s = normalize(s);
+    return [
+      s.fontSize + 'px', font(s.font).label, theme(s.theme).label,
+      s.letterSpacing > 0.06 ? 'ריווח אותיות ' + s.letterSpacing.toFixed(2) : null,
+      s.warpStrength > 0 && s.calibrationId ? 'תיקון עיוות ' + Math.round(s.warpStrength * 100) + '%' : null,
+      s.ruler !== 'off' ? 'סרגל קריאה' : null
+    ].filter(Boolean).join(' · ');
+  }
+
+  var loadedFonts = false;
+  function loadFonts() {
+    if (loadedFonts || typeof document === 'undefined') return;
+    loadedFonts = true;
+    var l = document.createElement('link');
+    l.rel = 'stylesheet'; l.href = FONTS_CSS;
+    document.head.appendChild(l);
+  }
+
+  DA.settings = {
+    DEFAULTS: DEFAULTS, RANGES: RANGES, FONTS: FONTS, THEMES: THEMES,
+    normalize: normalize, font: font, theme: theme, describe: describe, loadFonts: loadFonts
+  };
+})(typeof window !== 'undefined' ? window : globalThis);
