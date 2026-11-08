@@ -14,7 +14,7 @@ from html.parser import HTMLParser
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 HEB = re.compile(r'[֐-׿]')
-SKIP_WRAP = {'js/content/stimuli.js', 'js/content/sentences.js', 'js/core/i18n.js', 'js/core/i18n-en.js'}
+SKIP_WRAP = {'js/content/stimuli.js', 'js/content/sentences.js', 'js/content/readaids.js', 'js/core/i18n.js', 'js/core/i18n-en.js'}
 REGEX_PREV = set('(,=:[!&|?{};+-*%<>~^') | {''}
 
 

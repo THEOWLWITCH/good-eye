@@ -28,6 +28,7 @@
       { k: 'brightness', label: T('בהירות (עמעום לסנוור ורגישות לאור)'), type: 'range', min: 0.4, max: 1, step: 0.05, fmt: pct },
       { k: 'warmth', label: T('אור חם (פחות כחול)'), type: 'range', min: 0, max: 1, step: 0.05, fmt: pct },
       { k: 'cvd', label: T('עזרה בהבחנה בין צבעים (בתמונות ובתרשימים)'), type: 'select', options: function () { return [['none', T('כבוי')], ['protan', T('אדום־ירוק')], ['deutan', T('ירוק־אדום (הנפוץ ביותר)')], ['tritan', T('כחול־צהוב')]]; } },
+      { k: 'cvi', label: T('מצב פשוט וממוקד: צבע בולט אחד, בלי עומס, שתי תשובות ויותר זמן (מתאים ל־CVI)'), type: 'check' },
       { k: 'calm', label: T('מצב רגוע: ניגודיות רכה ובלי פסים צפופים (מיגרנה, רגישות לדגמים)'), type: 'check' }
     ] },
     { title: T('תיקון עיוות וחדות'), items: [
@@ -41,6 +42,8 @@
       { k: 'lineMarker', label: T('סימון תחילת שורה'), type: 'check' },
       { k: 'shiftX', label: T('הזזת הטקסט לצדדים'), type: 'range', min: -0.35, max: 0.35, step: 0.01, fmt: pct },
       { k: 'shiftY', label: T('הזזת הטקסט למעלה/למטה'), type: 'range', min: -0.35, max: 0.35, step: 0.01, fmt: pct },
+      { k: 'syllables', label: T('הברות בצבעים מתחלפים (בקירוב, לעברית מנוקדת ולאנגלית)'), type: 'check' },
+      { k: 'dictionary', label: T('לחיצה כפולה על מילה מראה תמונה ומקריאה אותה'), type: 'check' },
       { k: 'speechHighlight', label: T('להדגיש כל מילה בזמן ההקראה'), type: 'check' },
       { k: 'speechRate', label: T('מהירות הקראה'), type: 'range', min: 0.5, max: 1.5, step: 0.05, fmt: f2 }
     ] },

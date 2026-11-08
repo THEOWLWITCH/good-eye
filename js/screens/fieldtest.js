@@ -186,7 +186,9 @@
     if (left >= 0.5 && right <= 0.15) res.pattern = 'hemi-left';
     else if (right >= 0.5 && left <= 0.15) res.pattern = 'hemi-right';
     else if (central.length) res.pattern = 'central';
+    else if (outer(defect, pts)) res.pattern = 'periphery';
     else if (defect.length) res.pattern = 'scattered';
+    if (res.pattern === 'periphery') { res.suggest.lineChars = 26; res.suggest.maxFont = 40; }
     if (res.pattern === 'central') {
       var cx = central.reduce(function (a, q) { return a + q.xDeg; }, 0) / central.length;
       var cy = central.reduce(function (a, q) { return a + q.yDeg; }, 0) / central.length;
@@ -203,6 +205,15 @@
     return res;
   }
 
+  /** Most outer points (≥ 10°) missed while the inner ones were seen. */
+  function outer(defect, pts) {
+    var o = pts.filter(function (q) { return q.ecc >= 10; }), i = pts.filter(function (q) { return q.ecc <= 4; });
+    if (!o.length || !i.length) return false;
+    var om = defect.filter(function (q) { return q.ecc >= 10; }).length / o.length;
+    var im = defect.filter(function (q) { return q.ecc <= 4; }).length / i.length;
+    return om >= 0.5 && im <= 0.15;
+  }
+
   function finish(early) {
     stopAll();
     if (document.fullscreenElement) document.exitFullscreen().catch(function () {});
@@ -217,7 +228,10 @@
     var sug = sess.result.suggest;
     var has = Object.keys(sug).length;
     $('ftApply').style.display = has ? '' : 'none';
-    $('ftApply').onclick = function () { ctx.updateSettings(sug); DA.ui.toast(T('ההמלצות הופעלו בקריאה')); ctx.go('hub'); };
+    $('ftApply').onclick = function () {
+      var p2 = ctx.profile(), patch = Object.assign({}, sug);
+      if (patch.maxFont) { if (p2.settings.fontSize > patch.maxFont) patch.fontSize = patch.maxFont; delete patch.maxFont; }
+      ctx.updateSettings(patch); DA.ui.toast(T('ההמלצות הופעלו בקריאה')); ctx.go('hub'); };
     $('ftKeep').onclick = function () { ctx.go('hub'); };
   }
 
@@ -243,6 +257,7 @@
     central: T('נקודות קרובות למרכז נראו פחות. אפשר לנסות להזיז את הטקסט לצד שבו הנקודות נראו טוב.'),
     'hemi-left': T('נקודות בצד שמאל נראו פחות. בעברית זה הצד שבו השורה נגמרת, אז אפשר לנסות סימון שורה ושורות קצרות יותר.'),
     'hemi-right': T('נקודות בצד ימין נראו פחות. בעברית זה הצד שבו השורה מתחילה, אז אפשר לנסות סימון תחילת שורה ושורות קצרות יותר.'),
+    periphery: T('נקודות רחוקות מהמרכז נראו פחות, והקרובות נראו טוב. אפשר לנסות שורות קצרות ואותיות לא גדולות מדי, כדי שכל השורה תיכנס לאזור שרואים בו.'),
     scattered: T('כמה נקודות בודדות לא נראו. ייתכן שזה רק רגע של חוסר קשב. כדאי לחזור על הבדיקה.')
   };
 
@@ -269,6 +284,7 @@
     if (g.shiftX || g.shiftY) parts.push(T('להזיז את הטקסט ') + (g.shiftX < 0 ? T('שמאלה') : g.shiftX > 0 ? T('ימינה') : '') + (g.shiftY < 0 ? T(' ולמעלה') : g.shiftY > 0 ? T(' ולמטה') : ''));
     if (g.lineMarker) parts.push(T('סימון תחילת שורה'));
     if (g.lineChars) parts.push(T('שורות קצרות יותר'));
+    if (g.maxFont) parts.push(T('אותיות לא גדולות מדי'));
     return parts.join(' · ');
   }
 

@@ -5,7 +5,7 @@
  *  - Libraries, fonts and the face model from CDNs: cached the first time they are used.
  *  - Never caches sync requests (/api/).
  */
-var VERSION = 'f28038849c';
+var VERSION = '669af22a05';
 var APP_CACHE = 'good-eye-app-' + VERSION;
 var LIB_CACHE = 'good-eye-libs-v1';
 var FILES = [
@@ -14,6 +14,7 @@ var FILES = [
   'manifest.webmanifest',
   'icon.svg',
   'css/style.css',
+  'js/content/readaids.js',
   'js/content/sentences.js',
   'js/content/stimuli.js',
   'js/core/ai.js',
@@ -27,6 +28,7 @@ var FILES = [
   'js/core/settings.js',
   'js/core/storage.js',
   'js/core/sync.js',
+  'js/core/voice.js',
   'js/engine/deformation.js',
   'js/engine/imageproc.js',
   'js/instruments/grid.js',

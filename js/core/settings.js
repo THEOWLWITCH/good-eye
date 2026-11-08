@@ -68,6 +68,9 @@
     psf: null,             // { radius, stretch, angle, smear, tail, tailLen, halo, haloR }
     deblur: 'none',        // none | unsharp | directional | local | wiener | rl
     deblurAmount: 1, deblurRadius: 1.5, deblurK: 0.01, deblurIter: 10,
+    cvi: false,            // simple & focused mode (CVI): one bright colour, uncluttered, two answers, gentle motion, more time
+    syllables: false,      // colour syllables in alternating colours (approximate; pointed Hebrew and English)
+    dictionary: true,      // double-tap a word for a picture and to hear it
     // eye tracking (standalone version only)
     eyesKeepAngle: false,  // keep letters the same size for the eye when the reader moves closer/farther
     refDistanceCm: null    // viewing distance at which fontSize was chosen/learned
@@ -108,7 +111,9 @@
       s.warmth > 0.05 ? T('אור חם') : null,
       s.cvd !== 'none' ? T('צבעים לעיוורון צבעים') : null,
       s.calm ? T('מצב רגוע') : null,
-      s.deblur !== 'none' ? T('חידוד תמונות אישי') : null
+      s.deblur !== 'none' ? T('חידוד תמונות אישי') : null,
+      s.cvi ? T('מצב פשוט וממוקד') : null,
+      s.syllables ? T('הברות בצבעים') : null
     ].filter(Boolean).join(' · ');
   }
 

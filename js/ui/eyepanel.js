@@ -136,6 +136,7 @@
       T('<div>📏 מרחק: <b>') + (s.distanceCm ? s.distanceCm + T(' ס״מ') : '—') + '</b></div>' +
       T('<div>🎯 מבט: <b>') + (s.centered == null ? T('לא נקבע מרכז') : s.centered ? T('במרכז') : T('זז מהמרכז')) + '</b></div>' +
       T('<div>😉 מצמוצים לדקה: <b>') + (s.blinkPerMin == null ? T('מודד…') : s.blinkPerMin) + '</b></div>' +
+      (s.steadiest ? '<div>🧭 ' + T('המבט יציב יותר כשהראש מסובב בערך ') + Math.abs(s.steadiest.yaw) + '°' + T(' הצידה, ממה שהמצלמה ראתה (יציב יותר ב־') + s.steadiest.gainPct + '%)</div>' : '') +
       T('<div>😑 צמצום עיניים: <b>') + (s.squint > 0.5 ? T('כן') : T('לא')) + '</b></div>';
   }
 

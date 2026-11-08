@@ -198,5 +198,34 @@ test('unsharp mask increases measured sharpness', function () {
   ok(IP.measure(B, IP.unsharp(B, w, h, { amount: 1 }), w, h).sharpness > IP.measure(B, B, w, h).sharpness);
 });
 
+console.log('Reading aids');
+require(path.join(__dirname, '..', 'js/content/readaids.js'));
+var RA = DA.readaids;
+test('pointed Hebrew splits into syllables; unpointed stays whole', function () {
+  var s = RA.syllables('שָׁלוֹם');            // sha-lom
+  ok(s.length === 2 && s.join('') === 'שָׁלוֹם', JSON.stringify(s));
+  var s2 = RA.syllables('יְלָדִים');           // ye-la-dim
+  ok(s2.join('') === 'יְלָדִים' && s2.length >= 2, JSON.stringify(s2));
+  ok(RA.syllables('שלום').length === 1);
+});
+test('English splits into syllables and keeps punctuation', function () {
+  var s = RA.syllables('elephant.');
+  ok(s.join('') === 'elephant.' && s.length >= 2, JSON.stringify(s));
+  ok(RA.syllables('cat').length === 1);
+});
+test('picture dictionary finds words with Hebrew prefixes, nikud and plurals', function () {
+  ok(RA.lookup('הכלב') === '🐕');
+  ok(RA.lookup('וְהַכֶּלֶב') === '🐕', 'nikud and two prefixes');
+  ok(RA.lookup('dogs.') === '🐕');
+  ok(RA.lookup('xyzzy') === null);
+});
+test('gaze steadiness finds the calmer head turn', function () {
+  var hist = [], i;
+  for (i = 0; i < 200; i++) hist.push({ yaw: 0, h: 0.5 + (i % 2 ? 0.04 : -0.04) });      // jittery straight ahead
+  for (i = 0; i < 200; i++) hist.push({ yaw: 20, h: 0.5 + (i % 2 ? 0.01 : -0.01) });     // calmer at 20°
+  var r = DA.eyeMath.steadiest(hist);
+  ok(r && r.yaw === 20 && r.gainPct > 50, JSON.stringify(r));
+});
+
 console.log('\n' + passed + ' passed, ' + failed + ' failed');
 process.exit(failed ? 1 : 0);

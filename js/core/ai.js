@@ -64,6 +64,27 @@
     });
   }
 
+  /** Rewrite a text in simpler language (same language; keeps nikud if present). */
+  function simplify(text, kind, onText, signal) {
+    return get().then(function (sample) {
+      if (!sample) throw { code: 'unavailable' };
+      var level = kind === 'adult' ? 'plain, easy language for an adult reader' : 'very simple language for a child of about 7–9';
+      var prompt = 'Rewrite the following text in ' + level + '. Keep the same language as the text (Hebrew or English). ' +
+        'Keep all the important information, use short sentences and common words, short paragraphs. ' +
+        'If the Hebrew has nikud (vowel points), write the rewrite with full nikud too. No markdown, no title. Reply with the rewritten text only.\n\nTEXT:\n' + String(text).slice(0, 12000);
+      return sample(prompt, { onText: onText, signal: signal, cache: false });
+    });
+  }
+  /** A one- or two-sentence explanation of a word, in the language of the word. */
+  function explainWord(word, context, kind) {
+    return get().then(function (sample) {
+      if (!sample) throw { code: 'unavailable' };
+      var prompt = 'Explain the word "' + word + '" in one or two short, simple sentences' + (kind === 'adult' ? '' : ' for a child of about 8') +
+        ', in the same language as the word. Context (may help): ' + String(context).slice(0, 600) + '\nReply with the explanation only.';
+      return sample(prompt, { modelTier: 'quick' });
+    });
+  }
+
   function errorText(e) {
     var c = e && e.code;
     return ({
@@ -78,5 +99,5 @@
     })[c] || T('משהו השתבש (') + (c || T('שגיאה')) + T('). אפשר לנסות שוב.');
   }
 
-  DA.ai = { available: function () { return get().then(function (s) { return !!s; }); }, canImages: canImages, generate: generate, photoToText: photoToText, errorText: errorText, LEVELS: LEVELS, KINDS: KINDS };
+  DA.ai = { simplify: simplify, explainWord: explainWord, available: function () { return get().then(function (s) { return !!s; }); }, canImages: canImages, generate: generate, photoToText: photoToText, errorText: errorText, LEVELS: LEVELS, KINDS: KINDS };
 })(typeof window !== 'undefined' ? window : globalThis);

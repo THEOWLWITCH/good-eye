@@ -56,6 +56,7 @@
     DA.drawer.close();
     DA.screens[name].enter();
     root.scrollTo(0, 0);
+    var scr = $('screen-' + name); if (scr && document.activeElement && document.activeElement.tagName === 'BODY') scr.focus({ preventScroll: true });
   }
 
   function renderHeader() {
@@ -67,6 +68,7 @@
 
   function boot() {
     DA.i18n.apply(document.body);
+    accessibility();
     document.title = T('עין טובה');
     $('langBtn').textContent = DA.i18n.lang === 'he' ? 'English' : String.fromCharCode(0x5E2, 0x5D1, 0x5E8, 0x5D9, 0x5EA); // "עברית" — always shown in Hebrew
     $('langBtn').onclick = function () { DA.i18n.setLang(DA.i18n.lang === 'he' ? 'en' : 'he'); };
@@ -94,6 +96,14 @@
     registerOffline();
     var start = location.hash.slice(1) || (ctx.profile() ? 'hub' : 'home');
     show(start);
+  }
+
+  /** Screen-reader and keyboard support: labels for icon buttons, landmarks, skip link. */
+  function accessibility() {
+    document.querySelectorAll('button[title]:not([aria-label]), select[title]:not([aria-label])').forEach(function (b) { b.setAttribute('aria-label', b.getAttribute('title')); });
+    document.querySelectorAll('.screen').forEach(function (s) { s.setAttribute('role', 'main'); s.setAttribute('tabindex', '-1'); });
+    $('skipLink').onclick = function (e) { e.preventDefault(); var s = document.querySelector('.screen.active'); if (s) s.focus(); };
+    document.querySelectorAll('canvas').forEach(function (c) { if (!c.getAttribute('aria-label')) c.setAttribute('aria-label', T('אזור כיול גרפי')); });
   }
 
   /** Offline support for the standalone site (claude.ai does not allow service workers). */

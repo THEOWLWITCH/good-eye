@@ -404,3 +404,23 @@ body.ft-running .topbar, body.ft-running .eye-widget { visibility: hidden; }
 .lab-rating button.on { background: #1b6ef3; color: #fff; border-color: #1b6ef3; }
 .lab-list { margin: 8px 0; }
 .lab-body h3 { margin: 16px 0 6px; font-size: 16px; }
+
+/* ---------- v0.9: simple & focused mode (CVI), accessibility, reading aids ---------- */
+.learn-stage.cvi { background: #000 !important; }
+.learn-stage.cvi .stim-text { color: #ffd400; }
+.learn-stage.cvi .stim-svg { color: #ffd400; }
+.learn-stage.cvi .sil { filter: brightness(0) invert(1) sepia(1) saturate(9) hue-rotate(5deg); }
+.learn-stage.cvi .stim-wrap { animation: cviPulse 1.6s ease-in-out infinite; }
+@keyframes cviPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+@media (prefers-reduced-motion: reduce) { .learn-stage.cvi .stim-wrap { animation: none; } }
+:focus-visible { outline: 3px solid #ffb000; outline-offset: 2px; }
+.skip-link { position: fixed; top: -60px; inset-inline-start: 10px; background: #1d2329; color: #fff; padding: 8px 14px; border-radius: 8px; z-index: 100; }
+.skip-link:focus { top: 8px; }
+.screen:focus { outline: none; }
+.syl-a { color: inherit; }
+.syl-b { color: #1b6ef3; }
+.lens.reversed .syl-b { color: #7fb2ff; }
+.dict-pop { position: fixed; z-index: 70; background: #fff; color: #1d2329; border-radius: 14px; padding: 12px 16px; box-shadow: 0 8px 30px rgba(0,0,0,.25); text-align: center; min-width: 140px; }
+.dict-pop .emo { font-size: 64px; line-height: 1.1; }
+.dict-pop .w { font-size: 22px; font-weight: 600; }
+.rb.listening { background: #ffe1e1; border-color: #d0021b; }

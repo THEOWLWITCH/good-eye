@@ -303,6 +303,13 @@
     var cond = st.condition === 'corrected' ? work : plainSettings;
     stageLens.apply(cond, st.condition === 'corrected' ? ctx.opsFor(work) : null);
     var trial = DA.stimuli.make(st.category, step && step.trial ? step.trial.answer : null);
+    if (work.cvi) {
+      // simple & focused: only two answers, the target and one other
+      var tgt = trial.choices.filter(function (c) { return c.key === trial.answer; });
+      var other = trial.choices.filter(function (c) { return c.key !== trial.answer; }).slice(0, 1);
+      trial.choices = Math.random() < 0.5 ? tgt.concat(other) : other.concat(tgt);
+    }
+    $('learnStage').classList.toggle('cvi', !!work.cvi);
     var size = isCatch ? Math.max(st.size * 2.5, START[st.category] * 1.5) : st.size;
     step = { type: 'recognize', st: st, trial: trial, size: size, isCatch: !!isCatch };
     $('learnContent').innerHTML = '<div class="stim-wrap">' + trial.html(Math.round(size)) + '</div>';
@@ -344,7 +351,7 @@
     f.textContent = text;
     f.classList.add('show');
     $('learnChoices').querySelectorAll('button').forEach(function (b) { b.disabled = true; });
-    setTimeout(function () { f.classList.remove('show'); nextStep(); }, 650);
+    setTimeout(function () { f.classList.remove('show'); nextStep(); }, work && work.cvi ? 1300 : 650);
   }
 
   // ---------------- end ----------------

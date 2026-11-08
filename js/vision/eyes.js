@@ -79,6 +79,28 @@
     return { yaw: yaw * d, pitch: pitch * d, roll: roll * d };
   }
 
+  /**
+   * For each 10° band of head turn, how much the eyes jitter (mean frame-to-frame gaze change).
+   * Returns the steadiest band when it is clearly steadier than looking straight ahead.
+   */
+  function steadiest(hist) {
+    var bins = {};
+    for (var i = 1; i < hist.length; i++) {
+      var b = Math.round(hist[i].yaw / 10) * 10;
+      if (Math.round(hist[i - 1].yaw / 10) * 10 !== b) continue;
+      (bins[b] = bins[b] || []).push(Math.abs(hist[i].h - hist[i - 1].h));
+    }
+    var stats = Object.keys(bins).filter(function (k) { return bins[k].length >= 40; }).map(function (k) {
+      return { yaw: +k, jitter: bins[k].reduce(function (s, v) { return s + v; }, 0) / bins[k].length };
+    });
+    if (stats.length < 2) return null;
+    stats.sort(function (a, b) { return a.jitter - b.jitter; });
+    var centre = stats.filter(function (x) { return x.yaw === 0; })[0];
+    var best = stats[0];
+    if (!centre || best.yaw === 0 || best.jitter > centre.jitter * 0.75) return null;
+    return { yaw: best.yaw, gainPct: Math.round((1 - best.jitter / centre.jitter) * 100) };
+  }
+
   function median(a) { if (!a.length) return null; var s = a.slice().sort(function (x, y) { return x - y; }); return s[Math.floor(s.length / 2)]; }
 
   // ---------- live tracker ----------
@@ -218,6 +240,14 @@
       s.centered = s.gazeDeviation < 0.12;
     }
 
+    // gaze steadiness by head turn (for shaking eyes / nystagmus: some head positions calm the eyes)
+    if (head) {
+      var hist = this._steady = this._steady || [];
+      hist.push({ yaw: head.yaw, h: g.h });
+      if (hist.length > 600) hist.shift();
+      if (hist.length % 30 === 0) s.steadiest = steadiest(hist);
+    }
+
     // blinks & squint from blendshapes
     var bs = {};
     ((res.faceBlendshapes && res.faceBlendshapes[0] && res.faceBlendshapes[0].categories) || []).forEach(function (c) { bs[c.categoryName] = c.score; });
@@ -254,5 +284,5 @@
   };
 
   DA.eyes = new Eyes();
-  DA.eyeMath = { irisDiameterPx: irisDiameterPx, distanceCm: distanceCm, focalFromKnown: focalFromKnown, focalFromFov: focalFromFov, gazeRatios: gazeRatios, headAngles: headAngles, IRIS_MM: IRIS_MM };
+  DA.eyeMath = { steadiest: steadiest, irisDiameterPx: irisDiameterPx, distanceCm: distanceCm, focalFromKnown: focalFromKnown, focalFromFov: focalFromFov, gazeRatios: gazeRatios, headAngles: headAngles, IRIS_MM: IRIS_MM };
 })(typeof window !== 'undefined' ? window : globalThis);

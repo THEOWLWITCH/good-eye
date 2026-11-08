@@ -64,6 +64,28 @@
         DA.stimuli.SENTENCES.slice(0, 5).map(function (s) { return s.en + '.'; }).join(' ') + T('\n\nחשבון: $3 + 4 = 7$ ו־$\\frac{1}{2} + \\frac{1}{4} = \\frac{3}{4}$') });
     };
     $('aiStop').onclick = function () { if (aiCtl) aiCtl.abort(); };
+    // picture dictionary: double-click (or long-press) a word
+    var pressT = null;
+    $('readContent').addEventListener('dblclick', function (e) { var w = e.target.closest && e.target.closest('.w'); if (w) { e.preventDefault(); dictPop(w); } });
+    $('readContent').addEventListener('pointerdown', function (e) {
+      var w = e.target.closest && e.target.closest('.w');
+      if (!w || e.pointerType === 'mouse') return;
+      pressT = setTimeout(function () { dictPop(w); }, 600);
+    });
+    ['pointerup', 'pointercancel', 'pointermove'].forEach(function (ev) { $('readContent').addEventListener(ev, function () { clearTimeout(pressT); }); });
+    document.addEventListener('pointerdown', function (e) { var d = $('dictPop'); if (d && !d.contains(e.target)) d.remove(); });
+    // voice commands
+    if (DA.voice.supported()) {
+      $('rVoice').style.display = '';
+      $('rVoice').onclick = function () {
+        if (DA.voice.isOn()) { DA.voice.stop(); $('rVoice').classList.remove('listening'); return; }
+        DA.voice.start(DA.i18n.content, voiceCommand, function (onNow, err) {
+          $('rVoice').classList.toggle('listening', onNow);
+          if (err) DA.ui.tell(T('אין גישה למיקרופון. צריך לאשר אותו בדפדפן.'));
+          else if (onNow) DA.ui.toast(T('🎤 מקשיב: "גדול יותר", "קטן יותר", "תקריא", "עצור", "הבא", "הקודם", "צבעים", "סרגל"'));
+        });
+      };
+    }
     // tap (or click) a word to hear just that word — handy for young readers
     $('readContent').addEventListener('click', function (e) {
       var w = e.target.closest && e.target.closest('.w');
@@ -106,7 +128,52 @@
       if (last && last.type === 'text') openDoc(last, true); else showSources();
     }
   }
-  function leave() { stopCamera(); stopRsvp(); if (root.speechSynthesis) speechSynthesis.cancel(); }
+  function leave() { stopCamera(); stopRsvp(); if (root.speechSynthesis) speechSynthesis.cancel(); if (DA.voice.isOn()) { DA.voice.stop(); $('rVoice').classList.remove('listening'); } }
+
+  function voiceCommand(cmd) {
+    if (ctx.current() !== 'read') return;
+    if (cmd === 'bigger') bump('fontSize', 1.15);
+    else if (cmd === 'smaller') bump('fontSize', 1 / 1.15);
+    else if (cmd === 'read') { if (!root.speechSynthesis || !speechSynthesis.speaking) speak(); }
+    else if (cmd === 'stop') { if (root.speechSynthesis) speechSynthesis.cancel(); clearSpeaking(); stopRsvp(); }
+    else if (cmd === 'next') { if (mode === 'page') $('readScroll').scrollBy({ top: $('readScroll').clientHeight * 0.8, behavior: 'smooth' }); else stepSeg(1); }
+    else if (cmd === 'back') { if (mode === 'page') $('readScroll').scrollBy({ top: -$('readScroll').clientHeight * 0.8, behavior: 'smooth' }); else stepSeg(-1); }
+    else if (cmd === 'colors') cycleTheme();
+    else if (cmd === 'ruler') $('rRuler').click();
+    else if (cmd === 'best') $('rStar').click();
+  }
+
+  /** Picture dictionary pop-up for a word: picture (if known), the word, and read it aloud. */
+  function dictPop(w) {
+    if (ctx.profile().settings.dictionary === false) return;
+    var old = $('dictPop'); if (old) old.remove();
+    var word = w.textContent.replace(/[.,!?;:"״()]/g, '');
+    var emo = DA.readaids.lookup(word);
+    var pop = document.createElement('div');
+    pop.id = 'dictPop'; pop.className = 'dict-pop';
+    pop.innerHTML = (emo ? '<div class="emo">' + emo + '</div>' : '') + '<div class="w" dir="auto">' + esc(word) + '</div>' +
+      '<div class="row center"><button type="button" class="big" data-a="say">🔊</button><button type="button" data-a="ai" style="display:none">' + T('🪄 מה זה?') + '</button></div><p class="muted small" data-a="exp"></p>';
+    document.body.appendChild(pop);
+    var r = w.getBoundingClientRect();
+    pop.style.top = Math.max(8, Math.min(innerHeight - pop.offsetHeight - 8, r.bottom + 8)) + 'px';
+    pop.style.left = Math.max(8, Math.min(innerWidth - pop.offsetWidth - 8, r.left + r.width / 2 - pop.offsetWidth / 2)) + 'px';
+    pop.querySelector('[data-a=say]').onclick = function () { say(word, 'word'); };
+    DA.ai.available().then(function (ok) {
+      var b = pop.querySelector('[data-a=ai]'); if (!ok || !b) return;
+      b.style.display = '';
+      b.onclick = function () {
+        var exp = pop.querySelector('[data-a=exp]'); exp.textContent = T('⏳ חושב…');
+        DA.ai.explainWord(word, docText() || '', ctx.profile().kind).then(function (r) { exp.textContent = r.text; }, function (e) { exp.textContent = DA.ai.errorText(e); });
+      };
+    });
+  }
+
+  function simplify() {
+    var text = docText();
+    if (!text) return;
+    var kind = ctx.profile().kind;
+    runAi(T('כותב גרסה פשוטה יותר…'), function (onText, signal) { return DA.ai.simplify(text, kind, onText, signal); }, null);
+  }
 
   /** Re-apply the reader's settings (called after any settings change). */
   function refresh(previewSettings) {
@@ -114,6 +181,7 @@
     if (!p) return;
     var s = effective(previewSettings || p.settings);
     lens.apply(s, ctx.opsFor(s));
+    if (doc && lastSyl !== !!s.syllables) { lastSyl = !!s.syllables; render(); }
     var hasCal = !!ctx.opsFor(s);
     $('rGlassesWrap').style.display = hasCal ? '' : 'none';
     $('rGlasses').value = s.warpStrength;
@@ -130,7 +198,7 @@
   }
 
   /** Keep letters the same size for the eye: scale with measured distance (eye tracking). */
-  var lastDist = null;
+  var lastDist = null, lastSyl = null;
   function effective(s) {
     var e = DA.eyes.state;
     if (!s.eyesKeepAngle || !s.refDistanceCm || !e.running || !e.distanceCm) return s;
@@ -287,11 +355,13 @@
     showView();
     var extra = '';
     if (d.type === 'image') extra = T('<button id="toText" class="big">📝 להפוך לטקסט</button>');
+    if (d.type === 'text' || d.type === 'pages') extra += '<button id="simplifyBtn" style="display:none">' + T('🪄 לפשט') + '</button>';
     if ((d.type === 'image' || d.type === 'pages') && ctx.profile().settings.deblur !== 'none') extra += '<label class="inline check"><input type="checkbox" id="sharpenToggle"' + (ctx.store.getPref('sharpenOff', false) ? '' : ' checked') + '> ' + T('✨ חידוד אישי') + '</label>';
     if (d.type === 'pages') extra = T('<label class="inline">תצוגה <select id="pagesAs"><option value="text">טקסט מסודר</option><option value="pages">עמודים כמו במקור</option></select></label>');
     $('readExtra').innerHTML = extra;
     if ($('toText')) DA.ai.canImages().then(function (ok) { $('toText').style.display = ok ? '' : 'none'; $('toText').onclick = photoToText; });
     if ($('pagesAs')) $('pagesAs').onchange = function () { render(); };
+    if ($('simplifyBtn')) DA.ai.available().then(function (ok) { if (ok && $('simplifyBtn')) { $('simplifyBtn').style.display = ''; $('simplifyBtn').onclick = simplify; } });
     if ($('sharpenToggle')) $('sharpenToggle').onchange = function () { ctx.store.setPref('sharpenOff', !this.checked); render(); };
     $('rMode').disabled = d.type !== 'text' && !(d.type === 'pages');
     render();
@@ -390,12 +460,21 @@
           if (speech && !/\s$/.test(speech)) speech += ' ';
           var start = speech.length;
           speech += word;
-          return '<span class="w" data-s="' + start + '">' + esc(word) + '</span>';
+          return '<span class="w" data-s="' + start + '">' + wordInner(word) + '</span>';
         }).join(' ');
       });
       html += '<p dir="auto">' + lines.join('<br>') + '</p>';
     });
     return { html: html, text: speech };
+  }
+
+  /** A word's inner HTML: plain, or split into syllables in alternating colours. */
+  function wordInner(word) {
+    var p = ctx.profile();
+    if (!p || !p.settings.syllables) return esc(word);
+    var parts = DA.readaids.syllables(word);
+    if (parts.length < 2) return esc(word);
+    return parts.map(function (s, i) { return '<span class="' + (i % 2 ? 'syl-b' : 'syl-a') + '">' + esc(s) + '</span>'; }).join('');
   }
 
   function sentences(text) {

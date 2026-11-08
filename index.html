@@ -315,6 +315,7 @@
         <option value="sentence">➡️ משפט</option>
         <option value="word">🔎 מילה</option>
       </select>
+      <button id="rVoice" class="rb" title="פקודות קוליות" style="display:none">🎤</button>
       <button id="rEyes" class="rb eye-switch" data-short></button>
       <button id="rSettings" class="rb" title="הגדרות מתקדמות">⚙️</button>
       <span id="readExtra"></span>
@@ -519,7 +520,8 @@
     <div class="row wrap"><button id="eyeInfoBtn" class="linkish">מה זה, ומתי זה לא עובד?</button><button id="eyeOff" class="danger">כיבוי</button></div>
   </div>
 
-  <div id="toast" class="toast"></div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <a href="#main-content" class="skip-link" id="skipLink">דילוג לתוכן</a>
 
   <dialog id="saveDialog">
     <form method="dialog">
@@ -632,10 +634,12 @@
   <script src="js/render/lens.js"></script>
   <script src="js/content/stimuli.js"></script>
   <script src="js/content/sentences.js"></script>
+  <script src="js/content/readaids.js"></script>
+  <script src="js/core/voice.js"></script>
   <script src="js/core/device.js"></script>
   <script src="js/instruments/grid.js"></script>
   <script src="js/vision/eyes.js"></script>
-  <script>window.DA.VERSION = '0.8.0';</script>
+  <script>window.DA.VERSION = '0.9.0';</script>
   <script src="js/ui/common.js"></script>
   <script src="js/ui/drawer.js"></script>
   <script src="js/ui/eyepanel.js"></script>
