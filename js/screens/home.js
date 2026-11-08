@@ -118,6 +118,9 @@
     $('editProfileBtn').onclick = editProfile;
     DA.eyePanel.bindSwitch($('hubEyesToggle'));
     $('hubEyesInfo').onclick = function () { DA.eyePanel.info(); };
+    $('hubReadTest').onclick = function () { ctx.go('readtest'); };
+    $('hubFieldTest').onclick = function () { ctx.go('fieldtest'); };
+    $('hubCard').onclick = function () { DA.device.calibrate(); };
     ctx.profiles.onChange(function () { if (ctx.current() === 'hub') renderHub(); });
   }
 
@@ -163,8 +166,16 @@
       box.appendChild(row);
     });
 
-    var last = sessions[0];
-    $('hubLearned').innerHTML = last ? DA.screens.learn.summaryHtml(last) : T('<span class="muted">עוד לא שיחקנו. המשחק ילמד מה הכי ברור לך.</span>');
+    // latest result of each kind: game, reading test, field map
+    var shown = {}, parts = [];
+    sessions.forEach(function (s) {
+      var k = s.kind || 'learn';
+      if (shown[k]) return;
+      shown[k] = true;
+      var scr = k === 'mnread' ? DA.screens.readtest : k === 'fieldmap' ? DA.screens.fieldtest : DA.screens.learn;
+      parts.push('<div class="learned-item">' + scr.summaryHtml(s) + '</div>');
+    });
+    $('hubLearned').innerHTML = parts.length ? parts.join('') : T('<span class="muted">עוד לא שיחקנו. המשחק ילמד מה הכי ברור לך.</span>');
   }
 
   function restoreBest() {

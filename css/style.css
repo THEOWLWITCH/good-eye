@@ -337,3 +337,33 @@ dialog.wide { width: min(640px, 94vw); max-height: 88vh; overflow-y: auto; }
 .nudge-pad .pad { display: grid; grid-template-columns: repeat(3, 56px); grid-template-rows: repeat(3, 48px); gap: 4px; justify-content: center; margin: 8px 0; direction: ltr; }
 .nudge-pad .pad button { font-size: 22px; padding: 0; border-radius: 10px; }
 .nudge-pad .pad #nudgeClear { font-size: 16px; color: #6d7a86; }
+
+/* ---------- v0.5: reading-speed test, visual-field map, screen calibration ---------- */
+.setup-grid { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; margin: 12px 0; text-align: start; }
+.setup-grid label { display: flex; flex-direction: column; gap: 4px; font-size: 15px; }
+.setup-grid input, .setup-grid select { padding: 6px 8px; border: 1px solid #c5ced6; border-radius: 8px; min-width: 120px; }
+.rt-stage { width: min(94vw, 980px); height: min(52vh, 520px); border-radius: 14px; box-shadow: 0 2px 12px rgba(0,0,0,.12); }
+.rt-stage > .lens-content { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 3%; }
+.rt-sentence { max-width: 20em; margin: 0; text-align: center; line-height: 1.35; }
+.rt-wait { font-size: 56px; margin: 0; }
+.rt-chart { width: 100%; max-width: 620px; display: block; margin: 10px auto; background: #fff; border: 1px solid #eef1f4; border-radius: 10px; }
+.tests-card { margin-bottom: 16px; }
+.tests-card .tag { font-size: 12px; background: #eef1f4; border-radius: 999px; padding: 2px 9px; font-weight: 400; color: #44515d; }
+.learned-item + .learned-item { border-top: 1px solid #eef1f4; margin-top: 10px; padding-top: 6px; }
+.ft-stage { position: fixed; inset: 0; z-index: 45; background: #cfcfcf; cursor: pointer; user-select: none; touch-action: manipulation; }
+.ft-stage.flash { background: #c6d6c6; }
+.ft-fix { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #e00000; font-size: 30px; line-height: 1; pointer-events: none; }
+.ft-dot { position: absolute; display: none; border-radius: 50%; background: #111; pointer-events: none; }
+.ft-hud { position: absolute; top: 10px; inset-inline-start: 10px; display: flex; gap: 8px; align-items: center; color: #333; font-size: 14px; }
+.ft-hud button { padding: 4px 10px; font-size: 13px; opacity: .75; }
+.ft-note { position: absolute; top: 18%; left: 50%; transform: translateX(-50%); background: #fff; border-radius: 14px; padding: 16px 22px; box-shadow: 0 6px 24px rgba(0,0,0,.18); text-align: center; max-width: 90vw; cursor: default; }
+.ft-result { display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-start; }
+.ft-map { width: min(320px, 90vw); background: #fff; border: 1px solid #eef1f4; border-radius: 12px; }
+.ft-legend { flex: 1; min-width: 220px; }
+.ft-legend .lg { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-inline-end: 6px; vertical-align: middle; }
+.ft-legend .lg.ok { background: #19a35b; } .ft-legend .lg.unsure { background: #f5a623; }
+.ft-legend .lg.miss { background: none; color: #d0021b; font-weight: 700; width: auto; height: auto; border-radius: 0; }
+body.ft-running .topbar, body.ft-running .eye-widget { visibility: hidden; }
+.card-wrap { display: flex; justify-content: center; padding: 14px; background: #f3f5f8; border-radius: 10px; overflow: auto; }
+.card-box { background: linear-gradient(135deg, #3d7bfd, #7a3cdc); color: #fff; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 0 2px 8px rgba(0,0,0,.2); }
+#cardSlider { flex: 1; }

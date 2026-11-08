@@ -7,8 +7,8 @@
   var $ = DA.ui.$;
   var store = new DA.storage.Store();
   var profiles = new DA.ProfileStore(store);
-  var SCREENS = ['home', 'hub', 'calibrate', 'learn', 'read'];
-  var NEEDS_PROFILE = { hub: 1, calibrate: 1, learn: 1, read: 1 };
+  var SCREENS = ['home', 'hub', 'calibrate', 'learn', 'read', 'readtest', 'fieldtest'];
+  var NEEDS_PROFILE = { hub: 1, calibrate: 1, learn: 1, read: 1, readtest: 1, fieldtest: 1 };
   var cur = null;
 
   var ctx = {
@@ -68,7 +68,7 @@
   function boot() {
     DA.i18n.apply(document.body);
     document.title = T('עין טובה');
-    $('langBtn').textContent = DA.i18n.lang === 'he' ? 'English' : 'עברית'; // "עברית" — always shown in Hebrew
+    $('langBtn').textContent = DA.i18n.lang === 'he' ? 'English' : String.fromCharCode(0x5E2, 0x5D1, 0x5E8, 0x5D9, 0x5EA); // "עברית" — always shown in Hebrew
     $('langBtn').onclick = function () { DA.i18n.setLang(DA.i18n.lang === 'he' ? 'en' : 'he'); };
     DA.settings.loadFonts();
     $('version').textContent = 'v' + DA.VERSION;

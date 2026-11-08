@@ -63,6 +63,14 @@
       <button id="tileCalibrate" class="tile cal"><span class="ti">🎯</span><b>כיול עיוות</b><small id="tileCalSub">למי שרואה קווים עקומים. עדיף עם מבוגר</small><span class="cta">▶ לכייל</span></button>
       <button id="tileRead" class="tile read"><span class="ti">📖</span><b>לקרוא</b><small>טקסט, קובץ, תמונה או צילום, עם ההתאמות שלך</small><span class="cta">▶ לקרוא</span></button>
     </div>
+    <div class="card tests-card">
+      <h3>🔬 בדיקות נוספות <span class="tag">למבוגרים ולקוראים</span></h3>
+      <div class="row wrap">
+        <button id="hubReadTest">⏱️ מבחן מהירות קריאה</button>
+        <button id="hubFieldTest">🎯 מיפוי שדה ראייה (כתם עיוור, צד חסר)</button>
+        <button id="hubCard" class="linkish">📏 כיול גודל מסך</button>
+      </div>
+    </div>
     <div class="card eye-card">
       <h3>👁️ מעקב עיניים במצלמה <span class="tag">לא חובה</span></h3>
       <p class="muted">המצלמה מודדת את המרחק מהמסך ואת כיוון המבט, כדי להתאים את התצוגה טוב יותר. שום תמונה לא נשמרת ולא נשלחת.</p>
@@ -306,6 +314,75 @@
     </div>
   </section>
 
+  <!-- ============ READING-SPEED TEST ============ -->
+  <section id="screen-readtest" class="screen">
+    <div id="rtSetup" class="learn-setup">
+      <h1 class="big-title">⏱️ מבחן מהירות קריאה</h1>
+      <p class="lead">משפטים קצרים מופיעים בגדלים שהולכים וקטנים. קוראים כל משפט בקול, מהר ככל שנוח, ולוחצים "סיימתי". מבוגר מסמן כמה מילים נקראו לא נכון.</p>
+      <p class="muted">מתאים למי שכבר קורא משפטים (בערך מכיתה ב׳). לוקח כ־5 דקות. כך מוצאים את גודל האותיות הכי קטן שעדיין קוראים בו מהר ובנוחות.</p>
+      <div class="setup-grid">
+        <label>שפה <select id="rtLang"><option value="he">עברית</option><option value="en">English</option></select></label>
+        <label>מרחק מהמסך (ס״מ) <input id="rtDist" type="number" min="15" max="150"></label>
+      </div>
+      <label class="check"><input type="checkbox" id="rtCompare"> להשוות גם בלי ההגדרות האישיות (עוד כ־5 דקות)</label>
+      <p><span id="rtCalNote" class="muted small"></span> <button id="rtCard" class="linkish">📏 כיול גודל מסך</button></p>
+      <button id="rtStart" class="primary huge">▶ להתחיל</button>
+    </div>
+    <div id="rtPlay" class="learn-play" style="display:none">
+      <div class="learn-top">
+        <div class="progress"><div id="rtProgress"></div></div>
+        <span id="rtCond" class="muted small"></span>
+        <button id="rtExit" class="small">✕ עצירה</button>
+      </div>
+      <div id="rtPrompt" class="learn-prompt"></div>
+      <div id="rtStage" class="rt-stage"><div class="lens-content" id="rtContent"></div></div>
+      <div id="rtButtons" class="learn-choices"></div>
+    </div>
+    <div id="rtEnd" class="learn-end" style="display:none">
+      <h1 class="big-title">🏁 סיימנו!</h1>
+      <div id="rtSummary"></div>
+      <div class="row wrap center">
+        <button id="rtApply" class="primary big"></button>
+        <button id="rtKeep">לא לשנות</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VISUAL-FIELD MAP ============ -->
+  <section id="screen-fieldtest" class="screen">
+    <div id="ftSetup" class="learn-setup">
+      <h1 class="big-title">🎯 מיפוי שדה ראייה</h1>
+      <p class="lead">מביטים כל הזמן בצלב האדום שבמרכז. נקודות קטנות יהבהבו מסביב. כל פעם שרואים נקודה, לוחצים על המסך או על מקש הרווח. לא מזיזים את המבט אל הנקודה!</p>
+      <p class="muted">כך מגלים אם יש אזור שלא רואים בו (למשל כתם במרכז, או צד שלם אחרי שבץ), ומתאימים את מיקום הטקסט. לוקח כ־3 דקות. מתאים בעיקר למבוגרים ולילדים גדולים.</p>
+      <div class="setup-grid">
+        <label>איזו עין? <select id="ftEye"><option value="right">ימין (מכסים את השמאלית)</option><option value="left">שמאל (מכסים את הימנית)</option><option value="both">שתי העיניים</option></select></label>
+        <label>מרחק מהמסך (ס״מ) <input id="ftDist" type="number" min="15" max="150"></label>
+        <label>גודל הנקודה <select id="ftDotSize"><option value="0.35">קטנה</option><option value="0.5" selected>רגילה</option><option value="0.9">גדולה (לראייה חלשה)</option></select></label>
+      </div>
+      <p><span id="ftCalNote" class="muted small"></span> <button id="ftCard" class="linkish">📏 כיול גודל מסך</button></p>
+      <button id="ftStart" class="primary huge">▶ להתחיל</button>
+    </div>
+    <div id="ftStage" class="ft-stage" style="display:none">
+      <div class="ft-fix">✚</div>
+      <div id="ftDot" class="ft-dot"></div>
+      <div class="ft-hud"><span id="ftCount"></span><button id="ftPause">⏸ הפסקה</button><button id="ftStop">✕ עצירה</button></div>
+      <div id="ftPauseNote" class="ft-note" style="display:none">⏸ הפסקה. לחצו "הפסקה" שוב כדי להמשיך.</div>
+      <div id="ftIntro" class="ft-note">
+        <p><b>כסו את העין השנייה.</b></p>
+        <p>הביטו רק בצלב האדום. כשנקודה מהבהבת, נוגעים במסך או לוחצים רווח.</p>
+        <button id="ftGo" class="primary big">▶ מוכנים</button>
+      </div>
+    </div>
+    <div id="ftEnd" class="learn-end" style="display:none">
+      <h1 class="big-title">🗺️ מפת שדה הראייה</h1>
+      <div id="ftSummary"></div>
+      <div class="row wrap center">
+        <button id="ftApply" class="primary big">✓ להפעיל את ההמלצות בקריאה</button>
+        <button id="ftKeep">לא לשנות</button>
+      </div>
+    </div>
+  </section>
+
   <!-- ============ SETTINGS DRAWER ============ -->
   <div id="drawerScrim" class="drawer-scrim"></div>
   <aside id="drawer" class="drawer">
@@ -375,6 +452,16 @@
     </form>
   </dialog>
 
+  <dialog id="cardDialog" class="wide">
+    <form method="dialog">
+      <h3>📏 כיול גודל המסך</h3>
+      <p>הניחו כרטיס אשראי (או כל כרטיס בגודל כזה, כמו תעודת זהות) על המסך, והגדילו או הקטינו את המלבן עד שהוא בדיוק בגודל הכרטיס.</p>
+      <div class="card-wrap"><div id="cardBox" class="card-box">💳</div></div>
+      <div class="row center"><button type="button" id="cardMinus">−</button><input id="cardSlider" type="range"><button type="button" id="cardPlus">+</button></div>
+      <div class="row"><button value="ok" class="primary">שמירה</button> <button value="cancel">ביטול</button></div>
+    </form>
+  </dialog>
+
   <dialog id="profileDialog">
     <form method="dialog">
       <h3 id="profileDialogTitle">קורא/ת חדש/ה</h3>
@@ -438,9 +525,11 @@
   <script src="js/core/ai.js"></script>
   <script src="js/render/lens.js"></script>
   <script src="js/content/stimuli.js"></script>
+  <script src="js/content/sentences.js"></script>
+  <script src="js/core/device.js"></script>
   <script src="js/instruments/grid.js"></script>
   <script src="js/vision/eyes.js"></script>
-  <script>window.DA.VERSION = '0.4.0';</script>
+  <script>window.DA.VERSION = '0.5.0';</script>
   <script src="js/ui/common.js"></script>
   <script src="js/ui/drawer.js"></script>
   <script src="js/ui/eyepanel.js"></script>
@@ -448,6 +537,8 @@
   <script src="js/screens/home.js"></script>
   <script src="js/screens/learn.js"></script>
   <script src="js/screens/reader.js"></script>
+  <script src="js/screens/readtest.js"></script>
+  <script src="js/screens/fieldtest.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>
