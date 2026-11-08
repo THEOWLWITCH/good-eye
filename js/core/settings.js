@@ -45,6 +45,7 @@
     lineHeight: 1.6,
     lineChars: 45,         // max characters per line
     nikud: false,          // prefer pointed Hebrew in generated texts
+    nikudShow: 'asis',     // show nikud as in the text (asis) or hide it (hide)
     // colour & contrast
     theme: 'white',
     imageContrast: 1,      // 1 = unchanged
@@ -72,6 +73,11 @@
     deblurAmount: 1, deblurRadius: 1.5, deblurK: 0.01, deblurIter: 10,
     cvi: false,            // simple & focused mode (CVI): one bright colour, uncluttered, two answers, gentle motion, more time
     syllables: false,      // colour syllables in alternating colours (approximate; pointed Hebrew and English)
+    syllableMark: 'color', // how every second syllable is marked: color | line (underline, for colour-blind readers)
+    focusWords: 1,         // "focus word" mode: how many words are shown at full contrast (1–3)
+    focusDim: 0.15,        // "focus word" mode: how visible the other words stay (0.03–0.6)
+    wordEdge: 'off',       // a mark at the edge of every word: off | end | start (neglect at word level)
+    readAlong: 'next',     // read aloud in sentence / word mode: next (go on) | echo (wait: now you read) | stop
     dictionary: true,      // double-tap a word for a picture and to hear it
     copilot: true,         // show the navigator (Yanshufi the owl) with short guidance
     copilotVoice: false,   // the navigator reads its guidance aloud
@@ -87,7 +93,7 @@
   var RANGES = {
     fontSize: [12, 120], letterSpacing: [-0.02, 0.4], wordSpacing: [0, 1.2], lineHeight: [1.1, 3],
     lineChars: [15, 90], imageContrast: [0.6, 2.2], warpStrength: [0, 1], sharpen: [0, 1.5],
-    brightness: [0.4, 1], warmth: [0, 1], uiScale: [1, 1.5],
+    brightness: [0.4, 1], warmth: [0, 1], uiScale: [1, 1.5], focusWords: [1, 3], focusDim: [0.03, 0.6],
     zoom: [0.5, 4], shiftX: [-0.35, 0.35], shiftY: [-0.35, 0.35], speechRate: [0.5, 1.5]
   };
 
@@ -101,7 +107,30 @@
     if (!THEMES.some(function (t) { return t.id === out.theme; })) out.theme = DEFAULTS.theme;
     if (['none', 'protan', 'deutan', 'tritan'].indexOf(out.cvd) < 0) out.cvd = 'none';
     if (['none', 'unsharp', 'directional', 'local', 'wiener', 'rl'].indexOf(out.deblur) < 0) out.deblur = 'none';
+    if (['asis', 'hide'].indexOf(out.nikudShow) < 0) out.nikudShow = 'asis';
+    if (['color', 'line'].indexOf(out.syllableMark) < 0) out.syllableMark = 'color';
+    if (['off', 'end', 'start'].indexOf(out.wordEdge) < 0) out.wordEdge = 'off';
+    if (['next', 'echo', 'stop'].indexOf(out.readAlong) < 0) out.readAlong = 'next';
+    out.focusWords = Math.round(out.focusWords);
     return out;
+  }
+
+  // ---------- an accent colour per theme (syllables, word-edge marks): ≥ 4.5:1 on the background ----------
+  function rgb(h) { h = h.replace('#', ''); return [0, 2, 4].map(function (i) { return parseInt(h.substr(i, 2), 16); }); }
+  function lum(c) {
+    var v = c.map(function (x) { x /= 255; return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4); });
+    return 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2];
+  }
+  function contrast(a, b) { var x = lum(rgb(a)), y = lum(rgb(b)); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); }
+  var ACCENTS = ['#b3003c', '#7a1fa2', '#8a4b00', '#ff9e7a', '#7fd4ff', '#ffd166', '#c9a7ff'];
+  /** A colour that stands out from the text colour and reads at ≥ 4.5:1 on the theme's background. */
+  function accentFor(id) {
+    var t = theme(id), f = rgb(t.fg);
+    for (var i = 0; i < ACCENTS.length; i++) {
+      var c = ACCENTS[i], a = rgb(c);
+      if (contrast(c, t.bg) >= 4.5 && Math.hypot(a[0] - f[0], a[1] - f[1], a[2] - f[2]) > 140) return c;
+    }
+    return t.fg;
   }
 
   function font(id) { return FONTS.filter(function (f) { return f.id === id; })[0] || FONTS[0]; }
@@ -134,7 +163,7 @@
     document.head.appendChild(l);
   }
 
-  DA.settings = {
+  DA.settings = { accentFor: accentFor, contrast: contrast,
     DEFAULTS: DEFAULTS, RANGES: RANGES, FONTS: FONTS, THEMES: THEMES,
     normalize: normalize, font: font, theme: theme, describe: describe, loadFonts: loadFonts
   };

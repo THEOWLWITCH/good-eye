@@ -244,6 +244,23 @@ test('pointed Hebrew splits into syllables; unpointed stays whole', function () 
   ok(s2.join('') === 'יְלָדִים' && s2.length >= 2, JSON.stringify(s2));
   ok(RA.syllables('שלום').length === 1);
 });
+test('Hebrew syllables ignore punctuation around the word (furtive patah at the end of a sentence)', function () {
+  ok(RA.syllables('יָרֵחַ.').join('|') === 'יָ|רֵחַ.', JSON.stringify(RA.syllables('יָרֵחַ.')));
+  ok(RA.syllables('תַּפּוּחַ,').join('|') === 'תַּ|פּוּחַ,', JSON.stringify(RA.syllables('תַּפּוּחַ,')));
+  ok(RA.syllables('"שָׁלוֹם!"').join('|') === '"שָׁ|לוֹם!"', JSON.stringify(RA.syllables('"שָׁלוֹם!"')));
+});
+test('English consonant + le keeps its own syllable; silent e does not', function () {
+  ok(RA.syllables('apple').join('|') === 'ap|ple', JSON.stringify(RA.syllables('apple')));
+  ok(RA.syllables('little').join('|') === 'lit|tle', JSON.stringify(RA.syllables('little')));
+  ok(RA.syllables('table').join('|') === 'ta|ble', JSON.stringify(RA.syllables('table')));
+  ok(RA.syllables('cake').length === 1 && RA.syllables('while').length === 1);
+});
+test('syllable / word-edge accent reads at 4.5:1 on every theme and differs from the text', function () {
+  DA.settings.THEMES.forEach(function (t) {
+    var c = DA.settings.accentFor(t.id);
+    ok(c !== t.fg && DA.settings.contrast(c, t.bg) >= 4.5, t.id + ' ' + c + ' ' + DA.settings.contrast(c, t.bg).toFixed(2));
+  });
+});
 test('English splits into syllables and keeps punctuation', function () {
   var s = RA.syllables('elephant.');
   ok(s.join('') === 'elephant.' && s.length >= 2, JSON.stringify(s));
@@ -254,6 +271,7 @@ test('picture dictionary finds words with Hebrew prefixes, nikud and plurals', f
   ok(RA.lookup('וְהַכֶּלֶב') === '🐕', 'nikud and two prefixes');
   ok(RA.lookup('dogs.') === '🐕');
   ok(RA.lookup('xyzzy') === null);
+  ok(RA.lookup('כַּלְבִּי') === '🐕', 'possessive ending');
 });
 test('gaze steadiness finds the calmer head turn', function () {
   var hist = [], i;

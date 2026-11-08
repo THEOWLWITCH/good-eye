@@ -244,6 +244,12 @@ html[lang="he"] .stn-step, html[lang="he"] .eyebrow, html[lang="he"] .sec-title 
 .credits .link, .a11y-link { background: none !important; border: 0 !important; padding: 0; color: var(--ice); text-decoration: underline; font: inherit; cursor: pointer; }
 #a11yDialog ul { padding-inline-start: 20px; line-height: 1.6; }
 
+/* ---------- aid presets in the settings drawer ---------- */
+.aid-presets { display: grid; gap: 8px; margin: 6px 0 4px; }
+.aid-preset { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: start; padding: 10px 14px; border-radius: 12px; }
+.aid-preset small { color: var(--ink2); font-weight: 400; }
+html.hc .aid-preset small { color: #333; }
+
 /* ---------- warp anchor: control and camera gaze calibration ---------- */
 .rb2.follow select { max-width: 15em; }
 .gz-overlay { position: fixed; inset: 0; z-index: 90; background: #0a0f1e; color: #e8eefc; }

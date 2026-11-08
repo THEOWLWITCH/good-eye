@@ -76,6 +76,16 @@
       return sample(prompt, { onText: onText, signal: signal, cache: false });
     });
   }
+  /** Add full nikud to the Hebrew words of a text, changing nothing else. */
+  function addNikud(text, onText, signal) {
+    return get().then(function (sample) {
+      if (!sample) throw { code: 'unavailable' };
+      var prompt = 'Add full, correct Hebrew nikud (vowel points) to every Hebrew word of the following text. ' +
+        'Do not change, add or remove any word, punctuation mark or line break, and keep any non-Hebrew text exactly as it is. ' +
+        'No markdown. Reply with the pointed text only.\n\nTEXT:\n' + String(text).slice(0, 12000);
+      return sample(prompt, { onText: onText, signal: signal, cache: false });
+    });
+  }
   /** A one- or two-sentence explanation of a word, in the language of the word. */
   function explainWord(word, context, kind) {
     return get().then(function (sample) {
@@ -100,5 +110,5 @@
     })[c] || T('משהו השתבש (') + (c || T('שגיאה')) + T('). אפשר לנסות שוב.');
   }
 
-  DA.ai = { simplify: simplify, explainWord: explainWord, available: function () { return get().then(function (s) { return !!s; }); }, canImages: canImages, generate: generate, photoToText: photoToText, errorText: errorText, LEVELS: LEVELS, KINDS: KINDS };
+  DA.ai = { addNikud: addNikud, simplify: simplify, explainWord: explainWord, available: function () { return get().then(function (s) { return !!s; }); }, canImages: canImages, generate: generate, photoToText: photoToText, errorText: errorText, LEVELS: LEVELS, KINDS: KINDS };
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -79,6 +79,11 @@
     st.setProperty('--zoom', String(s.zoom));
     this.el.classList.toggle('line-marker', !!s.lineMarker);
     this.el.classList.toggle('line-marker-end', !!s.lineMarkerEnd);
+    st.setProperty('--accent', DA.settings.accentFor(s.theme));
+    st.setProperty('--focus-dim', String(s.focusDim));
+    this.el.classList.toggle('word-edge-end', s.wordEdge === 'end');
+    this.el.classList.toggle('word-edge-start', s.wordEdge === 'start');
+    this.el.classList.toggle('syl-line', s.syllableMark === 'line');
     this.el.classList.toggle('reversed', !!t.reversed);
     // calm mode: softer text contrast and more air between lines
     this.el.classList.toggle('calm', !!s.calm);
@@ -93,15 +98,39 @@
     this._updateFilter();
   };
 
+  /** Centres (px from the lens top) of the text lines in view, from the word spans; cached briefly. */
+  Lens.prototype._lineCenters = function () {
+    var now = Date.now();
+    if (this._lines && now - this._lines.t < 250) return this._lines.ys;
+    var r = this.el.getBoundingClientRect(), ys = [];
+    this.content.querySelectorAll('.w').forEach(function (w) {
+      var b = w.getBoundingClientRect();
+      if (!b.height || b.bottom < r.top || b.top > r.bottom) return;
+      var c = b.top + b.height / 2 - r.top;
+      if (!ys.some(function (y) { return Math.abs(y - c) < b.height * 0.5; })) ys.push(c);
+    });
+    ys.sort(function (a, b) { return a - b; });
+    this._lines = { t: now, ys: ys };
+    return ys;
+  };
+  /** Move the reading ruler to a point, snapped to the nearest line of text (so it never cuts a line in half). */
   Lens.prototype.moveRulerTo = function (clientY) {
-    var r = this.el.getBoundingClientRect();
-    this.rulerY = Math.min(0.98, Math.max(0.02, (clientY - r.top) / r.height));
+    var r = this.el.getBoundingClientRect(), y = clientY - r.top, ys = this._lineCenters();
+    if (ys.length) y = ys.reduce(function (a, b) { return Math.abs(b - y) < Math.abs(a - y) ? b : a; });
+    this.rulerY = Math.min(0.98, Math.max(0.02, y / r.height));
     this._placeRuler();
   };
+  /** One line down (1) or up (−1). */
   Lens.prototype.moveRuler = function (dir) {
-    var r = this.el.getBoundingClientRect();
-    var step = this.settings.fontSize * this.settings.lineHeight / Math.max(1, r.height);
-    this.rulerY = Math.min(0.98, Math.max(0.02, this.rulerY + dir * step));
+    var r = this.el.getBoundingClientRect(), cur = this.rulerY * r.height, ys = this._lineCenters(), next = null;
+    this._lines = null;
+    ys = this._lineCenters();
+    ys.forEach(function (y) {
+      if (dir > 0 && y > cur + 2 && (next == null || y < next)) next = y;
+      if (dir < 0 && y < cur - 2 && (next == null || y > next)) next = y;
+    });
+    if (next == null) next = cur + dir * this.settings.fontSize * this.settings.lineHeight;
+    this.rulerY = Math.min(0.98, Math.max(0.02, next / Math.max(1, r.height)));
     this._placeRuler();
   };
   Lens.prototype._placeRuler = function () {

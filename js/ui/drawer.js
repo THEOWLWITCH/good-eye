@@ -28,7 +28,8 @@
       { k: 'wordSpacing', label: T('ריווח בין מילים'), type: 'range', min: 0, max: 1.2, step: 0.05, fmt: f2 },
       { k: 'lineHeight', label: T('ריווח בין שורות'), type: 'range', min: 1.1, max: 3, step: 0.05, fmt: f2 },
       { k: 'lineChars', label: T('אורך שורה (תווים)'), type: 'range', min: 15, max: 90, step: 1, fmt: String },
-      { k: 'nikud', label: T('טקסטים חדשים עם ניקוד'), type: 'check' }
+      { k: 'nikud', label: T('טקסטים חדשים עם ניקוד'), type: 'check' },
+      { k: 'nikudShow', label: T('ניקוד בטקסט'), type: 'select', options: function () { return [['asis', T('כמו בטקסט')], ['hide', T('להסתיר את הניקוד')]]; } }
     ] },
     { title: T('צבעים וניגודיות'), items: [
       { k: 'theme', label: T('צבע רקע וטקסט'), type: 'themes' },
@@ -44,9 +45,12 @@
     ] },
     { title: T('תיקון עיוות וחדות'), items: [
       { k: 'calibrationId', label: T('כיול רשת פעיל'), type: 'select', options: calibrationOptions },
-      { k: 'warpStrength', label: T('עוצמת תיקון העיוות'), type: 'range', min: 0, max: 1.5, step: 0.05, fmt: pct },
+      { k: 'warpStrength', label: T('עוצמת תיקון העיוות'), type: 'range', min: 0, max: 1, step: 0.05, fmt: pct },
       { k: 'sharpen', label: T('חידוד'), type: 'range', min: 0, max: 1.5, step: 0.05, fmt: f2 },
       { k: 'zoom', label: T('הגדלת תמונות ועמודים'), type: 'range', min: 0.5, max: 4, step: 0.1, fmt: function (v) { return '×' + (+v).toFixed(1); } }
+    ] },
+    { title: T('ערכות עזר לקריאה'), note: T('כל ערכה מפעילה כמה עזרים יחד. אפשר לשנות כל אחד מהם למטה. הערכות לא מאבחנות ולא מחליפות הוראה מתקנת: בוחרים לפי מה שעוזר לקורא/ת, ואם יש אבחון, לפי ההמלצות שבו.'), items: [
+      { type: 'presets' }
     ] },
     { title: T('עזרי קריאה'), items: [
       { k: 'ruler', label: T('סרגל קריאה'), type: 'select', options: function () { return [['off', T('כבוי')], ['band', T('פס מודגש')], ['mask', T('חלון (מחשיך את השאר)')]]; } },
@@ -55,6 +59,11 @@
       { k: 'shiftX', label: T('הזזת הטקסט לצדדים'), type: 'range', min: -0.35, max: 0.35, step: 0.01, fmt: pct },
       { k: 'shiftY', label: T('הזזת הטקסט למעלה/למטה'), type: 'range', min: -0.35, max: 0.35, step: 0.01, fmt: pct },
       { k: 'syllables', label: T('הברות בצבעים מתחלפים (בקירוב, לעברית מנוקדת ולאנגלית)'), type: 'check' },
+      { k: 'syllableMark', label: T('סימון ההברות'), type: 'select', options: function () { return [['color', T('בצבע')], ['line', T('בקו תחתון (בלי צבע)')]]; } },
+      { k: 'wordEdge', label: T('סימון קצה בכל מילה (למי שמדלג/ת על תחילת המילה או סופה)'), type: 'select', options: function () { return [['off', T('כבוי')], ['end', T('סימון סוף המילה')], ['start', T('סימון תחילת המילה')]]; } },
+      { k: 'focusWords', label: T('"מילה במוקד": כמה מילים מודגשות'), type: 'range', min: 1, max: 3, step: 1, fmt: String },
+      { k: 'focusDim', label: T('"מילה במוקד": כמה רואים את שאר המילים'), type: 'range', min: 0.03, max: 0.6, step: 0.01, fmt: pct },
+      { k: 'readAlong', label: T('הקראה במצב משפט או מילה'), type: 'select', options: function () { return [['next', T('ממשיכה לבד למשפט הבא')], ['echo', T('אחרי כל משפט: עכשיו את/ה קוראים')], ['stop', T('עוצרת בסוף המשפט')]]; } },
       { k: 'dictionary', label: T('לחיצה כפולה על מילה מראה תמונה ומקריאה אותה'), type: 'check' },
       { k: 'speechHighlight', label: T('להדגיש כל מילה בזמן ההקראה'), type: 'check' },
       { k: 'speechRate', label: T('מהירות הקראה'), type: 'range', min: 0.5, max: 1.5, step: 0.05, fmt: f2 }
@@ -114,8 +123,8 @@
     box.innerHTML = '';
     GROUPS.forEach(function (g) {
       var sec = document.createElement('section');
-      sec.innerHTML = '<h3>' + esc(g.title) + '</h3>';
-      g.items.forEach(function (it) { sec.appendChild(control(it)); });
+      sec.innerHTML = '<h3>' + esc(g.title) + '</h3>' + (g.note ? '<p class="muted small">' + esc(g.note) + '</p>' : '');
+      g.items.forEach(function (it) { sec.appendChild(it.type === 'presets' ? presets() : control(it)); });
       box.appendChild(sec);
     });
     preview();
@@ -171,6 +180,38 @@
       });
     }
     return wrap;
+  }
+
+  /**
+   * Aid presets with neutral names (not diagnoses): each switches on a few aids together, and
+   * sometimes a reading mode. A professional who knows the reader can pick one in a click.
+   */
+  var PRESETS = [
+    { id: 'focus', label: T('מילה במוקד'), sub: T('מילה אחת ברורה והשאר מעומעם, וריווח בין מילים'), mode: 'focus',
+      patch: { focusWords: 1, focusDim: 0.15, wordSpacing: 0.35, letterSpacing: 0.06 } },
+    { id: 'edges', label: T('סמני קצה'), sub: T('סימון סוף המילה, תחילת השורה וסוף השורה'), patch: { wordEdge: 'end', lineMarker: true, lineMarkerEnd: true } },
+    { id: 'syll', label: T('הברות והקראה'), sub: T('הברות בצבעים, הקראה עם הדגשה, משפט אחרי משפט'), mode: 'sentence',
+      patch: { syllables: true, speechHighlight: true, readAlong: 'next' } },
+    { id: 'space', label: T('ריווח ושורות קצרות'), sub: T('יותר מקום בין אותיות, מילים ושורות'), patch: { letterSpacing: 0.12, wordSpacing: 0.35, lineHeight: 1.9, lineChars: 40 } },
+    { id: 'one', label: T('מילה אחרי מילה'), sub: T('מילה אחת בכל פעם, בקצב שלך'), mode: 'word', patch: {} }
+  ];
+  function presets() {
+    var box = document.createElement('div');
+    box.className = 'aid-presets';
+    PRESETS.forEach(function (pr) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'aid-preset';
+      b.innerHTML = '<b>' + esc(pr.label) + '</b><small>' + esc(pr.sub) + '</small>';
+      b.onclick = function () {
+        Object.assign(work, pr.patch);
+        commit();
+        if (pr.mode) { ctx.store.setPref('read.mode', pr.mode); if (ctx.current() === 'read') DA.screens.read.setMode(pr.mode); }
+        render();
+        DA.ui.toast(T('הופעל: ') + pr.label);
+      };
+      box.appendChild(b);
+    });
+    return box;
   }
 
   function preview(live) {

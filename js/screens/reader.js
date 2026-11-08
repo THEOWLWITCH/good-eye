@@ -12,6 +12,7 @@
   DA.screens = DA.screens || {};
   var $ = DA.ui.$, esc = DA.ui.esc;
   var ctx, lens, doc = null, mode = 'page', segs = [], segIdx = 0, rsvpTimer = null, stream = null, aiCtl = null;
+  var segMap = null, focusSpans = [], lastNik = null;
 
   function init(c) {
     ctx = c;
@@ -111,8 +112,9 @@
     // tap (or click) a word to hear just that word — handy for young readers
     $('readContent').addEventListener('click', function (e) {
       var w = e.target.closest && e.target.closest('.w');
-      if (!w || !root.speechSynthesis || speechSynthesis.speaking) return;
-      if (ctx.profile().settings.ruler !== 'off') return; // ruler taps move the ruler
+      if (!w) return;
+      if (mode === 'focus') { var all = Array.prototype.indexOf.call(focusSpans, w); if (all >= 0) { segIdx = all; markFocus(); } }
+      if (!root.speechSynthesis || speechSynthesis.speaking) return;
       say(w.textContent, 'word');
       w.classList.add('speaking');
       setTimeout(function () { w.classList.remove('speaking'); }, 900);
@@ -149,6 +151,7 @@
     if (!p) { ctx.go('home'); return; }
     refresh();
     mode = ctx.store.getPref('read.mode', 'page'); $('rMode').value = mode;
+    if (doc) render();
     var intent = ctx.store.getPref('read.intent', null);
     ctx.store.setPref('read.intent', null);
     $('readSources').classList.toggle('see', intent === 'see');
@@ -158,14 +161,14 @@
       if (last && last.type === 'text') openDoc(last, true); else showSources();
     }
   }
-  function leave() { stopCamera(); stopRsvp(); if (root.speechSynthesis) speechSynthesis.cancel(); if (DA.voice.isOn()) { DA.voice.stop(); $('rVoice').classList.remove('listening'); } }
+  function leave() { stopCamera(); stopRsvp(); stopSpeech(); if (DA.voice.isOn()) { DA.voice.stop(); $('rVoice').classList.remove('listening'); } }
 
   function voiceCommand(cmd) {
     if (ctx.current() !== 'read') return;
     if (cmd === 'bigger') bump('fontSize', 1.15);
     else if (cmd === 'smaller') bump('fontSize', 1 / 1.15);
     else if (cmd === 'read') { if (!root.speechSynthesis || !speechSynthesis.speaking) speak(); }
-    else if (cmd === 'stop') { if (root.speechSynthesis) speechSynthesis.cancel(); clearSpeaking(); stopRsvp(); }
+    else if (cmd === 'stop') { stopSpeech(); stopRsvp(); }
     else if (cmd === 'next') { if (mode === 'page') $('readScroll').scrollBy({ top: $('readScroll').clientHeight * 0.8, behavior: 'smooth' }); else stepSeg(1); }
     else if (cmd === 'back') { if (mode === 'page') $('readScroll').scrollBy({ top: -$('readScroll').clientHeight * 0.8, behavior: 'smooth' }); else stepSeg(-1); }
     else if (cmd === 'colors') cycleTheme();
@@ -279,7 +282,8 @@
     var hasCal = !!ctx.opsFor(s), oneEye = hasCal && ctx.store.getPref('read.oneEye.' + p.id, false);
     lens.apply(s, oneEye ? ctx.warpFor(s) : null);
     followSetup(oneEye);
-    if (doc && lastSyl !== !!s.syllables) { lastSyl = !!s.syllables; render(); }
+    if (doc && (lastSyl !== !!s.syllables || lastNik !== s.nikudShow)) { lastSyl = !!s.syllables; lastNik = s.nikudShow; render(); }
+    else if (doc && mode === 'focus') markFocus();
     var eye = ctx.calEye(s);
     $('rOneEye').style.display = hasCal ? '' : 'none';
     $('rOneEye').classList.toggle('on', !!oneEye);
@@ -458,18 +462,33 @@
     var extra = '';
     if (d.type === 'image') extra = T('<button id="toText" class="big">להפוך לטקסט</button>');
     if (d.type === 'text' || d.type === 'pages') extra += '<button id="simplifyBtn" style="display:none">' + T('לפשט') + '</button>';
+    if (d.type === 'text' && /[א-ת]/.test(d.text || '') && !/[ְ-ׇ]/.test(d.text || '')) extra += '<button id="nikudBtn" style="display:none">' + T('להוסיף ניקוד') + '</button>';
     if ((d.type === 'image' || d.type === 'pages') && ctx.profile().settings.deblur !== 'none') extra += '<label class="inline check"><input type="checkbox" id="sharpenToggle"' + (ctx.store.getPref('sharpenOff', false) ? '' : ' checked') + '> ' + T('חידוד אישי') + '</label>';
     if (d.type === 'pages') extra = T('<label class="inline">תצוגה <select id="pagesAs"><option value="text">טקסט מסודר</option><option value="pages">עמודים כמו במקור</option></select></label>');
     $('readExtra').innerHTML = extra;
     if ($('toText')) DA.ai.canImages().then(function (ok) { $('toText').style.display = ok ? '' : 'none'; $('toText').onclick = photoToText; });
     if ($('pagesAs')) $('pagesAs').onchange = function () { render(); };
     if ($('simplifyBtn')) DA.ai.available().then(function (ok) { if (ok && $('simplifyBtn')) { $('simplifyBtn').style.display = ''; $('simplifyBtn').onclick = simplify; } });
+    if ($('nikudBtn')) DA.ai.available().then(function (ok) { if (ok && $('nikudBtn')) { $('nikudBtn').style.display = ''; $('nikudBtn').onclick = addNikud; } });
     if ($('sharpenToggle')) $('sharpenToggle').onchange = function () { ctx.store.setPref('sharpenOff', !this.checked); render(); };
     $('rMode').disabled = d.type !== 'text' && !(d.type === 'pages');
     render();
     if (!silent) $('readScroll').scrollTop = 0;
   }
 
+  /** Add nikud to the text with Claude (claude.ai only). Automatic nikud can be wrong: said on the screen. */
+  function addNikud() {
+    var text = docText();
+    if (!text) return;
+    runAi(T('מוסיף ניקוד…'), function (onText, signal) { return DA.ai.addNikud(text, onText, signal); }, null);
+    DA.ui.toast(T('ניקוד אוטומטי עלול לטעות לפעמים. כדאי שמבוגר/ת יעבור/תעבור עליו.'));
+  }
+  /** The text as shown: with nikud hidden if the reader asked for that. */
+  function displayText() {
+    var t = docText();
+    if (t && ctx.profile().settings.nikudShow === 'hide') t = t.replace(/[֑-ׇֽֿׁׂׅׄ]/g, '');
+    return t;
+  }
   function docText() {
     if (!doc) return '';
     if (doc.type === 'text') return doc.text;
@@ -479,7 +498,8 @@
 
   function render() {
     var box = $('readContent');
-    var text = docText();
+    var text = displayText();
+    lens.el.classList.toggle('focus-mode', mode === 'focus');
     $('segNav').style.display = 'none';
     if (doc.type === 'image') {
       box.innerHTML = '<div class="img-wrap"><img class="lens-img" alt="" src="' + doc.url + '"></div>';
@@ -493,12 +513,19 @@
     }
     if (text == null) return;
     $('segNav').style.display = '';
-    if (mode === 'page') {
+    box.classList.toggle('pointed', /[ְ-ׇּׁׂ]/.test(text));
+    if (mode === 'page' || mode === 'focus') {
       $('segCount').textContent = '';
       var w = wordsHtml(text);
       speechMap = w;
       box.innerHTML = (doc.title ? '<h2 class="read-title" dir="auto">' + esc(doc.title) + '</h2>' : '') + '<div class="read-text">' + w.html + '</div>';
       typesetMath(box);
+      if (mode === 'focus') {
+        focusSpans = Array.prototype.slice.call(box.querySelectorAll('.read-text .w'));
+        segs = focusSpans.map(function (e) { return e.textContent; });
+        segIdx = Math.min(segIdx, Math.max(0, segs.length - 1));
+        showSeg();
+      }
     } else {
       segs = mode === 'sentence' ? sentences(text) : text.split(/\s+/).filter(Boolean);
       segIdx = Math.min(segIdx, Math.max(0, segs.length - 1));
@@ -579,8 +606,15 @@
     return parts.map(function (s, i) { return '<span class="' + (i % 2 ? 'syl-b' : 'syl-a') + '">' + esc(s) + '</span>'; }).join('');
   }
 
+  /** Sentences; a line break (a title, a list item) also ends a sentence. */
   function sentences(text) {
-    return String(text).replace(/\s+/g, ' ').match(/[^.!?。؟\n]+[.!?؟]*["”׳]?\s*/g) || [text];
+    var out = [];
+    String(text).split(/\n+/).forEach(function (line) {
+      line = line.replace(/\s+/g, ' ').trim();
+      if (!line) return;
+      (line.match(/[^.!?。؟]+[.!?؟]*["”׳]?\s*/g) || [line]).forEach(function (x) { if (x.trim()) out.push(x.trim()); });
+    });
+    return out.length ? out : [String(text)];
   }
 
   function typesetMath(el) {
@@ -596,10 +630,27 @@
   }
   function showSeg() {
     var box = $('readContent');
-    if (mode === 'word') showWord(box, segs[segIdx] || '');
-    else box.innerHTML = '<div class="seg ' + mode + '" dir="auto">' + esc(segs[segIdx] || '') + '</div>';
+    if (mode === 'focus') { markFocus(); return; }
+    if (mode === 'word') { segMap = null; showWord(box, segs[segIdx] || ''); }
+    else {
+      // a sentence with word spans: syllables, tap to hear, picture dictionary and word highlight work here too
+      segMap = wordsHtml(segs[segIdx] || '');
+      box.innerHTML = '<div class="seg sentence" dir="auto">' + segMap.html + '</div>';
+    }
     $('segCount').textContent = (segIdx + 1) + ' / ' + segs.length;
     if (mode !== 'word') typesetMath(box);
+    if (echoWait) { echoWait = false; setTimeout(readCurrent, 250); }   // "now you" was read: go on reading together
+  }
+  /** Focus word: the current 1–3 words at full contrast, the rest dimmed. */
+  function markFocus() {
+    if (!focusSpans.length) return;
+    var n = ctx.profile().settings.focusWords || 1;
+    segIdx = Math.max(0, Math.min(segIdx, focusSpans.length - 1));
+    focusSpans.forEach(function (e, i) { e.classList.toggle('focus', i >= segIdx && i < segIdx + n); });
+    $('segCount').textContent = (segIdx + 1) + ' / ' + focusSpans.length;
+    var f = focusSpans[segIdx], r = f.getBoundingClientRect(), v = $('readScroll').getBoundingClientRect();
+    if (r.top < v.top + 30 || r.bottom > v.bottom - 30) f.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    if (followOn && follow !== 'center') anchorToWord(f);
   }
 
   /**
@@ -610,9 +661,23 @@
   function wordAnchor(n) { return n <= 1 ? 0 : n <= 5 ? 1 : n <= 9 ? 2 : n <= 13 ? 3 : 4; }
   function showWord(box, word) {
     var letters = word.match(/[^\u0591-\u05C7\u0300-\u036F][\u0591-\u05C7\u0300-\u036F]*/g) || [word];
-    var a = wordAnchor(letters.length);
+    var st = ctx.profile().settings, isL = function (x) { return /[א-תA-Za-z0-9]/.test(x); };
+    var first = 0, lastL = letters.length - 1;
+    while (first < lastL && !isL(letters[first])) first++;
+    while (lastL > first && !isL(letters[lastL])) lastL--;
+    // neglect at word level: put the whole word on the side that is seen (fixate at the marked edge)
+    var a = st.wordEdge === 'end' ? lastL : st.wordEdge === 'start' ? first : first + wordAnchor(lastL - first + 1);
+    // syllable colour of each letter
+    var syl = [];
+    if (st.syllables) {
+      var parts = DA.readaids.syllables(word), pos = 0, k = 0, lim = parts.length ? parts[0].length : Infinity;
+      letters.forEach(function (L) { while (pos >= lim && k < parts.length - 1) { k++; lim += parts[k].length; } syl.push(parts.length > 1 ? (k % 2 ? 'syl-b' : 'syl-a') : ''); pos += L.length; });
+    }
     box.innerHTML = '<div class="seg word rsvp"><span class="fix-tick top" aria-hidden="true"></span>' +
-      '<span class="rsvp-word" dir="auto">' + esc(letters.slice(0, a).join('')) + '<span class="anchor">' + esc(letters[a] || '') + '</span>' + esc(letters.slice(a + 1).join('')) + '</span>' +
+      '<span class="rsvp-word w" data-s="0" dir="auto">' + letters.map(function (L, i) {
+        var c = [syl[i] || '', i === a ? 'anchor' : ''].join(' ').trim();
+        return c ? '<span class="' + c + '">' + esc(L) + '</span>' : esc(L);
+      }).join('') + '</span>' +
       '<span class="fix-tick bottom" aria-hidden="true"></span></div>';
     var seg = box.firstChild, w = seg.querySelector('.rsvp-word'), an = seg.querySelector('.anchor');
     var r = seg.getBoundingClientRect(), room = r.width * 0.94, ww = w.getBoundingClientRect().width;
@@ -636,7 +701,8 @@
       sc.scrollBy({ top: d * sc.clientHeight * 0.8, behavior: 'smooth' });
       return;
     }
-    segIdx = Math.max(0, Math.min(segs.length - 1, segIdx + d));
+    var n = mode === 'focus' ? (ctx.profile().settings.focusWords || 1) : 1;
+    segIdx = Math.max(0, Math.min(segs.length - 1, segIdx + d * n));
     showSeg();
   }
   /** Back to the beginning. */
@@ -650,7 +716,15 @@
   /** Seconds to wait before the next step: the chosen pace, or by length ("auto"). */
   function stepDelay() {
     var every = ctx.store.getPref('read.every', 'auto'), rate = ctx.profile().settings.speechRate || 1;
+    if (every === 'slow') {
+      var cur = mode === 'focus' ? segs.slice(segIdx, segIdx + (ctx.profile().settings.focusWords || 1)).join(' ') : (segs[segIdx] || '');
+      return (mode === 'page' ? 5000 : 700 + cur.length * (mode === 'sentence' ? 220 : 320)) / rate;
+    }
     if (every !== 'auto') return +every * 1000;
+    if (mode === 'focus') {
+      var fw = segs.slice(segIdx, segIdx + (ctx.profile().settings.focusWords || 1)).join(' ');
+      return (380 + fw.length * 45 + (/[.!?؟:]["”׳]?$/.test(fw) ? 450 : 0)) / rate;
+    }
     if (mode === 'word') {
       var wd = segs[segIdx] || '', extra = /[.!?؟:;]["”׳]?$/.test(wd) ? 450 : /[,،]$/.test(wd) ? 180 : 0;   // a short rest at the end of a sentence
       return (380 + wd.length * 45 + extra) / rate;
@@ -669,8 +743,9 @@
         if (sc.scrollTop + sc.clientHeight >= sc.scrollHeight - 2) { stopRsvp(); return; }
         sc.scrollBy({ top: s.fontSize * s.lineHeight, behavior: 'smooth' });
       } else {
-        if (segIdx >= segs.length - 1) { stopRsvp(); return; }
-        segIdx++; showSeg();
+        var n = mode === 'focus' ? (ctx.profile().settings.focusWords || 1) : 1;
+        if (segIdx + n > segs.length - 1) { stopRsvp(); return; }
+        segIdx += n; showSeg();
       }
       rsvpTimer = setTimeout(tick, stepDelay());
     };
@@ -682,67 +757,131 @@
   }
 
   // ---------------- read aloud ----------------
+  // Read what is shown. In sentence / word mode the reading goes on to the next one ("read along"),
+  // or waits for the reader to read it too ("echo"). Mixed Hebrew / English text is read in runs, each
+  // in its own voice, and the word being read is highlighted (by the voice's word events, or by an
+  // estimate from word length and punctuation when the voice gives none).
+  var sayToken = 0, chainOn = false, echoWait = false, fallbackTimer = null, warnedVoice = false;
   function speak() {
     var synth = root.speechSynthesis;
     if (!synth) { DA.ui.toast(T('הקראה לא זמינה בדפדפן הזה')); return; }
-    if (synth.speaking) { synth.cancel(); clearSpeaking(); return; }
-    var pageMode = mode === 'page' && speechMap && $('readContent').querySelector('.w');
-    var text = pageMode ? speechMap.text : mode === 'page' ? docText() : segs[segIdx];
+    if (synth.speaking || chainOn) { stopSpeech(); return; }
+    readCurrent();
+  }
+  function stopSpeech() {
+    chainOn = false; echoWait = false; sayToken++;
+    if (root.speechSynthesis) speechSynthesis.cancel();
+    clearSpeaking();
+  }
+  function readCurrent() {
+    var hasSpans = !!$('readContent').querySelector('.w');
+    if ((mode === 'page' || mode === 'focus') && speechMap && hasSpans) { say(speechMap.text, 'page'); return; }
+    if (mode === 'page') { var t = displayText(); if (t) say(t, 'seg'); return; }
+    var text = mode === 'sentence' && segMap ? segMap.text : segs[segIdx];
     if (!text) return;
-    say(text, pageMode ? 'page' : 'seg');
+    chainOn = true;
+    say(text, mode === 'sentence' && segMap ? 'page' : 'word', function () {
+      if (!chainOn) return;
+      var along = ctx.profile().settings.readAlong;
+      if (along === 'stop' || segIdx >= segs.length - 1) { chainOn = false; return; }
+      if (along === 'echo') {
+        chainOn = false; echoWait = true;
+        DA.ui.toast(mode === 'word' ? T('עכשיו את/ה: קוראים את המילה בקול, ואז לוחצים "הבא"') : T('עכשיו את/ה: קוראים את המשפט בקול, ואז לוחצים "הבא"'));
+        return;
+      }
+      setTimeout(function () { if (!chainOn) return; segIdx++; showSeg(); readCurrent(); }, mode === 'word' ? 180 : 450);
+    });
   }
 
-  var fallbackTimer = null, gotBoundary = false;
   function clearSpeaking() {
     clearInterval(fallbackTimer); fallbackTimer = null;
     $('readContent').querySelectorAll('.speaking').forEach(function (e) { e.classList.remove('speaking'); });
     $('rSpeak').classList.remove('on');
   }
   function highlightAt(charIndex) {
-    var spans = $('readContent').querySelectorAll('.w'), hit = null;
-    for (var i = 0; i < spans.length; i++) { if (+spans[i].getAttribute('data-s') <= charIndex) hit = spans[i]; else break; }
+    var spans = $('readContent').querySelectorAll('.w'), hit = null, hi = -1;
+    for (var i = 0; i < spans.length; i++) { if (+spans[i].getAttribute('data-s') <= charIndex) { hit = spans[i]; hi = i; } else break; }
     if (!hit || hit.classList.contains('speaking')) return;
     $('readContent').querySelectorAll('.w.speaking').forEach(function (e) { e.classList.remove('speaking'); });
     hit.classList.add('speaking');
+    if (mode === 'focus') { segIdx = hi; markFocus(); }                         // the focus follows the voice
     if (followOn && follow === 'pointer' && mode !== 'word') anchorToWord(hit);   // the eye follows the word read aloud
     var r = hit.getBoundingClientRect(), v = $('readScroll').getBoundingClientRect();
     if (r.top < v.top + 20 || r.bottom > v.bottom - 20) hit.scrollIntoView({ block: 'center', behavior: 'smooth' });
   }
 
-  /** Speak text; kind 'page' highlights word by word, 'seg' highlights the shown segment, 'word' nothing. */
-  function say(text, kind) {
-    var synth = root.speechSynthesis;
-    var s = ctx.profile().settings;
-    var light = s.speechHighlight !== false;
-    synth.cancel(); clearSpeaking();
-    var u = new SpeechSynthesisUtterance(text.replace(/\$[^$]*\$/g, ' '));
-    var he = /[֐-׿]/.test(text);
-    u.lang = he ? 'he-IL' : 'en-US';
-    var v = synth.getVoices().filter(function (x) { return x.lang && x.lang.toLowerCase().indexOf(he ? 'he' : 'en') === 0; })[0];
-    if (v) u.voice = v;
-    else if (he) DA.ui.toast(T('לא נמצא קול בעברית במכשיר הזה'));
-    u.rate = s.speechRate;
-    gotBoundary = false;
-    if (kind !== 'word') $('rSpeak').classList.add('on');
-    if (light && kind === 'page') {
-      u.onboundary = function (e) { if (e.name === 'word' || e.name === undefined) { gotBoundary = true; highlightAt(e.charIndex); } };
-      u.onstart = function () {
-        // some voices never report word boundaries: estimate the pace instead
-        setTimeout(function () {
-          if (gotBoundary || !synth.speaking) return;
-          var spans = $('readContent').querySelectorAll('.w'), i = 0;
-          var perWord = 60000 / (150 * s.speechRate);
-          fallbackTimer = setInterval(function () {
-            if (i >= spans.length || !synth.speaking) { clearInterval(fallbackTimer); return; }
-            highlightAt(+spans[i].getAttribute('data-s')); i++;
-          }, perWord);
-        }, 900);
-      };
+  function langOf(w) { return /[א-ת]/.test(w) ? 'he' : /[A-Za-z]/.test(w) ? 'en' : null; }
+  /** Runs of one language (words with no letters join the run they are in). Offsets into `text`. */
+  function langRuns(text) {
+    var runs = [], re = /\S+/g, m;
+    while ((m = re.exec(text))) {
+      var l = langOf(m[0]), last = runs[runs.length - 1], end = m.index + m[0].length;
+      if (last && (!l || !last.lang || l === last.lang)) { last.lang = last.lang || l; last.end = end; }
+      else runs.push({ lang: l, start: m.index, end: end });
     }
-    if (light && kind === 'seg') { var segEl = $('readContent').querySelector('.seg'); if (segEl) segEl.classList.add('speaking'); }
-    u.onend = u.onerror = function () { clearSpeaking(); };
-    synth.speak(u);
+    var def = /[א-ת]/.test(text) ? 'he' : 'en';
+    runs.forEach(function (r) { r.lang = r.lang || def; });
+    return runs;
+  }
+  function voiceFor(lang) {
+    return root.speechSynthesis.getVoices().filter(function (x) { return x.lang && x.lang.toLowerCase().indexOf(lang) === 0; })[0] || null;
   }
 
-  DA.screens.read = { init: init, enter: enter, leave: leave, refresh: refresh, openDoc: openDoc };
+  /** Speak text; kind 'page' highlights word by word, 'seg' highlights the shown segment, 'word' nothing. */
+  function say(text, kind, onDone) {
+    var synth = root.speechSynthesis;
+    if (!synth) return;
+    var s = ctx.profile().settings, light = s.speechHighlight !== false, token = ++sayToken;
+    synth.cancel(); clearSpeaking();
+    // math is not read; same-length blanks keep the character offsets of the highlight
+    text = String(text).replace(/\$[^$]*\$/g, function (m) { return new Array(m.length + 1).join(' '); });
+    var runs = langRuns(text);
+    if (!runs.length) { if (onDone) onDone(); return; }
+    if (kind !== 'word') $('rSpeak').classList.add('on');
+    if (light && kind === 'seg') { var segEl = $('readContent').querySelector('.seg'); if (segEl) segEl.classList.add('speaking'); }
+    runs.forEach(function (run, i) {
+      var u = new SpeechSynthesisUtterance(text.slice(run.start, run.end));
+      u.lang = run.lang === 'he' ? 'he-IL' : 'en-US';
+      var v = voiceFor(run.lang);
+      if (v) u.voice = v;
+      else if (run.lang === 'he' && !warnedVoice) { warnedVoice = true; DA.ui.toast(T('לא נמצא קול בעברית במכשיר הזה')); }
+      u.rate = s.speechRate;
+      if (light && kind === 'page') {
+        var got = { v: false };
+        u.onboundary = function (e) {
+          if (token !== sayToken) return;
+          if (e.name === 'word' || e.name === undefined) { got.v = true; highlightAt(run.start + e.charIndex); }
+        };
+        u.onstart = function () { if (token !== sayToken) return; highlightAt(run.start); estimate(run, text, s.speechRate, got, token); };
+      }
+      var last = i === runs.length - 1;
+      u.onend = u.onerror = function () {
+        if (token !== sayToken) return;
+        clearInterval(fallbackTimer); fallbackTimer = null;
+        if (last) { clearSpeaking(); if (onDone) onDone(); }
+      };
+      synth.speak(u);
+    });
+  }
+  /** For voices that report no word boundaries: move the highlight by an estimate (word length, pauses at punctuation). */
+  function estimate(run, text, rate, got, token) {
+    clearInterval(fallbackTimer); fallbackTimer = null;
+    var t0 = performance.now(), words = [], re = /\S+/g, m, part = text.slice(run.start, run.end), at = 0;
+    while ((m = re.exec(part))) {
+      words.push({ off: run.start + m.index, t: at });
+      at += (110 + 62 * m[0].length + (/[.!?؟:]["”׳]?$/.test(m[0]) ? 320 : /[,;،]$/.test(m[0]) ? 140 : 0)) / rate;
+    }
+    if (!words.length) return;
+    setTimeout(function () {
+      if (got.v || token !== sayToken) return;
+      fallbackTimer = setInterval(function () {
+        if (token !== sayToken) { clearInterval(fallbackTimer); return; }
+        var el = performance.now() - t0, cur = words[0];
+        for (var i = 0; i < words.length && words[i].t <= el; i++) cur = words[i];
+        highlightAt(cur.off);
+      }, 60);
+    }, 450);
+  }
+
+  DA.screens.read = { init: init, enter: enter, leave: leave, refresh: refresh, openDoc: openDoc, setMode: setMode };
 })(typeof window !== 'undefined' ? window : globalThis);

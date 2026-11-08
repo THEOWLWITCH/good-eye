@@ -413,7 +413,7 @@
           <button id="rTheme" class="rb2"><i data-icon="palette"></i><span>צבעים</span></button>
           <button id="rRuler" class="rb2"><i data-icon="ruler"></i><span>סרגל קריאה</span></button>
           <label class="rb2 mode"><i data-icon="text"></i><select id="rMode" title="אופן הצגה">
-            <option value="page">עמוד שלם</option><option value="sentence">משפט אחרי משפט</option><option value="word">מילה אחרי מילה</option>
+            <option value="page">עמוד שלם</option><option value="focus">מילה במוקד</option><option value="sentence">משפט אחרי משפט</option><option value="word">מילה אחרי מילה</option>
           </select></label>
           <button id="rVoice" class="rb2" style="display:none"><i data-icon="mic"></i><span>פקודות קוליות</span></button>
           <button id="rEyes" class="rb2 eye-switch" data-short="label"></button>
@@ -448,9 +448,10 @@
         <button id="segPrev" class="rb" title="הקודם">→</button>
         <button id="segPlay" class="rb play" title="התקדמות אוטומטית">▶</button>
         <button id="segNext" class="rb" title="הבא">←</button>
-        <span id="segCount" class="seg-count"></span>
+        <span id="segCount" class="seg-count" dir="ltr"></span>
         <label class="seg-every"><select id="segEvery" title="כל כמה שניות להתקדם">
           <option value="auto">קצב לפי האורך</option>
+          <option value="slow">לאט, לקריאה אות אחר אות</option>
           <option value="1">כל שנייה</option><option value="2">כל 2 שניות</option><option value="3">כל 3 שניות</option>
           <option value="5">כל 5 שניות</option><option value="8">כל 8 שניות</option><option value="12">כל 12 שניות</option>
         </select></label>
@@ -533,6 +534,7 @@
         <label>מרחק מהמסך (ס״מ) <input id="rtDist" type="number" min="15" max="150"></label>
       </div>
       <label class="check"><input type="checkbox" id="rtCompare"> להשוות גם בלי ההגדרות האישיות (עוד כ־5 דקות)</label>
+      <label>מה משווים <select id="rtCompareWhat"><option value="all">את כל ההגדרות יחד</option><option value="letterSpacing">רק ריווח בין אותיות</option><option value="wordSpacing">רק ריווח בין מילים</option><option value="font">רק גופן</option><option value="bold">רק אותיות עבות</option></select></label>
       <p><span id="rtCalNote" class="muted small"></span> <button id="rtCard" class="linkish"><i data-icon="ruler"></i> כיול גודל מסך</button></p>
       <p class="glasses-note" data-glasses></p>
       <p class="device-note" data-small-screen></p>
@@ -762,13 +764,17 @@
         <details class="about-item"><summary>עיוורון צבעים</summary>
           <p><b>מה הבעיה:</b> קשה להבחין בין אדום לירוק, ולפעמים בין כחול לצהוב.</p>
           <p><b>מה עין טובה עושה:</b> מסנן צבעים לתמונות ולתרשימים, שמזיז צבעים שקשה להבחין ביניהם לגוונים שקל יותר להבחין בהם.</p><p class="about-limit"><b>חשוב לדעת:</b> זו לא בדיקת ראיית צבעים.</p></details>
+        <details class="about-item"><summary>דיסלקציה ולקויות קריאה</summary>
+          <p><b>מה הבעיה:</b> יש כמה סוגים של קושי בקריאה, ולכל אחד עוזר משהו אחר. למשל: אותיות שמחליפות מקום בתוך המילה, אותיות שעוברות ממילה למילה בשורה, דילוג על תחילת המילה או סופה, קושי לחבר אותיות לצלילים, או קריאה נכונה אבל איטית ומאומצת.</p>
+          <p><b>מה עין טובה עושה:</b> מציעה עזרים שונים, ואפשר לנסות ולבחור מה עוזר: "מילה במוקד" (מילה אחת ברורה והשאר מעומעם), מילה אחרי מילה, סימון קצה המילה וקצה השורה, הברות בצבעים, הקראה עם הדגשת המילה, קריאה משותפת ("עכשיו את/ה"), הסתרת ניקוד (והוספה שלו בגרסת claude.ai), וריווח. בהגדרות יש ערכות עזר מוכנות.</p><p class="about-limit"><b>חשוב לדעת:</b> עין טובה לא מאבחנת לקות למידה ולא מחליפה הוראה מתקנת. אם יש אבחון, כדאי לבחור עזרים לפי ההמלצות שבו. אין הוכחה שגופנים מיוחדים או צבעים מטפלים בדיסלקציה.</p></details>
         <details class="about-item"><summary>קושי בקריאה וצפיפות אותיות</summary>
-          <p><b>מה הבעיה:</b> כשהאותיות צפופות הן מתערבבות, והעין מאבדת את השורה. זה קורה גם בדיסלקציה.</p>
+          <p><b>מה הבעיה:</b> אצל חלק מהקוראים, גם עם דיסלקציה, אותיות צפופות מתערבבות והעין מאבדת את השורה.</p>
           <p><b>מה עין טובה עושה:</b> ריווח בין אותיות, מילים ושורות, שורות קצרות, הקראה עם הדגשת המילה, וצביעת הברות בטקסט מנוקד.</p></details>
       </div>
       <h4>מה עין טובה לא עושה</h4>
       <ul>
         <li>היא לא מכשיר רפואי, ולא מאבחנת, בודקת או עוקבת אחרי מחלת עיניים.</li>
+        <li>היא לא מאבחנת לקות למידה ולא מחליפה הוראה מתקנת או התאמות שנקבעו בבית הספר.</li>
         <li>היא לא מתקנת את העין עצמה, רק את מה שמוצג על המסך. חידוד תמונה לא מחליף משקפיים מתאימים.</li>
         <li>מפת הנוחות היא לא בדיקת שדה ראייה, ולא מתאימה לקביעת כשירות לנהיגה או לעבודה.</li>
         <li>אין הוכחה שגוונים או רקע צבעוני מטפלים בבעיה כלשהי. הם רק עניין של נוחות.</li>

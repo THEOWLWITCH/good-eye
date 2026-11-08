@@ -61,13 +61,14 @@
   function start() {
     var p = ctx.profile();
     var conds = $('rtCompare').checked ? (Math.random() < 0.5 ? ['with', 'without'] : ['without', 'with']) : ['with'];
+    var what = $('rtCompare').checked ? $('rtCompareWhat').value : 'all';
     usedSentences = [];
     sess = {
       schema: 'da.session/1', id: 'R' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), kind: 'mnread',
       profileId: p.id, softwareVersion: DA.VERSION, startedAt: new Date().toISOString(),
       lang: $('rtLang').value, distanceCm: +$('rtDist').value || 40, glasses: ctx.glasses(),
       pxPerMm: Math.round(DA.device.pxPerMm() * 1000) / 1000, screenCalibrated: DA.device.isCalibrated(),
-      settings: DA.settings.normalize(p.settings), runs: []
+      settings: DA.settings.normalize(p.settings), runs: [], compareWhat: what
     };
     queue = conds.slice();
     runs = [];
@@ -81,11 +82,11 @@
   function nextRun() {
     if (!queue.length) { finish(false); return; }
     var cond = queue.shift(), p = ctx.profile();
-    var s = cond === 'with' ? DA.settings.normalize(p.settings) : DA.settings.normalize(Object.assign({}, p.settings, PLAIN));
+    var s = cond === 'with' ? DA.settings.normalize(p.settings) : DA.settings.normalize(Object.assign({}, p.settings, withoutPatch(sess.compareWhat)));
     lens.apply(s, cond === 'with' ? ctx.warpFor(s) : null);
     run = { condition: cond, trials: [], size: sess.startPx, logMAR: sess.startLogMAR, sentences: DA.sentences.pool(sess.lang, usedSentences) };
     runs.push(run);
-    $('rtCond').textContent = cond === 'with' ? T('עם ההגדרות האישיות') : T('בלי ההגדרות (להשוואה)');
+    $('rtCond').textContent = cond === 'with' ? T('עם ההגדרות האישיות') : sess.compareWhat && sess.compareWhat !== 'all' ? T('בלי: ') + whatLabel(sess.compareWhat) : T('בלי ההגדרות (להשוואה)');
     ready();
   }
 
@@ -149,6 +150,19 @@
   }
 
   function endRun() { nextRun(); }
+
+  /**
+   * "Without" for the comparison: all personal settings off, or just one of them (so a reader can
+   * check, for themselves, whether this one aid helps — the evidence for each aid is personal).
+   */
+  var PLAIN_ONE = { letterSpacing: 0, wordSpacing: 0.05, lineChars: 70, font: 'arial', bold: false };
+  function withoutPatch(what) {
+    if (!what || what === 'all') return PLAIN;
+    var o = {}; o[what] = PLAIN_ONE[what]; return o;
+  }
+  function whatLabel(what) {
+    return { letterSpacing: T('ריווח בין אותיות'), wordSpacing: T('ריווח בין מילים'), lineChars: T('אורך שורה'), font: T('גופן'), bold: T('אותיות עבות') }[what] || '';
+  }
 
   /**
    * The first (largest) size. With a calibrated screen: logMAR 1.3 (the top of an MNREAD chart)
@@ -288,7 +302,7 @@
   function summaryHtml(s, full) {
     var rows = s.runs.map(function (r) {
       var x = r.result || analyze(r.trials);
-      return '<tr><td>' + (r.condition === 'with' ? T('עם ההגדרות שלי') : T('בלי ההגדרות')) + '</td><td>' + x.mrsWpm + '</td><td>' + sizeText(x.cps, s, x.cpsLogMAR) + '</td><td>' + sizeText(x.acuity, s, x.acuityLogMAR) + '</td></tr>';
+      return '<tr><td>' + (r.condition === 'with' ? T('עם ההגדרות שלי') : s.compareWhat && s.compareWhat !== 'all' ? T('בלי: ') + whatLabel(s.compareWhat) : T('בלי ההגדרות')) + '</td><td>' + x.mrsWpm + '</td><td>' + sizeText(x.cps, s, x.cpsLogMAR) + '</td><td>' + sizeText(x.acuity, s, x.acuityLogMAR) + '</td></tr>';
     }).join('');
     var w = s.runs.filter(function (r) { return r.condition === 'with'; })[0], wo = s.runs.filter(function (r) { return r.condition === 'without'; })[0];
     var verdict = '';

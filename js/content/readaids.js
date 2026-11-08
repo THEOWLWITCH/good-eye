@@ -55,13 +55,21 @@
     var n = m.length;
     // consonant + "le" at the end is a syllable of its own: ta|ble
     if (n > 1 && /^le$/i.test(m[n - 1]) && /[^aeiouy]$/i.test(m[n - 2])) { m[n - 1] = m[n - 2].slice(-1) + m[n - 1]; m[n - 2] = m[n - 2].slice(0, -1); }
-    // silent final e: cake is one syllable
-    else if (n > 1 && /^[^aeiouy]+e$/i.test(m[n - 1])) { m[n - 2] += m[n - 1]; m.pop(); }
+    // silent final e: cake is one syllable (but not consonant + "le": ap|ple, lit|tle)
+    else if (n > 1 && /^[^aeiouy]+e$/i.test(m[n - 1]) && !/[^aeiouyl]le$/i.test(m[n - 1])) { m[n - 2] += m[n - 1]; m.pop(); }
     return m.filter(Boolean);
   }
 
   function syllables(word) {
-    if (/[֐-׿]/.test(word)) return hebrewSyllables(word);
+    if (/[֐-׿]/.test(word)) {
+      // punctuation before / after the word is not part of a syllable (a furtive patah before a full stop)
+      var m = word.match(/^([^א-ת]*)([\s\S]*?)([^א-ת֑-ׇ]*)$/);
+      if (!m || !m[2]) return [word];
+      var parts = hebrewSyllables(m[2]);
+      parts[0] = m[1] + parts[0];
+      parts[parts.length - 1] += m[3];
+      return parts;
+    }
     if (/^[A-Za-z']+[.,!?;:]*$/.test(word)) {
       var core = word.replace(/[.,!?;:]+$/, ''), tail = word.slice(core.length);
       var s = englishSyllables(core);
@@ -111,6 +119,11 @@
         if ('הובלמשכ'.indexOf(t[0]) >= 0) tries.push(t.slice(1));
       }
       tries.slice().forEach(function (t) { if (/(ים|ות)$/.test(t)) tries.push(t.slice(0, -2)); });
+      // possessive endings: כלבי, ספרו, ביתך, ביתנו
+      tries.slice().forEach(function (t) {
+        if (t.length > 3 && /(נו|כם|הם)$/.test(t)) tries.push(t.slice(0, -2));
+        if (t.length > 2 && /[יוך]$/.test(t)) tries.push(t.slice(0, -1));
+      });
     } else {
       if (/s$/.test(w)) tries.push(w.slice(0, -1));
     }
