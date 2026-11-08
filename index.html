@@ -21,6 +21,7 @@
       <div class="brand-sub" role="note">כלי עזר ללמידה ולחיי היומיום. לא מכשיר רפואי, ואין להסתמך על התוצאות לקביעה רפואית כלשהי.</div>
     </div>
     <span id="cloudDot" class="cloud-dot" title=""></span>
+    <button id="aboutBtn" class="about-btn" title="אודות עין טובה ומגבלותיה"><i data-icon="info"></i><span>אודות</span></button>
     <button id="langBtn" class="lang-btn" data-noi18n title="Language / שפה"></button>
     <button id="whoChip" class="who-chip" title="החלפת קורא"><span id="whoEmoji"></span> <span id="whoName"></span> ⇄</button>
   </header>
@@ -67,7 +68,7 @@
       </div>
     </details>
     <p class="disclaimer" role="note"><b>עין טובה היא כלי עזר ללמידה ולחיי היומיום.</b> היא לא מכשיר רפואי, לא מאבחנת ולא מחליפה בדיקה אצל איש מקצוע. אין להסתמך על התוצאות שלה לצורך קביעה רפואית כלשהי.</p>
-    <p class="credits"><span class="credits-thanks">הכלי פותח לטובתכם. נשמח לקבל משוב והערות כדי שנוכל להמשיך ולשפר אותו.</span><br>פיתוח: פרופ' דני ברנס וד"ר יעל שדה · <a href="tel:+972523969417" dir="ltr">052-3969417</a> · <a href="mailto:yael.sade@gmail.com" dir="ltr">yael.sade@gmail.com</a><br><span class="muted small">בפנייה אלינו אין ייעוץ רפואי.</span> · <button type="button" class="link a11y-link">הצהרת נגישות</button></p>
+    <p class="credits"><span class="credits-thanks">הכלי פותח לטובתכם. נשמח לקבל משוב והערות כדי שנוכל להמשיך ולשפר אותו.</span><br>פיתוח: פרופ' דני ברנס וד"ר יעל שדה · <a href="tel:+972523969417" dir="ltr">052-3969417</a> · <a href="mailto:yael.sade@gmail.com" dir="ltr">yael.sade@gmail.com</a><br><span class="muted small">בפנייה אלינו אין ייעוץ רפואי.</span> · <button type="button" class="link about-link">אודות ומגבלות</button> · <button type="button" class="link a11y-link">הצהרת נגישות</button></p>
     <div class="home-actions">
       <form id="codeForm" class="code-form">
         <label>כבר נרשמתם? הקוד האישי <input id="codeInput" inputmode="numeric" maxlength="6" placeholder="1234"></label>
@@ -143,7 +144,7 @@
         <div class="glass"><h3>היסטוריה</h3><p class="muted small">אם רוצים, התוצאות נשמרות לאורך זמן ומוצגות בגרפים פשוטים.</p><button id="hubHistToggle" class="eye-switch"></button></div>
       </div>
     </section>
-    <p class="credits"><span class="credits-thanks">הכלי פותח לטובתכם. נשמח לקבל משוב והערות כדי שנוכל להמשיך ולשפר אותו.</span><br>פיתוח: פרופ' דני ברנס וד"ר יעל שדה · <a href="tel:+972523969417" dir="ltr">052-3969417</a> · <a href="mailto:yael.sade@gmail.com" dir="ltr">yael.sade@gmail.com</a><br><span class="muted small">בפנייה אלינו אין ייעוץ רפואי.</span> · <button type="button" class="link a11y-link">הצהרת נגישות</button></p>
+    <p class="credits"><span class="credits-thanks">הכלי פותח לטובתכם. נשמח לקבל משוב והערות כדי שנוכל להמשיך ולשפר אותו.</span><br>פיתוח: פרופ' דני ברנס וד"ר יעל שדה · <a href="tel:+972523969417" dir="ltr">052-3969417</a> · <a href="mailto:yael.sade@gmail.com" dir="ltr">yael.sade@gmail.com</a><br><span class="muted small">בפנייה אלינו אין ייעוץ רפואי.</span> · <button type="button" class="link about-link">אודות ומגבלות</button> · <button type="button" class="link a11y-link">הצהרת נגישות</button></p>
   </section>
 
   <!-- ============ CALIBRATE (grid) ============ -->
@@ -723,6 +724,66 @@
     </form>
   </dialog>
 
+  <dialog id="aboutDialog" class="wide about-dialog">
+    <form method="dialog">
+      <h3><i data-icon="info"></i> אודות עין טובה</h3>
+      <p>עין טובה היא כלי עזר שמתאים את הטקסט והתמונות על המסך לעיניים של הקורא: גודל, ריווח, צבעים, ותיקון לקווים שנראים עקומים. עושים פעם אחת טיסת ניסוי קצרה, ומאז כל טקסט באפליקציה מוצג בהגדרות שנמצאו.</p>
+      <h4>למי זה יכול לעזור</h4>
+      <p class="muted small">לוחצים על שם כדי לקרוא מה הבעיה ואיך עין טובה עוזרת.</p>
+      <div class="about-list">
+        <details class="about-item"><summary>ראייה ירודה</summary>
+          <p><b>מה הבעיה:</b> גם עם משקפיים, אותיות קטנות ופרטים נראים מטושטשים. זה יכול לנבוע ממחלות שונות, כמו ניוון מקולרי, גלאוקומה, אלביניזם או פגיעה בעצב הראייה.</p>
+          <p><b>מה עין טובה עושה:</b> מוצאת את גודל הקריאה הנוח, ומגדילה, מרווחת ומקריאה. אפשר לקרוא מילה אחרי מילה, כך שכל מילה מופיעה גדולה במרכז.</p></details>
+        <details class="about-item"><summary>ניגודיות ירודה</summary>
+          <p><b>מה הבעיה:</b> אותיות חיוורות או אפורות נבלעות ברקע, גם כשהן גדולות.</p>
+          <p><b>מה עין טובה עושה:</b> אותיות עבות, ערכות צבעים בניגודיות גבוהה (למשל צהוב על שחור), והדגשת ניגודיות בתמונות.</p></details>
+        <details class="about-item"><summary>קווים שנראים עקומים (מטמורפופסיה)</summary>
+          <p><b>מה הבעיה:</b> כשהרשתית במרכז העין מקומטת או נפוחה, למשל בקרום על הרשתית, קווים ישרים נראים גליים ואותיות מתעקמות.</p>
+          <p><b>מה עין טובה עושה:</b> בכיול העיוות מיישרים רשת על המסך, ועין טובה מציגה את הטקסט עם תיקון הפוך, כך שהוא נראה ישר יותר.</p><p class="about-limit"><b>חשוב לדעת:</b> התיקון מתאים לעין אחת, כשמסתכלים על נקודה קבועה, והוא הכי מדויק במצב "מילה אחרי מילה". העיוות משתנה עם הזמן, ולכן מכיילים מחדש.</p></details>
+        <details class="about-item"><summary>כתם במרכז הראייה</summary>
+          <p><b>מה הבעיה:</b> חלק מהמרכז חסר או מטושטש, למשל בניוון מקולרי, ודווקא המילה שמסתכלים עליה נעלמת.</p>
+          <p><b>מה עין טובה עושה:</b> אותיות גדולות יותר, מילה אחרי מילה עם סימן קיבוע קבוע, הקראה, ומפת נוחות שעוזרת להחליט איך נוח לקרוא.</p><p class="about-limit"><b>חשוב לדעת:</b> אי אפשר "למלא" את החלק החסר.</p></details>
+        <details class="about-item"><summary>חסר צד בשדה הראייה (המיאנופסיה)</summary>
+          <p><b>מה הבעיה:</b> אחרי שבץ או פגיעה בראש, צד אחד של שדה הראייה חסר. קשה למצוא את תחילת השורה הבאה, או לראות את סוף השורה.</p>
+          <p><b>מה עין טובה עושה:</b> סימון תחילת שורה או סוף שורה (לפי כיוון הקריאה), שורות קצרות, סרגל קריאה והקראה.</p></details>
+        <details class="about-item"><summary>ראיית צינור</summary>
+          <p><b>מה הבעיה:</b> רואים רק את המרכז, כמו דרך צינור, למשל ברטיניטיס פיגמנטוזה או בגלאוקומה מתקדמת. אותיות גדולות מדי כבר לא נכנסות לשטח שרואים.</p>
+          <p><b>מה עין טובה עושה:</b> שורות קצרות, אותיות בגודל מתאים ולא גדולות מדי, וערכות צבעים כהות.</p></details>
+        <details class="about-item"><summary>ריצוד עיניים (ניסטגמוס)</summary>
+          <p><b>מה הבעיה:</b> העיניים זזות מעצמן, והאותיות נראות כאילו הן קופצות.</p>
+          <p><b>מה עין טובה עושה:</b> הגדלה, מילה אחרי מילה והקראה.</p></details>
+        <details class="about-item"><summary>לקות ראייה מוחית (CVI)</summary>
+          <p><b>מה הבעיה:</b> העיניים תקינות, אבל המוח מתקשה לעבד את מה שרואים. מסך עמוס מעייף.</p>
+          <p><b>מה עין טובה עושה:</b> מצב רגוע ופשוט, מילה אחרי מילה, ומילון תמונות למילים.</p></details>
+        <details class="about-item"><summary>רגישות לאור</summary>
+          <p><b>מה הבעיה:</b> אור חזק מסנוור ומעייף, למשל באלביניזם או כשחסרה הקשתית.</p>
+          <p><b>מה עין טובה עושה:</b> ערכות צבעים כהות, עמעום הבהירות ואור חמים.</p></details>
+        <details class="about-item"><summary>עיוורון צבעים</summary>
+          <p><b>מה הבעיה:</b> קשה להבחין בין אדום לירוק, ולפעמים בין כחול לצהוב.</p>
+          <p><b>מה עין טובה עושה:</b> מסנן צבעים לתמונות ולתרשימים, שמזיז צבעים שקשה להבחין ביניהם לגוונים שקל יותר להבחין בהם.</p><p class="about-limit"><b>חשוב לדעת:</b> זו לא בדיקת ראיית צבעים.</p></details>
+        <details class="about-item"><summary>קושי בקריאה וצפיפות אותיות</summary>
+          <p><b>מה הבעיה:</b> כשהאותיות צפופות הן מתערבבות, והעין מאבדת את השורה. זה קורה גם בדיסלקציה.</p>
+          <p><b>מה עין טובה עושה:</b> ריווח בין אותיות, מילים ושורות, שורות קצרות, הקראה עם הדגשת המילה, וצביעת הברות בטקסט מנוקד.</p></details>
+      </div>
+      <h4>מה עין טובה לא עושה</h4>
+      <ul>
+        <li>היא לא מכשיר רפואי, ולא מאבחנת, בודקת או עוקבת אחרי מחלת עיניים.</li>
+        <li>היא לא מתקנת את העין עצמה, רק את מה שמוצג על המסך. חידוד תמונה לא מחליף משקפיים מתאימים.</li>
+        <li>מפת הנוחות היא לא בדיקת שדה ראייה, ולא מתאימה לקביעת כשירות לנהיגה או לעבודה.</li>
+        <li>אין הוכחה שגוונים או רקע צבעוני מטפלים בבעיה כלשהי. הם רק עניין של נוחות.</li>
+      </ul>
+      <h4>מגבלות</h4>
+      <ul>
+        <li>המדידות מתאימות למכשיר שבו נעשו, ולמרחק שבו יושבים. במסך אחר כדאי לטוס שוב.</li>
+        <li>משתמשים תמיד באותם משקפיים: בטיסות הניסוי ובקריאה.</li>
+        <li>תיקון העיוות מכויל לעין אחת, ומדויק רק כשמסתכלים על נקודה קבועה.</li>
+        <li>מעקב העיניים במצלמה הוא הערכה גסה, ולא מתאים לכל אחד.</li>
+      </ul>
+      <p class="referral-note"><b>חשוב:</b> אם קווים נראים עקומים, גליים או חסרים, או שחלק מהמראה חסר, וזה חדש או השתנה, כדאי להתייעץ עם רופא/ת עיניים בימים הקרובים. אם זה קרה פתאום, כדאי לפנות באותו יום.</p>
+      <p class="muted small">פיתוח: פרופ' דני ברנס וד"ר יעל שדה · <a href="tel:+972523969417" dir="ltr">052-3969417</a> · <a href="mailto:yael.sade@gmail.com" dir="ltr">yael.sade@gmail.com</a></p>
+      <div class="row"><button value="ok" class="primary">סגירה</button></div>
+    </form>
+  </dialog>
   <dialog id="a11yDialog" class="wide">
     <form method="dialog">
       <h3><i data-icon="info"></i> הצהרת נגישות</h3>

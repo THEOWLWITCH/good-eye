@@ -89,6 +89,8 @@
     DA.i18n.apply(document.body);
     accessibility();
     document.querySelectorAll('.a11y-link').forEach(function (b) { b.onclick = function () { document.getElementById('a11yDialog').showModal(); }; });
+    var openAbout = function () { var d = document.getElementById('aboutDialog'); d.querySelectorAll('details').forEach(function (x) { x.open = false; }); d.showModal(); d.scrollTop = 0; };
+    document.querySelectorAll('.about-link, #aboutBtn').forEach(function (b) { b.onclick = openAbout; });
     var bar = document.querySelector('.topbar');
     var setHdr = function () { if (bar) document.documentElement.style.setProperty('--hdr', bar.offsetHeight + 'px'); };
     setHdr();
