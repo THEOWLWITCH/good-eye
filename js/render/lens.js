@@ -206,12 +206,13 @@
   }
 
   // ---------- colour-vision deficiency help ("daltonize") ----------
-  // Simulation matrices (Viénot/Brettel-style, sRGB approximation) and the error-shift matrix of
-  // Fidaner et al.: colours a person cannot tell apart are shifted into channels they can see.
+  // Simulation matrices of Machado, Oliveira & Fernandes (2009), severity 1.0, for LINEAR RGB
+  // (the SVG filter runs in linearRGB), and the error-shift matrix of Fidaner et al.: colours a
+  // person cannot tell apart are shifted into channels they can see.
   var CVD_SIM = {
-    protan: [[0.567, 0.433, 0], [0.558, 0.442, 0], [0, 0.242, 0.758]],
-    deutan: [[0.625, 0.375, 0], [0.7, 0.3, 0], [0, 0.3, 0.7]],
-    tritan: [[0.95, 0.05, 0], [0, 0.433, 0.567], [0, 0.475, 0.525]]
+    protan: [[0.152286, 1.052583, -0.204868], [0.114503, 0.786281, 0.099216], [-0.003882, -0.048116, 1.051998]],
+    deutan: [[0.367322, 0.860646, -0.227968], [0.280085, 0.672501, 0.047413], [-0.011820, 0.042940, 0.968881]],
+    tritan: [[1.255528, -0.076749, -0.178779], [-0.078411, 0.930809, 0.147602], [0.004733, 0.691367, 0.303900]]
   };
   var CVD_SHIFT = {
     protan: [[0, 0, 0], [0.7, 1, 0], [0.7, 0, 1]],
@@ -240,7 +241,7 @@
       var M = daltonizeMatrix(type);
       var f = document.createElementNS(SVGNS, 'filter');
       f.setAttribute('id', 'daCvd-' + type);
-      f.setAttribute('color-interpolation-filters', 'sRGB');
+      f.setAttribute('color-interpolation-filters', 'linearRGB');
       var cm = document.createElementNS(SVGNS, 'feColorMatrix');
       cm.setAttribute('type', 'matrix');
       cm.setAttribute('values', [M[0].concat([0, 0]), M[1].concat([0, 0]), M[2].concat([0, 0]), [0, 0, 0, 1, 0]].map(function (r) { return r.join(' '); }).join(' '));

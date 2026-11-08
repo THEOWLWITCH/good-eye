@@ -181,6 +181,10 @@ table.sum th { color: #44515d; font-weight: 600; font-size: 13px; }
 .busy { text-align: center; font-size: 22px; padding: 40px; }
 .seg { text-align: center; padding: 18vh 4% 4%; }
 .seg.word { font-size: 1.8em; }
+.seg.rsvp { position: relative; overflow: hidden; white-space: nowrap; }
+.rsvp-word { display: inline-block; }
+.rsvp-word .anchor { color: #d6452f; }
+.fix-tick { position: absolute; left: 50%; width: 2px; height: .55em; margin-left: -1px; background: currentColor; opacity: .55; }
 .seg-nav { display: flex; gap: 12px; justify-content: center; align-items: center; padding: 8px; background: #fff; border-top: 1px solid #d7dde3; font-size: 18px; }
 .cam-wrap video { width: calc(var(--zoom, 1) * 100%); display: block; margin: 0 auto; filter: contrast(var(--imgc, 1)) invert(var(--inv, 0)); }
 .ai-bar { background: #fff6cc; padding: 6px 12px; display: flex; gap: 10px; align-items: center; }
@@ -347,6 +351,8 @@ dialog.wide { width: min(640px, 94vw); max-height: 88vh; overflow-y: auto; }
 .rt-stage > .lens-content { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 3%; }
 .rt-sentence { max-width: 20em; margin: 0; text-align: center; line-height: 1.35; }
 .rt-wait { font-size: 56px; margin: 0; }
+.rt-wait .ic { width: 64px; height: 64px; stroke: currentColor; opacity: .45; }
+.rt-wait .ic .f { fill: currentColor; opacity: .12; }
 .rt-chart { width: 100%; max-width: 620px; display: block; margin: 10px auto; background: #fff; border: 1px solid #eef1f4; border-radius: 10px; }
 .tests-card { margin-bottom: 16px; }
 .tests-card .tag { font-size: 12px; background: #eef1f4; border-radius: 999px; padding: 2px 9px; font-weight: 400; color: #44515d; }

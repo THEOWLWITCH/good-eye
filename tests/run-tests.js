@@ -160,6 +160,19 @@ test('daltonize keeps grays gray and makes red visible to a deutan viewer', func
   var D = dalt('deutan');
   ok(Math.abs(D[2][0]) > 0.1, 'red gains a blue component');
 });
+test('Machado matrices: a deutan viewer confuses red/green, and the correction separates them', function () {
+  var src = require('fs').readFileSync(path.join(__dirname, '..', 'js/render/lens.js'), 'utf8');
+  var tables = src.slice(src.indexOf('var CVD_SIM'), src.indexOf('/** D = I'));
+  var fn = src.slice(src.indexOf('function daltonizeMatrix'), src.indexOf('var cvdReady'));
+  var lib = new Function(tables + fn + 'return { S: CVD_SIM, dalt: daltonizeMatrix };')();
+  function mul(M, v) { return M.map(function (r) { return r[0] * v[0] + r[1] * v[1] + r[2] * v[2]; }); }
+  function dist(a, b) { return Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]); }
+  var red = [0.6, 0.2, 0.1], green = [0.25, 0.4, 0.1];          // linear RGB, similar brightness
+  var S = lib.S.deutan, D = lib.dalt('deutan');
+  var before = dist(mul(S, red), mul(S, green)), after = dist(mul(S, mul(D, red)), mul(S, mul(D, green)));
+  ok(before < dist(red, green) * 0.5, 'simulated colours are close: ' + before.toFixed(3));
+  ok(after > before * 1.3, 'corrected colours are further apart for the viewer: ' + after.toFixed(3));
+});
 test('comfort settings are kept within range', function () {
   var s = DA.settings.normalize({ brightness: 0.1, warmth: 3, cvd: 'xyz', calm: true });
   ok(s.brightness === 0.4 && s.warmth === 1 && s.cvd === 'none' && s.calm === true);

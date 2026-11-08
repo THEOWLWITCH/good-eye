@@ -1,7 +1,8 @@
 /*
  * עין טובה — Matched sentences for the reading-speed test (MNREAD-style).
  * Each sentence is simple, everyday language for children from about grade 2, with a similar
- * length (≈52–66 characters with spaces) so reading speed can be compared between print sizes.
+ * length (≈52–66 characters with spaces), and enough of them (40+ per language) that no sentence
+ * repeats within a session, even when the test is run twice for the comparison. so reading speed can be compared between print sizes.
  * Speed is computed per character and per word, so small length differences do not matter.
  * There is no validated Hebrew MNREAD — this is a practical, matched pool, not a clinical chart.
  */
@@ -27,7 +28,31 @@
     'אחי הקטן צייר בית עם גג אדום ושמש צהובה מעל עץ ירוק וגבוה',
     'הדג הכתום שוחה באקווריום בסלון ואני מאכיל אותו בכל בוקר',
     'ביום ההולדת קיבלתי ספר חדש עם תמונות של דינוזאורים ענקיים',
-    'בחורף אנחנו יושבים ליד התנור ושותים תה חם עם עוגיות שקדים'
+    'בחורף אנחנו יושבים ליד התנור ושותים תה חם עם עוגיות שקדים',
+    'בכיתה שלנו יש אקווריום קטן עם שלושה דגים אדומים וצב ירוק אחד',
+    'אחרי בית הספר אני הולך עם חבר שלי לשחק כדורגל במגרש הגדול',
+    'הפרפר הלבן עף מפרח לפרח בגינה ונח לרגע על עלה רחב וירוק',
+    'בקיץ אנחנו קונים אבטיח גדול ואוכלים אותו קר על המרפסת בערב',
+    'סבא לימד אותי לשתול עגבניות ועכשיו אני משקה אותן כל יום',
+    'הרכבת יצאה מהתחנה בדיוק בזמן ונסעה לאט ליד שדות של חיטה',
+    'אחותי מנגנת בפסנתר שיר חדש ואני שר איתה בקול רם ושמח',
+    'בספרייה מצאתי ספר על החלל עם תמונות של כוכבי לכת רחוקים',
+    'הארנב הלבן אכל גזר ירוק וקפץ מהר אל המחילה שלו בשדה הגדול',
+    'בטיול השנתי הלכנו בשביל ארוך וראינו צבאים רצים על הגבעה',
+    'אמא הכינה מרק ירקות חם ואכלנו אותו עם לחם טרי מהמאפייה',
+    'השכנה שלנו מגדלת תרנגולות ונותנת לנו ביצים טריות כל שבוע',
+    'בים ראינו סירה לבנה עם מפרש כחול שהפליגה רחוק אל האופק',
+    'בשיעור מדעים גידלנו שעועית בכוס ומדדנו כמה היא גדלה בכל יום',
+    'הצב הזקן הולך לאט מאוד אבל תמיד מגיע בסוף לאן שהוא רוצה',
+    'כשהשמש שקעה השמיים נצבעו בכתום ובוורוד ואז הופיעו הכוכבים',
+    'הדוד שלנו נוהג באוטובוס והוא מכיר את כל הרחובות בעיר שלנו',
+    'ביום ראשון בבוקר הלכנו לשוק וקנינו פרחים צהובים בשביל סבתא',
+    'החברה שלי ואני בנינו מגדל גבוה מקוביות והוא לא נפל בכלל',
+    'בלילה שמעתי ינשוף קורא מהעץ שליד הבית והלכתי לחלון להקשיב',
+    'הנמלים הולכות בשורה ארוכה ומביאות פירורים קטנים אל הקן שלהן',
+    'במוזיאון ראינו שלד של לווייתן ענק שתלוי מהתקרה הגבוהה',
+    'הכיתה שלנו יצאה לחווה והאכלנו את העיזים בחציר טרי וריחני',
+    'בפארק יש מגלשה ארוכה ונדנדה גבוהה ואני אוהב לעלות על שתיהן'
   ];
   var EN = [
     'My little brother likes to play with his red ball in the park',
@@ -47,7 +72,28 @@
     'The orange fish swims in the tank and I feed it every morning',
     'For my birthday I got a new book with pictures of dinosaurs',
     'In winter we sit by the fire and drink hot tea with cookies',
-    'The children ran across the field to catch the flying kite'
+    'The children ran across the field to catch the flying kite',
+    'After school I play football with my best friend in the yard',
+    'A white butterfly flew from flower to flower in our garden',
+    'In summer we eat cold watermelon on the porch after lunch',
+    'Grandpa showed me how to plant tomatoes in a sunny corner',
+    'The train left the station on time and rolled past the fields',
+    'My sister plays a new song on the piano and I sing along',
+    'At the library I found a book about planets and faraway stars',
+    'The white rabbit ate a carrot and hopped back to its burrow',
+    'Mom made hot vegetable soup and we ate it with fresh bread',
+    'We saw a small boat with a blue sail far out on the calm sea',
+    'In science class we grew beans in a cup and measured them daily',
+    'The old turtle walks very slowly but always gets where it goes',
+    'When the sun went down the sky turned orange and then pink',
+    'My uncle drives a bus and he knows every street in the city',
+    'On Sunday we bought yellow flowers at the market for Grandma',
+    'My friend and I built a tall tower of blocks that did not fall',
+    'At night I heard an owl calling from the tree near our house',
+    'The ants walk in a long line and carry crumbs to their nest',
+    'At the museum we saw a huge whale hanging from the ceiling',
+    'Our class went to the farm and fed the goats some fresh hay',
+    'The park has a long slide and a high swing that I love to ride'
   ];
 
   function words(s) { return s.trim().split(/\s+/).length; }

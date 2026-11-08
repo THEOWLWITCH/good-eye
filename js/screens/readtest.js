@@ -87,7 +87,7 @@
 
   function ready() {
     state = 'ready';
-    $('rtContent').innerHTML = '<p class="rt-wait">👀</p>';
+    $('rtContent').innerHTML = '<p class="rt-wait">' + DA.icons.svg('eye') + '</p>';
     $('rtPrompt').textContent = T('כשמוכנים, לוחצים "הצג" וקוראים את המשפט בקול, מהר ככל שנוח.');
     buttons([{ html: T('▶ הצג משפט'), cls: 'pick', fn: show }]);
     progress();
@@ -112,7 +112,7 @@
     if (state !== 'reading') return;
     run.ms = performance.now() - t0;
     state = 'errors';
-    $('rtContent').innerHTML = '<p class="rt-wait">✍️</p>';
+    $('rtContent').innerHTML = '<p class="rt-wait">' + DA.icons.svg('edit') + '</p>';
     $('rtPrompt').textContent = T('למי שהקשיב: כמה מילים נקראו לא נכון או דולגו?');
     buttons([0, 1, 2, 3, 4, 5].map(function (n) { return { html: n === 5 ? '5+' : String(n), cls: 'answer', fn: function () { errors(n); } }; }));
   }

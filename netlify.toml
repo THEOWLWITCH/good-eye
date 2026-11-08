@@ -9,6 +9,12 @@
     Permissions-Policy = "camera=(self), microphone=(self), geolocation=()"
     Referrer-Policy = "no-referrer"
     X-Content-Type-Options = "nosniff"
+    # Content-Security-Policy: scripts only from this site and the two library CDNs (pdf.js, mammoth,
+    # MathJax, MediaPipe); the eye-tracking model from Google storage; fonts from Google Fonts.
+    # 'wasm-unsafe-eval' lets MediaPipe run its WebAssembly; inline styles are used by the app itself.
+    # The same policy is applied by tools/dev-server.mjs, so problems show up locally first.
+    Content-Security-Policy = "default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob:; media-src 'self' blob: mediastream:; connect-src 'self' https://cdn.jsdelivr.net https://storage.googleapis.com https://cdnjs.cloudflare.com; worker-src 'self' blob:; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+    X-Frame-Options = "DENY"
 
 [functions]
   directory = "netlify/functions"

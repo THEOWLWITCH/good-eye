@@ -272,7 +272,7 @@
     busy(T('קורא את ה־PDF…'));
     var pdfLib;
     DA.loader.pdfjs().then(function (lib) { pdfLib = lib; return f.arrayBuffer(); })
-      .then(function (buf) { return pdfLib.getDocument({ data: buf }).promise; })
+      .then(function (buf) { return pdfLib.getDocument({ data: buf, isEvalSupported: false }).promise; })
       .then(function (pdf) {
         var pages = [], texts = [];
         var n = Math.min(pdf.numPages, 30);
@@ -521,9 +521,37 @@
   }
   function showSeg() {
     var box = $('readContent');
-    box.innerHTML = '<div class="seg ' + mode + '" dir="auto">' + esc(segs[segIdx] || '') + '</div>';
+    if (mode === 'word') showWord(box, segs[segIdx] || '');
+    else box.innerHTML = '<div class="seg ' + mode + '" dir="auto">' + esc(segs[segIdx] || '') + '</div>';
     $('segCount').textContent = (segIdx + 1) + ' / ' + segs.length;
-    typesetMath(box);
+    if (mode !== 'word') typesetMath(box);
+  }
+
+  /**
+   * One word at a time with a fixed fixation mark: two short ticks (above and below) that never
+   * move, and the word placed so its anchor letter (a little before the middle) sits between them.
+   * The eyes can stay on one point; useful with a central blind spot or unsteady fixation.
+   */
+  function wordAnchor(n) { return n <= 1 ? 0 : n <= 5 ? 1 : n <= 9 ? 2 : n <= 13 ? 3 : 4; }
+  function showWord(box, word) {
+    var letters = word.match(/[^\u0591-\u05C7\u0300-\u036F][\u0591-\u05C7\u0300-\u036F]*/g) || [word];
+    var a = wordAnchor(letters.length);
+    box.innerHTML = '<div class="seg word rsvp"><span class="fix-tick top" aria-hidden="true"></span>' +
+      '<span class="rsvp-word" dir="auto">' + esc(letters.slice(0, a).join('')) + '<span class="anchor">' + esc(letters[a] || '') + '</span>' + esc(letters.slice(a + 1).join('')) + '</span>' +
+      '<span class="fix-tick bottom" aria-hidden="true"></span></div>';
+    var seg = box.firstChild, w = seg.querySelector('.rsvp-word'), an = seg.querySelector('.anchor');
+    var r = seg.getBoundingClientRect(), room = r.width * 0.94, ww = w.getBoundingClientRect().width;
+    if (ww > room) w.style.fontSize = (room / ww) + 'em';          // a very long word on a narrow screen: shrink to fit
+    var wb = w.getBoundingClientRect(), ar = an.getBoundingClientRect();
+    var shift = ar.width ? r.left + r.width / 2 - (ar.left + ar.width / 2) : 0;
+    // keep the whole word on screen (then the anchor may sit slightly off the mark)
+    var minS = r.left + r.width * 0.03 - wb.left, maxS = r.right - r.width * 0.03 - wb.right;
+    shift = Math.max(minS, Math.min(maxS, shift));
+    w.style.transform = 'translateX(' + Math.round(shift) + 'px)';
+    // the ticks sit just above and below the word's box (which includes the vowel marks)
+    var wr = w.getBoundingClientRect(), em = parseFloat(getComputedStyle(seg).fontSize) || 30;
+    seg.querySelector('.fix-tick.top').style.top = Math.round(wr.top - r.top - em * 0.8) + 'px';
+    seg.querySelector('.fix-tick.bottom').style.top = Math.round(wr.bottom - r.top + em * 0.25) + 'px';
   }
   /** Next / previous: a sentence or word, or (whole-page mode) one screen of text. */
   function stepSeg(d) {
@@ -547,7 +575,10 @@
   function stepDelay() {
     var every = ctx.store.getPref('read.every', 'auto'), rate = ctx.profile().settings.speechRate || 1;
     if (every !== 'auto') return +every * 1000;
-    if (mode === 'word') return (380 + (segs[segIdx] || '').length * 45) / rate;
+    if (mode === 'word') {
+      var wd = segs[segIdx] || '', extra = /[.!?؟:;]["”׳]?$/.test(wd) ? 450 : /[,،]$/.test(wd) ? 180 : 0;   // a short rest at the end of a sentence
+      return (380 + wd.length * 45 + extra) / rate;
+    }
     if (mode === 'sentence') return (900 + (segs[segIdx] || '').length * 75) / rate;
     return 2500 / rate;                                   // page: one line every ~2.5 s
   }
