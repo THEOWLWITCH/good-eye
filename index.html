@@ -6,9 +6,10 @@
   <title>עין טובה</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
-  <meta name="theme-color" content="#1b6ef3">
+  <meta name="theme-color" content="#0a1430">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/cockpit.css">
 </head>
 <body>
   <header class="topbar">
@@ -23,23 +24,20 @@
   <section id="screen-home" class="screen">
     <div class="welcome">
       <h1 class="big-title">👁️ ברוכים הבאים לעין טובה</h1>
-      <p class="lead">כל קורא נרשם פעם אחת, משחק משחק קצר, והאפליקציה לומדת איך להציג לו טקסט ותמונות בצורה הכי ברורה.</p>
+      <p class="lead">כל טייס נרשם פעם אחת, עובר בדיקות קצרות לפני ההמראה, ואז עין טובה מנווטת אותו אל היעד: לקרוא ולראות הכי ברור שאפשר.</p>
     </div>
     <div id="whoSection">
-      <h2>מי קורא עכשיו? <span class="muted small">(לחצו על הכרטיס)</span></h2>
+      <h2>🧑‍✈️ מי הטייס היום? <span class="muted small">(לחצו על הכרטיס)</span></h2>
       <div id="profileGrid" class="profile-grid"></div>
     </div>
     <h2 id="registerTitle">בואו נתחיל: מי הקורא הראשון?</h2>
     <div class="register">
-      <button id="newChildBtn" class="reg-card child"><span class="avatar">🧒</span><b>הרשמה של ילד/ה</b><small>משחק עם תמונות, מספרים ומילים</small></button>
-      <button id="newAdultBtn" class="reg-card adult"><span class="avatar">🧑</span><b>הרשמה של מבוגר/ת</b><small>אותיות, מילים ומשפטים, וגם כיול עיוות</small></button>
+      <button id="newChildBtn" class="reg-card child"><span class="avatar">🧒</span><b>טייס/ת צעיר/ה</b><small>הרשמה של ילד/ה: משחק עם תמונות, מספרים ומילים</small></button>
+      <button id="newAdultBtn" class="reg-card adult"><span class="avatar">🧑</span><b>טייס/ת מבוגר/ת</b><small>הרשמה של מבוגר/ת: אותיות, מילים, משפטים וכיול עיוות</small></button>
     </div>
-    <p class="disclaimer">עין טובה היא כלי עזר להתאמת התצוגה לקורא. היא לא מכשיר רפואי, לא מאבחנת ולא מחליפה בדיקה אצל איש מקצוע.</p>
-    <div class="home-actions">
-      <form id="codeForm" class="code-form">
-        <label>כבר נרשמתם? הקוד האישי <input id="codeInput" inputmode="numeric" maxlength="6" placeholder="1234"></label>
-        <button class="primary">כניסה</button>
-      </form>
+    <details class="engine-room home-room">
+      <summary>🔧 חדר המכונות <span class="muted small">(סנכרון בין מכשירים, גיבוי)</span></summary>
+      <div class="engine-grid">
       <div class="card sync-card" id="syncCard" style="display:none">
         <h3>🔄 סנכרון בין מכשירים</h3>
         <p class="muted small">כל הקוראים וההגדרות יופיעו בכל המכשירים של המשפחה. הנתונים מוצפנים בתוך המכשיר לפני שהם נשלחים, כך שגם לשרת אין גישה אליהם. מי שיש לו את קוד המשפחה יכול לראות את הנתונים, אז שומרים אותו רק במשפחה.</p>
@@ -61,62 +59,79 @@
         <button id="restoreBtn" title="טעינת נתונים מקובץ גיבוי">📥 שחזור מגיבוי</button>
         <input id="restoreFile" type="file" accept=".json,application/json" hidden>
       </div>
+      </div>
+    </details>
+    <p class="disclaimer">עין טובה היא כלי עזר להתאמת התצוגה לקורא. היא לא מכשיר רפואי, לא מאבחנת ולא מחליפה בדיקה אצל איש מקצוע.</p>
+    <div class="home-actions">
+      <form id="codeForm" class="code-form">
+        <label>כבר נרשמתם? הקוד האישי <input id="codeInput" inputmode="numeric" maxlength="6" placeholder="1234"></label>
+        <button class="primary">כניסה</button>
+      </form>
     </div>
   </section>
 
-  <!-- ============ HUB ============ -->
-  <section id="screen-hub" class="screen">
-    <div class="hub-hello">
+  <!-- ============ HUB: the reader's cockpit ============ -->
+  <section id="screen-hub" class="screen cockpit">
+    <div class="pilot">
       <span id="hubAvatar" class="avatar xl"></span>
       <div>
+        <div class="pilot-label">🛩️ תא הטייס של</div>
         <h1 id="hubHello" class="big-title"></h1>
-        <div class="muted"><span id="hubKind"></span> · הקוד האישי: <b id="hubCode"></b> · <button id="editProfileBtn" class="linkish">עריכה או מחיקה</button></div>
+        <div class="muted"><span id="hubKind"></span> · קוד טייס: <b id="hubCode"></b> · <button id="editProfileBtn" class="linkish">עריכה או מחיקה</button></div>
       </div>
     </div>
-    <h2>מה עושים היום? <span class="muted small">(בוחרים אחד)</span></h2>
     <p id="hubTip" class="hub-tip"></p>
-    <div class="tiles">
-      <button id="tileLearn" class="tile learn"><span id="tileLearnBadge" class="badge">מתחילים כאן</span><span class="ti">🎮</span><b>משחק ההתאמה</b><small>נגלה ביחד מה הכי ברור לך (כ־5 דקות)</small><span class="cta">▶ לשחק</span></button>
-      <button id="tileCalibrate" class="tile cal"><span class="ti">🎯</span><b>כיול עיוות</b><small id="tileCalSub">למי שרואה קווים עקומים. עדיף עם מבוגר</small><span class="cta">▶ לכייל</span></button>
-      <button id="tileRead" class="tile read"><span class="ti">📖</span><b>לקרוא</b><small>טקסט, קובץ, תמונה או צילום, עם ההתאמות שלך</small><span class="cta">▶ לקרוא</span></button>
+
+    <h2 class="cp-h">🧭 לאן טסים היום?</h2>
+    <div class="destinations">
+      <button id="tileRead" class="dest read"><span class="dest-ring"><span class="ti">📖</span></span><b>לקרוא</b><small>טקסט, ספר או קובץ</small></button>
+      <button id="tileSee" class="dest see"><span class="dest-ring"><span class="ti">👀</span></span><b>לראות</b><small>תמונה, צילום או מצלמה</small></button>
     </div>
-    <div class="card hist-mini">
-      <h3>📈 ההיסטוריה שלי <span class="tag">לא חובה</span></h3>
-      <p class="muted small">אם רוצים, התוצאות נשמרות לאורך זמן ומוצגות בגרפים פשוטים. בלי פרשנות ובלי אבחון.</p>
-      <div class="row wrap"><button id="hubHistToggle" class="eye-switch"></button><button id="hubHistShow">להציג</button></div>
+
+    <h2 class="cp-h">✈️ בדיקות לפני ההמראה</h2>
+    <div class="preflight">
+      <button id="tileLearn" class="pf"><span class="pf-num">1</span><span class="ti">🎮</span><span class="pf-text"><b>משחק ההתאמה</b><small>נגלה ביחד מה הכי ברור לך (כ־5 דקות)</small></span><span id="tileLearnBadge" class="badge">מתחילים כאן</span><span id="pfLearnCheck" class="pf-check"></span></button>
+      <button id="tileCalibrate" class="pf"><span class="pf-num">2</span><span class="ti">🎯</span><span class="pf-text"><b>כיול עיוות</b><small id="tileCalSub">למי שרואה קווים עקומים. עדיף עם מבוגר</small></span><span id="pfCalCheck" class="pf-check"></span></button>
+      <div class="pf eye"><span class="pf-num">3</span><span class="ti">👁️</span><span class="pf-text"><b>מעקב עיניים</b><small>לא חובה · <button id="hubEyesInfo" class="linkish">מה זה?</button></small></span><button id="hubEyesToggle" class="eye-switch" data-short></button></div>
     </div>
-    <div class="card tests-card">
-      <h3>🧰 כלים נוספים להתאמה <span class="tag">למבוגרים ולקוראים</span></h3>
-      <div class="row wrap">
-        <button id="hubReadTest">⏱️ גודל קריאה נוח</button>
-        <button id="hubFieldTest">🎯 מפת נוחות צפייה</button>
-        <button id="hubLab">🔬 מעבדת טשטוש וניגודיות (מתקדם)</button>
-        <button id="hubTools">🎯 כלי כיול נוספים</button>
-        <button id="hubCard" class="linkish">📏 כיול גודל מסך</button>
+
+    <h2 class="cp-h">🎛️ לוח המכוונים</h2>
+    <div class="dash">
+      <div id="gauges" class="gauges"></div>
+      <div class="dash-actions">
+        <button id="bestBtn" class="primary big">⭐ המצב שלי</button>
+        <button id="pinBtn">📌 לשמור מצב</button>
+        <button id="settingsBtn">🎚️ כיוונון עדין</button>
       </div>
+      <p id="bestInfo" class="muted small"></p>
+      <p class="muted small">עכשיו: <span id="hubCurrent"></span></p>
+      <div id="pinnedList" class="pinned-list"></div>
     </div>
-    <div class="card eye-card">
-      <h3>👁️ מעקב עיניים במצלמה <span class="tag">לא חובה</span></h3>
-      <p class="muted">המצלמה מודדת את המרחק מהמסך ואת כיוון המבט, כדי להתאים את התצוגה טוב יותר. שום תמונה לא נשמרת ולא נשלחת.</p>
-      <div class="row wrap"><button id="hubEyesToggle" class="eye-switch"></button><button id="hubEyesInfo" class="linkish">מה זה, ומתי זה לא עובד?</button></div>
-    </div>
-    <div class="hub-cols">
-      <div class="card">
-        <h3>⭐ המצב שלי</h3>
-        <p id="bestInfo" class="muted"></p>
-        <div class="row wrap">
-          <button id="bestBtn" class="primary big">⭐ לחזור למצב שלי</button>
-          <button id="pinBtn">📌 לשמור את המצב הנוכחי</button>
-          <button id="settingsBtn">⚙️ הגדרות מתקדמות</button>
+
+    <details class="engine-room" id="engineRoom">
+      <summary>🔧 חדר המכונות <span class="muted small">(למבוגרים: מדידות, מעבדה, היסטוריה)</span></summary>
+      <div class="engine-grid">
+        <div class="card">
+          <h3>🧰 כלים נוספים להתאמה</h3>
+          <div class="tool-buttons">
+            <button id="hubReadTest">⏱️ גודל קריאה נוח</button>
+            <button id="hubFieldTest">🎯 מפת נוחות צפייה</button>
+            <button id="hubTools">📐 כלי כיול נוספים</button>
+            <button id="hubLab">🔬 מעבדת טשטוש וניגודיות</button>
+            <button id="hubCard">📏 כיול גודל מסך</button>
+          </div>
         </div>
-        <p class="muted small">עכשיו: <span id="hubCurrent"></span></p>
-        <div id="pinnedList" class="pinned-list"></div>
+        <div class="card">
+          <h3>📈 ההיסטוריה שלי <span class="tag">לא חובה</span></h3>
+          <p class="muted small">אם רוצים, התוצאות נשמרות לאורך זמן ומוצגות בגרפים פשוטים. בלי פרשנות ובלי אבחון.</p>
+          <div class="row wrap"><button id="hubHistToggle" class="eye-switch"></button><button id="hubHistShow">להציג</button></div>
+        </div>
+        <div class="card wide">
+          <h3>🧠 מה למדנו עליך</h3>
+          <div id="hubLearned"></div>
+        </div>
       </div>
-      <div class="card">
-        <h3>🧠 מה למדנו עליך</h3>
-        <div id="hubLearned"></div>
-      </div>
-    </div>
+    </details>
   </section>
 
   <!-- ============ CALIBRATE (grid) ============ -->
@@ -639,9 +654,10 @@
   <script src="js/core/device.js"></script>
   <script src="js/instruments/grid.js"></script>
   <script src="js/vision/eyes.js"></script>
-  <script>window.DA.VERSION = '0.9.0';</script>
+  <script>window.DA.VERSION = '1.0.0';</script>
   <script src="js/ui/common.js"></script>
   <script src="js/ui/drawer.js"></script>
+  <script src="js/ui/cockpit.js"></script>
   <script src="js/ui/eyepanel.js"></script>
   <script src="js/screens/calibrate.js"></script>
   <script src="js/screens/home.js"></script>

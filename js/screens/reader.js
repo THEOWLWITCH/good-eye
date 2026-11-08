@@ -123,6 +123,10 @@
     var p = ctx.profile();
     if (!p) { ctx.go('home'); return; }
     refresh();
+    var intent = ctx.store.getPref('read.intent', null);
+    ctx.store.setPref('read.intent', null);
+    $('readSources').classList.toggle('see', intent === 'see');
+    if (intent === 'see') { showSources(); return; }
     if (!doc) {
       var last = ctx.store.getPref('lastDoc.' + p.id, null);
       if (last && last.type === 'text') openDoc(last, true); else showSources();

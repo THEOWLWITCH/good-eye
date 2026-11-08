@@ -45,7 +45,7 @@
       box.appendChild(card);
     });
     $('whoSection').style.display = list.length ? '' : 'none';
-    $('registerTitle').textContent = list.length ? T('להוסיף קורא חדש') : T('בואו נתחיל: מי הקורא הראשון?');
+    $('registerTitle').textContent = list.length ? T('טייס/ת חדש/ה מצטרף/ת') : T('בואו נתחיל: מי הטייס הראשון?');
   }
 
   function newProfile(kind) {
@@ -149,7 +149,8 @@
   // ================= HUB =================
   function hubInit(c) {
     ctx = c;
-    $('tileRead').onclick = function () { ctx.go('read'); };
+    $('tileRead').onclick = function () { ctx.store.setPref('read.intent', 'read'); ctx.go('read'); };
+    $('tileSee').onclick = function () { ctx.store.setPref('read.intent', 'see'); ctx.go('read'); };
     $('tileLearn').onclick = function () { ctx.go('learn'); };
     $('tileCalibrate').onclick = function () { ctx.go('calibrate'); };
     $('bestBtn').onclick = restoreBest;
@@ -170,7 +171,7 @@
     var p = ctx.profile();
     if (!p) { ctx.go('home'); return; }
     $('hubAvatar').textContent = p.emoji;
-    $('hubHello').textContent = T('שלום, ') + p.name + '!';
+    $('hubHello').textContent = p.name;
     $('hubKind').textContent = kindLabel(p);
     $('hubCode').textContent = p.code;
     $('hubCurrent').textContent = DA.settings.describe(p.settings);
@@ -181,12 +182,16 @@
     var hasCal = !!ctx.opsFor(p.settings);
     // guide the first steps
     var tip;
-    if (!sessions.length) tip = T('👇 בפעם הראשונה מתחילים ב<b>משחק ההתאמה</b> (כ־5 דקות). הוא לומד מה הכי ברור לך.');
-    else if (p.kind === 'adult' && !hasCal) tip = T('רואים קווים עקומים או גלים? אפשר לעשות <b>כיול עיוות</b>. אם לא, אפשר לעבור ישר ל<b>קריאה</b>.');
-    else tip = T('הכול מוכן. בחרו <b>לקרוא</b>, או שחקו שוב כדי לעדכן את ההתאמה.');
+    if (!sessions.length) tip = T('✈️ לפני הטיסה הראשונה עושים את <b>בדיקה 1: משחק ההתאמה</b> (כ־5 דקות). הוא מכוון את המכשירים בשבילך.');
+    else if (p.kind === 'adult' && !hasCal) tip = T('רואים קווים עקומים או גלים? אפשר לעשות את <b>בדיקה 2: כיול עיוות</b>. אם לא, אפשר להמריא ישר אל <b>לקרוא</b>.');
+    else tip = T('🛫 הכול מוכן להמראה! בוחרים יעד: <b>לקרוא</b> או <b>לראות</b>.');
     $('hubTip').innerHTML = tip;
     DA.screens.history.hubCard();
     $('tileLearn').classList.toggle('first', !sessions.length);
+    var played = sessions.some(function (x) { return !x.kind || x.kind === 'learn'; });
+    $('pfLearnCheck').textContent = played ? '✓' : '';
+    $('pfCalCheck').textContent = hasCal ? '✓' : '';
+    DA.cockpit.render($('gauges'), DA.settings.normalize(p.settings), hasCal);
     $('tileLearnBadge').style.display = sessions.length ? 'none' : '';
     $('tileCalSub').textContent = hasCal ? T('✓ יש כיול. אפשר לעדכן אותו') : T('למי שרואה קווים עקומים. עדיף עם מבוגר');
 

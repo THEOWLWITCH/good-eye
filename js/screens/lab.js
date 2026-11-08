@@ -493,7 +493,7 @@
 
   // ================= 7.2 Motion =================
   function motionTab(body) {
-    var N = 340, path = 'h', speed = 0.25, playing = false, t = 0, last = 0, raf = 0, events = [];
+    var N = 340, path = 'h', speed = 0.5, playing = false, t = 0, last = 0, raf = 0, events = [];
     body.appendChild(el('<p class="lab-help">' + T('נקודה נעה במסלול. עוקבים אחריה במבט, וכשקורה משהו מוזר לוחצים על הכפתור המתאים: קפיצה, מריחה, כפילות, עיכוב או היעלמות.') + '</p>'));
     var c = canvas(N, N); body.appendChild(wrapCap(c, ''));
     var ctl = el('<div class="lab-controls"></div>');
@@ -518,7 +518,7 @@
     };
     ctl.appendChild(sv); body.appendChild(ctl);
     function pos() {
-      var u = (Math.sin(t * Math.PI * 2) + 1) / 2, m = 40;
+      var ph = t % 1, u = ph < 0.5 ? ph * 2 : 2 - ph * 2, m = 40;   // constant speed back and forth
       if (path === 'h') return [m + u * (N - 2 * m), N / 2];
       if (path === 'v') return [N / 2, m + u * (N - 2 * m)];
       if (path === 'd') return [m + u * (N - 2 * m), m + u * (N - 2 * m)];
@@ -532,7 +532,7 @@
     function loop(now) {
       if (!playing) return;
       now = now || performance.now();
-      t += (now - last) / 1000 * speed * 0.5; last = now;
+      t += (now - last) / 1000 * speed * 0.35; last = now;
       draw();
       raf = requestAnimationFrame(loop);
     }
