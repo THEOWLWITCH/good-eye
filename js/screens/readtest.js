@@ -25,7 +25,7 @@
     $('rtStart').onclick = start;
     $('rtCard').onclick = function () { DA.device.calibrate().then(renderCalNote); };
     $('rtExit').onclick = function () {
-      DA.ui.ask(T('לעצור את המבחן? מה שכבר נמדד יישמר.'), T('לעצור')).then(function (y) { if (y) finish(true); });
+      DA.ui.ask(T('לעצור? מה שכבר נמדד יישמר.'), T('לעצור')).then(function (y) { if (y) finish(true); });
     };
     document.addEventListener('keydown', function (e) {
       if (ctx.current() !== 'readtest' || !state) return;
@@ -38,8 +38,8 @@
 
   function renderCalNote() {
     $('rtCalNote').textContent = DA.device.isCalibrated()
-      ? T('✓ גודל המסך מכויל. התוצאות יוצגו גם במידות מקובלות (logMAR).')
-      : T('כדאי לכייל את גודל המסך עם כרטיס אשראי, כדי לקבל תוצאות במידות מקובלות. בלי כיול, הגודל יוצג בפיקסלים.');
+      ? T('✓ גודל המסך מכויל, אז הגדלים יתאימו גם במכשירים אחרים.')
+      : T('אפשר לכייל את גודל המסך עם כרטיס אשראי, כדי שהגדלים יתאימו בין מכשירים שונים.');
   }
 
   function enter() {
@@ -220,8 +220,8 @@
     if (px == null) return '—';
     var out = Math.round(px) + 'px';
     if (s.screenCalibrated) {
-      var ps = DA.device.printSize(px, s.distanceCm);
-      out += ' (logMAR ' + ps.logMAR.toFixed(2) + ', ' + ps.mUnits + 'M)';
+      var mm = px / DA.device.pxPerMm();
+      out += ' (≈' + mm.toFixed(1) + T(' מ״מ') + ')';
     }
     return out;
   }
@@ -268,12 +268,12 @@
         : gain < -8 ? '<span class="bad">' + T('בלי ההגדרות הקריאה הייתה מהירה יותר. כדאי לבדוק את ההגדרות.') + '</span>'
         : T('מהירות דומה עם ההגדרות ובלעדיהן.')) + '</p>';
     }
-    return '<p class="muted">⏱️ ' + T('מבחן מהירות קריאה') + ' · ' + new Date(s.startedAt).toLocaleString(DA.i18n.locale) + ' · ' + s.distanceCm + T(' ס״מ') +
+    return '<p class="muted">⏱️ ' + T('גודל קריאה נוח') + ' · ' + new Date(s.startedAt).toLocaleString(DA.i18n.locale) + ' · ' + s.distanceCm + T(' ס״מ') +
       (s.early ? T(' · הופסק באמצע') : '') + '</p>' +
-      '<table class="sum"><tr><th></th><th>' + T('מהירות מרבית (מילים לדקה)') + '</th><th>' + T('גודל קריטי (הכי קטן שעדיין קוראים מהר)') + '</th><th>' + T('הגודל הקטן ביותר שנקרא') + '</th></tr>' + rows + '</table>' +
+      '<table class="sum"><tr><th></th><th>' + T('מהירות מרבית (מילים לדקה)') + '</th><th>' + T('הגודל הקטן שעדיין נקרא בנוחות') + '</th><th>' + T('הגודל הקטן ביותר שנקרא') + '</th></tr>' + rows + '</table>' +
       verdict + (full ? chart(s) : '') +
-      (full && w && w.result.recommendedFont ? '<p>' + T('המלצה: גודל אותיות של ') + '<b>' + w.result.recommendedFont + 'px</b>' + T(' (קצת מעל הגודל הקריטי, כדי שהקריאה תהיה נוחה).') + '</p>' : '') +
-      (full && !s.screenCalibrated ? '<p class="muted small">' + T('הגדלים בפיקסלים. אחרי כיול גודל המסך יוצגו גם במידות מקובלות.') + '</p>' : '');
+      (full && w && w.result.recommendedFont ? '<p>' + T('המלצה: גודל אותיות של ') + '<b>' + w.result.recommendedFont + 'px</b>' + T(' (קצת מעל הגודל הקטן שעדיין נוח, כדי שהקריאה תהיה רגועה).') + '</p>' : '') +
+      (full && !s.screenCalibrated ? '<p class="muted small">' + T('הגדלים בפיקסלים. אחרי כיול גודל המסך יוצג גם הגודל במילימטרים.') + '</p>' : '');
   }
 
   DA.screens.readtest = { init: init, enter: enter, leave: leave, summaryHtml: summaryHtml, analyze: analyze };

@@ -9,3 +9,7 @@
     Permissions-Policy = "camera=(self), microphone=(), geolocation=()"
     Referrer-Policy = "no-referrer"
     X-Content-Type-Options = "nosniff"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"

@@ -268,6 +268,7 @@
       return;
     }
     DA.cloud.save('trials', t.id, t);
+    if (DA.sync) DA.sync.touch();
     dirty = false;
     saveDraft();
     updateTrialInfo();

@@ -34,11 +34,28 @@
       <button id="newChildBtn" class="reg-card child"><span class="avatar">🧒</span><b>הרשמה של ילד/ה</b><small>משחק עם תמונות, מספרים ומילים</small></button>
       <button id="newAdultBtn" class="reg-card adult"><span class="avatar">🧑</span><b>הרשמה של מבוגר/ת</b><small>אותיות, מילים ומשפטים, וגם כיול עיוות</small></button>
     </div>
+    <p class="disclaimer">עין טובה היא כלי עזר להתאמת התצוגה לקורא. היא לא מכשיר רפואי, לא מאבחנת ולא מחליפה בדיקה אצל איש מקצוע.</p>
     <div class="home-actions">
       <form id="codeForm" class="code-form">
         <label>כבר נרשמתם? הקוד האישי <input id="codeInput" inputmode="numeric" maxlength="6" placeholder="1234"></label>
         <button class="primary">כניסה</button>
       </form>
+      <div class="card sync-card" id="syncCard" style="display:none">
+        <h3>🔄 סנכרון בין מכשירים</h3>
+        <p class="muted small">כל הקוראים וההגדרות יופיעו בכל המכשירים של המשפחה. הנתונים מוצפנים בתוך המכשיר לפני שהם נשלחים, כך שגם לשרת אין גישה אליהם. מי שיש לו את קוד המשפחה יכול לראות את הנתונים, אז שומרים אותו רק במשפחה.</p>
+        <div id="syncOff">
+          <button id="syncCreate" class="primary">להפעיל ולקבל קוד משפחה</button>
+          <form id="syncJoin" class="code-form">
+            <label>יש לכם כבר קוד ממכשיר אחר? <input id="syncCodeIn" dir="ltr" placeholder="XXXX-XXXX-XXXX-XXXX" autocomplete="off"></label>
+            <button>להצטרף</button>
+          </form>
+        </div>
+        <div id="syncOn" style="display:none">
+          <p>קוד המשפחה: <b id="syncCodeShow" dir="ltr" class="sync-code"></b> <button id="syncCopy" class="small">📋 העתקה</button></p>
+          <div class="row wrap"><button id="syncNowBtn">🔄 לסנכרן עכשיו</button><button id="syncLeave" class="danger small">ניתוק המכשיר הזה</button></div>
+          <p id="syncStatus" class="muted small"></p>
+        </div>
+      </div>
       <div class="backup">
         <button id="backupBtn" title="שמירת כל הנתונים במכשיר הזה לקובץ">💾 גיבוי</button>
         <button id="restoreBtn" title="טעינת נתונים מקובץ גיבוי">📥 שחזור מגיבוי</button>
@@ -63,11 +80,16 @@
       <button id="tileCalibrate" class="tile cal"><span class="ti">🎯</span><b>כיול עיוות</b><small id="tileCalSub">למי שרואה קווים עקומים. עדיף עם מבוגר</small><span class="cta">▶ לכייל</span></button>
       <button id="tileRead" class="tile read"><span class="ti">📖</span><b>לקרוא</b><small>טקסט, קובץ, תמונה או צילום, עם ההתאמות שלך</small><span class="cta">▶ לקרוא</span></button>
     </div>
+    <div class="card hist-mini">
+      <h3>📈 ההיסטוריה שלי <span class="tag">לא חובה</span></h3>
+      <p class="muted small">אם רוצים, התוצאות נשמרות לאורך זמן ומוצגות בגרפים פשוטים. בלי פרשנות ובלי אבחון.</p>
+      <div class="row wrap"><button id="hubHistToggle" class="eye-switch"></button><button id="hubHistShow">להציג</button></div>
+    </div>
     <div class="card tests-card">
-      <h3>🔬 בדיקות נוספות <span class="tag">למבוגרים ולקוראים</span></h3>
+      <h3>🧰 כלים נוספים להתאמה <span class="tag">למבוגרים ולקוראים</span></h3>
       <div class="row wrap">
-        <button id="hubReadTest">⏱️ מבחן מהירות קריאה</button>
-        <button id="hubFieldTest">🎯 מיפוי שדה ראייה (כתם עיוור, צד חסר)</button>
+        <button id="hubReadTest">⏱️ גודל קריאה נוח</button>
+        <button id="hubFieldTest">🎯 מפת נוחות צפייה</button>
         <button id="hubCard" class="linkish">📏 כיול גודל מסך</button>
       </div>
     </div>
@@ -317,7 +339,7 @@
   <!-- ============ READING-SPEED TEST ============ -->
   <section id="screen-readtest" class="screen">
     <div id="rtSetup" class="learn-setup">
-      <h1 class="big-title">⏱️ מבחן מהירות קריאה</h1>
+      <h1 class="big-title">⏱️ גודל קריאה נוח</h1>
       <p class="lead">משפטים קצרים מופיעים בגדלים שהולכים וקטנים. קוראים כל משפט בקול, מהר ככל שנוח, ולוחצים "סיימתי". מבוגר מסמן כמה מילים נקראו לא נכון.</p>
       <p class="muted">מתאים למי שכבר קורא משפטים (בערך מכיתה ב׳). לוקח כ־5 דקות. כך מוצאים את גודל האותיות הכי קטן שעדיין קוראים בו מהר ובנוחות.</p>
       <div class="setup-grid">
@@ -351,9 +373,9 @@
   <!-- ============ VISUAL-FIELD MAP ============ -->
   <section id="screen-fieldtest" class="screen">
     <div id="ftSetup" class="learn-setup">
-      <h1 class="big-title">🎯 מיפוי שדה ראייה</h1>
+      <h1 class="big-title">🎯 מפת נוחות צפייה</h1>
       <p class="lead">מביטים כל הזמן בצלב האדום שבמרכז. נקודות קטנות יהבהבו מסביב. כל פעם שרואים נקודה, לוחצים על המסך או על מקש הרווח. לא מזיזים את המבט אל הנקודה!</p>
-      <p class="muted">כך מגלים אם יש אזור שלא רואים בו (למשל כתם במרכז, או צד שלם אחרי שבץ), ומתאימים את מיקום הטקסט. לוקח כ־3 דקות. מתאים בעיקר למבוגרים ולילדים גדולים.</p>
+      <p class="muted">כך רואים אם יש אזורים במסך שבהם קשה יותר לראות את הנקודות, ומתאימים לפי זה את מיקום הטקסט. לוקח כ־3 דקות. מתאים בעיקר למבוגרים ולילדים גדולים.</p>
       <div class="setup-grid">
         <label>איזו עין? <select id="ftEye"><option value="right">ימין (מכסים את השמאלית)</option><option value="left">שמאל (מכסים את הימנית)</option><option value="both">שתי העיניים</option></select></label>
         <label>מרחק מהמסך (ס״מ) <input id="ftDist" type="number" min="15" max="150"></label>
@@ -374,13 +396,21 @@
       </div>
     </div>
     <div id="ftEnd" class="learn-end" style="display:none">
-      <h1 class="big-title">🗺️ מפת שדה הראייה</h1>
+      <h1 class="big-title">🗺️ מפת נוחות הצפייה</h1>
       <div id="ftSummary"></div>
       <div class="row wrap center">
         <button id="ftApply" class="primary big">✓ להפעיל את ההמלצות בקריאה</button>
         <button id="ftKeep">לא לשנות</button>
       </div>
     </div>
+  </section>
+
+  <!-- ============ HISTORY (optional) ============ -->
+  <section id="screen-history" class="screen">
+    <h1 class="big-title">📈 ההיסטוריה שלי</h1>
+    <p class="muted">הנתונים נשמרים רק במכשירים שלכם (ובסנכרון המוצפן, אם הופעל). הגרפים לא מפרשים ולא מאבחנים, הם רק מראים איך ההתאמות השתנו.</p>
+    <div class="row wrap"><button id="histToggle" class="eye-switch"></button><button id="histClear" class="danger">🗑️ למחוק את ההיסטוריה</button></div>
+    <div id="histBody"></div>
   </section>
 
   <!-- ============ SETTINGS DRAWER ============ -->
@@ -521,6 +551,7 @@
   <script src="js/core/cloud.js"></script>
   <script src="js/core/settings.js"></script>
   <script src="js/core/profiles.js"></script>
+  <script src="js/core/sync.js"></script>
   <script src="js/core/loader.js"></script>
   <script src="js/core/ai.js"></script>
   <script src="js/render/lens.js"></script>
@@ -529,7 +560,7 @@
   <script src="js/core/device.js"></script>
   <script src="js/instruments/grid.js"></script>
   <script src="js/vision/eyes.js"></script>
-  <script>window.DA.VERSION = '0.5.0';</script>
+  <script>window.DA.VERSION = '0.6.0';</script>
   <script src="js/ui/common.js"></script>
   <script src="js/ui/drawer.js"></script>
   <script src="js/ui/eyepanel.js"></script>
@@ -539,6 +570,7 @@
   <script src="js/screens/reader.js"></script>
   <script src="js/screens/readtest.js"></script>
   <script src="js/screens/fieldtest.js"></script>
+  <script src="js/screens/history.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

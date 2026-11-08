@@ -65,7 +65,8 @@
     this._write(INDEX_KEY, idx);
     return trial;
   };
-  Store.prototype.deleteTrial = function (id) {
+  Store.prototype.deleteTrial = function (id, fromSync) {
+    if (!fromSync && root.DA && root.DA.sync) root.DA.sync.tomb('trial', id);
     this.b.removeItem(PREFIX + 'trial.' + id);
     this._write(INDEX_KEY, this.listTrials().filter(function (t) { return t.id !== id; }));
   };

@@ -23,6 +23,7 @@
       ctx.setProfile(p.id); ctx.go('hub');
     });
     $('backupBtn').onclick = backup;
+    initSync();
     $('restoreBtn').onclick = function () { $('restoreFile').click(); };
     $('restoreFile').onchange = function () { if (this.files[0]) restore(this.files[0]); this.value = ''; };
     ctx.profiles.onChange(function () { if (ctx.current() === 'home') renderHome(); });
@@ -91,6 +92,45 @@
     });
   }
 
+  // ---- encrypted sync between devices (standalone site) ----
+  function initSync() {
+    if (!DA.sync.available()) return;
+    $('syncCard').style.display = '';
+    $('syncCreate').onclick = function () {
+      var c = DA.sync.newCode();
+      DA.sync.enable(c).then(renderSync);
+      renderSync();
+      DA.ui.tell(T('קוד המשפחה: ') + c + T('. מקלידים אותו בכל מכשיר נוסף, בכרטיס "סנכרון בין מכשירים". כדאי לשמור אותו במקום בטוח.'));
+    };
+    $('syncJoin').addEventListener('submit', function (e) {
+      e.preventDefault();
+      var n = DA.sync.normalize($('syncCodeIn').value);
+      if (n.length !== 16) { DA.ui.toast(T('הקוד צריך להכיל 16 תווים')); return; }
+      var c = n.match(/.{4}/g).join('-');
+      DA.sync.enable(c).then(function (r) { renderSync(); renderHome(); if (r && r.ok) DA.ui.toast(T('✓ המכשיר מחובר לסנכרון')); });
+      $('syncCodeIn').value = '';
+      renderSync();
+    });
+    $('syncCopy').onclick = function () {
+      var c = DA.sync.code();
+      if (navigator.clipboard) navigator.clipboard.writeText(c).then(function () { DA.ui.toast(T('הקוד הועתק')); }, function () {});
+    };
+    $('syncNowBtn').onclick = function () { DA.sync.syncNow().then(function () { renderHome(); }); };
+    $('syncLeave').onclick = function () {
+      DA.ui.ask(T('לנתק את המכשיר הזה מהסנכרון? הנתונים במכשיר נשארים. כדי לחבר שוב צריך את קוד המשפחה.'), T('ניתוק')).then(function (y) {
+        if (y) { DA.sync.disable(); renderSync(); }
+      });
+    };
+    renderSync();
+  }
+  function renderSync() {
+    if (!DA.sync.available()) return;
+    var c = DA.sync.code();
+    $('syncOff').style.display = c ? 'none' : '';
+    $('syncOn').style.display = c ? '' : 'none';
+    if (c) $('syncCodeShow').textContent = c;
+  }
+
   var selectedEmoji = DA.AVATARS[0];
   function renderEmojiPick(sel) {
     selectedEmoji = sel;
@@ -143,6 +183,7 @@
     else if (p.kind === 'adult' && !hasCal) tip = T('רואים קווים עקומים או גלים? אפשר לעשות <b>כיול עיוות</b>. אם לא, אפשר לעבור ישר ל<b>קריאה</b>.');
     else tip = T('הכול מוכן. בחרו <b>לקרוא</b>, או שחקו שוב כדי לעדכן את ההתאמה.');
     $('hubTip').innerHTML = tip;
+    DA.screens.history.hubCard();
     $('tileLearn').classList.toggle('first', !sessions.length);
     $('tileLearnBadge').style.display = sessions.length ? 'none' : '';
     $('tileCalSub').textContent = hasCal ? T('✓ יש כיול. אפשר לעדכן אותו') : T('למי שרואה קווים עקומים. עדיף עם מבוגר');

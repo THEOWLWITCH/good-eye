@@ -27,7 +27,7 @@
     { title: T('נוחות ורגישויות'), items: [
       { k: 'brightness', label: T('בהירות (עמעום לסנוור ורגישות לאור)'), type: 'range', min: 0.4, max: 1, step: 0.05, fmt: pct },
       { k: 'warmth', label: T('אור חם (פחות כחול)'), type: 'range', min: 0, max: 1, step: 0.05, fmt: pct },
-      { k: 'cvd', label: T('עזרה בעיוורון צבעים (בתמונות ובתרשימים)'), type: 'select', options: function () { return [['none', T('כבוי')], ['protan', T('אדום־ירוק (פרוטנופיה)')], ['deutan', T('ירוק־אדום (דאוטרנופיה, הנפוץ ביותר)')], ['tritan', T('כחול־צהוב (טריטנופיה)')]]; } },
+      { k: 'cvd', label: T('עזרה בהבחנה בין צבעים (בתמונות ובתרשימים)'), type: 'select', options: function () { return [['none', T('כבוי')], ['protan', T('אדום־ירוק')], ['deutan', T('ירוק־אדום (הנפוץ ביותר)')], ['tritan', T('כחול־צהוב')]]; } },
       { k: 'calm', label: T('מצב רגוע: ניגודיות רכה ובלי פסים צפופים (מיגרנה, רגישות לדגמים)'), type: 'check' }
     ] },
     { title: T('תיקון עיוות וחדות'), items: [

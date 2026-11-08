@@ -1,0 +1,12 @@
+{
+  "name": "good-eye",
+  "private": true,
+  "version": "0.6.0",
+  "description": "Good Eye / עין טובה — personal display adjustment for reading (helper tool, not a medical device)",
+  "scripts": {
+    "test": "node tests/run-tests.js && node tests/sync-tests.mjs"
+  },
+  "dependencies": {
+    "@netlify/blobs": "^8.1.0"
+  }
+}

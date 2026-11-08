@@ -28,7 +28,7 @@
     $('ftPause').onclick = function (e) { e.stopPropagation(); togglePause(); };
     $('ftStop').onclick = function (e) {
       e.stopPropagation(); togglePause(true);
-      DA.ui.ask(T('לעצור את המיפוי? מה שכבר נמדד יישמר.'), T('לעצור')).then(function (y) { if (y) finish(true); else togglePause(false); });
+      DA.ui.ask(T('לעצור? מה שכבר נמדד יישמר.'), T('לעצור')).then(function (y) { if (y) finish(true); else togglePause(false); });
     };
     document.addEventListener('keydown', function (e) {
       if (ctx.current() !== 'fieldtest' || !running) return;
@@ -224,7 +224,7 @@
   // ---------------- report ----------------
   function mapSvg(s) {
     var R = 150, max = 14, k = R / max;
-    var svg = '<svg class="ft-map" viewBox="' + (-R - 10) + ' ' + (-R - 10) + ' ' + (2 * R + 20) + ' ' + (2 * R + 20) + '" dir="ltr" role="img" aria-label="' + esc(T('מפת שדה הראייה')) + '">';
+    var svg = '<svg class="ft-map" viewBox="' + (-R - 10) + ' ' + (-R - 10) + ' ' + (2 * R + 20) + ' ' + (2 * R + 20) + '" dir="ltr" role="img" aria-label="' + esc(T('מפת נוחות הצפייה')) + '">';
     [5, 10].forEach(function (d) { svg += '<circle r="' + d * k + '" fill="none" stroke="#dfe5ec"/><text x="' + (d * k + 2) + '" y="-3" font-size="9" fill="#9aa6b2">' + d + '°</text>'; });
     svg += '<line x1="' + -R + '" y1="0" x2="' + R + '" y2="0" stroke="#eef1f4"/><line x1="0" y1="' + -R + '" x2="0" y2="' + R + '" stroke="#eef1f4"/>';
     svg += '<path d="M-6 0 H6 M0 -6 V6" stroke="#e00000" stroke-width="2"/>';
@@ -240,16 +240,16 @@
 
   var PATTERN = {
     none: T('לא נמצאו אזורים שלא רואים בהם, בטווח שנבדק.'),
-    central: T('נמצא אזור קרוב למרכז שבו נקודות לא נראו (ייתכן כתם עיוור מרכזי). מומלץ להזיז את הטקסט לצד שרואים בו.'),
-    'hemi-left': T('רוב הנקודות בצד שמאל לא נראו (ייתכן אובדן חצי שדה שמאלי). בעברית זה הצד שבו השורה נגמרת, לכן מומלץ סימון שורה ושורות קצרות יותר.'),
-    'hemi-right': T('רוב הנקודות בצד ימין לא נראו (ייתכן אובדן חצי שדה ימני). בעברית זה הצד שבו השורה מתחילה, לכן מומלץ סימון תחילת שורה ושורות קצרות יותר.'),
+    central: T('נקודות קרובות למרכז נראו פחות. אפשר לנסות להזיז את הטקסט לצד שבו הנקודות נראו טוב.'),
+    'hemi-left': T('נקודות בצד שמאל נראו פחות. בעברית זה הצד שבו השורה נגמרת, אז אפשר לנסות סימון שורה ושורות קצרות יותר.'),
+    'hemi-right': T('נקודות בצד ימין נראו פחות. בעברית זה הצד שבו השורה מתחילה, אז אפשר לנסות סימון תחילת שורה ושורות קצרות יותר.'),
     scattered: T('כמה נקודות בודדות לא נראו. ייתכן שזה רק רגע של חוסר קשב. כדאי לחזור על הבדיקה.')
   };
 
   function summaryHtml(s, full) {
     var r = s.result || analyze(s);
     var eye = { right: T('עין ימין'), left: T('עין שמאל'), both: T('שתי העיניים') }[s.eye] || '';
-    var out = '<p class="muted">🎯 ' + T('מיפוי שדה ראייה') + ' · ' + eye + ' · ' + new Date(s.startedAt).toLocaleString(DA.i18n.locale) + (s.early ? T(' · הופסק באמצע') : '') + '</p>' +
+    var out = '<p class="muted">🎯 ' + T('מפת נוחות צפייה') + ' · ' + eye + ' · ' + new Date(s.startedAt).toLocaleString(DA.i18n.locale) + (s.early ? T(' · הופסק באמצע') : '') + '</p>' +
       '<p><b>' + PATTERN[r.pattern] + '</b></p>';
     if (full) {
       out += '<div class="ft-result">' + mapSvg(s) + '<div class="ft-legend">' +
@@ -259,7 +259,7 @@
         (r.falseAlarmPct > 33 ? '<p class="bad small">' + T('היו הרבה לחיצות כשלא הופיעה נקודה, ולכן התוצאה פחות אמינה.') + '</p>' : '') +
         (Object.keys(r.suggest).length ? '<p>' + T('ההמלצה לקריאה: ') + esc(describeSuggest(r.suggest)) + '</p>' : '') +
         '</div></div>' +
-        '<p class="muted small">' + T('זו לא בדיקת שדה ראייה רפואית. אם נמצא אזור חסר, כדאי לספר לרופא העיניים.') + '</p>';
+        '<p class="muted small">' + T('זה לא כלי רפואי ולא בדיקה. המפה רק עוזרת להחליט איפה נוח למקם טקסט.') + '</p>';
     }
     return out;
   }

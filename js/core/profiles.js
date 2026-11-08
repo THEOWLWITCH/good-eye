@@ -49,11 +49,13 @@
     var idx = this._idx();
     if (idx.indexOf(p.id) < 0) { idx.push(p.id); this._setIdx(idx); }
     if (!fromCloud) DA.cloud.save('profiles', p.id, p);
+    if (!fromCloud && DA.sync) DA.sync.touch();
     this._emit();
     return p;
   };
 
   ProfileStore.prototype.remove = function (id, fromCloud) {
+    if (!fromCloud && DA.sync) DA.sync.tomb('profile', id);
     this.s.b.removeItem(P + 'profile.' + id);
     this._setIdx(this._idx().filter(function (x) { return x !== id; }));
     if (!fromCloud) DA.cloud.remove('profiles', id);
@@ -85,14 +87,35 @@
     this.s._write(P + 'session.' + sess.id, sess);
     var idx = this.s._read(P + 'sessions.index', []);
     if (idx.indexOf(sess.id) < 0) { idx.push(sess.id); this.s._write(P + 'sessions.index', idx); }
-    if (!fromCloud) DA.cloud.save('sessions', sess.id, sess);
+    if (!fromCloud) { DA.cloud.save('sessions', sess.id, sess); this.prune(sess.profileId); if (DA.sync) DA.sync.touch(); }
     return sess;
+  };
+
+  /** History is optional: when it is off keep only the newest result of each kind. */
+  ProfileStore.prototype.prune = function (pid) {
+    var p = this.get(pid);
+    if (!p || p.keepHistory) return;
+    var seen = {}, self = this;
+    this.sessionsFor(pid).forEach(function (x) {      // newest first
+      var k = x.kind || 'learn';
+      if (!seen[k]) { seen[k] = true; return; }
+      self.s.b.removeItem(P + 'session.' + x.id);
+      DA.cloud.remove('sessions', x.id);
+      if (DA.sync) DA.sync.tomb('session', x.id);
+      self.s._write(P + 'sessions.index', self.s._read(P + 'sessions.index', []).filter(function (i) { return i !== x.id; }));
+    });
+  };
+  ProfileStore.prototype.removeSession = function (id, fromSync) {
+    if (!this.s._read(P + 'session.' + id, null)) return;
+    this.s.b.removeItem(P + 'session.' + id);
+    this.s._write(P + 'sessions.index', this.s._read(P + 'sessions.index', []).filter(function (x) { return x !== id; }));
+    if (!fromSync && DA.sync) DA.sync.tomb('session', id);
   };
   ProfileStore.prototype.removeSessionsFor = function (pid) {
     var self = this, idx = this.s._read(P + 'sessions.index', []), keep = [];
     idx.forEach(function (id) {
       var x = self.s._read(P + 'session.' + id, null);
-      if (x && x.profileId === pid) { self.s.b.removeItem(P + 'session.' + id); DA.cloud.remove('sessions', id); }
+      if (x && x.profileId === pid) { self.s.b.removeItem(P + 'session.' + id); DA.cloud.remove('sessions', id); if (DA.sync) DA.sync.tomb('session', id); }
       else keep.push(id);
     });
     this.s._write(P + 'sessions.index', keep);

@@ -7,8 +7,8 @@
   var $ = DA.ui.$;
   var store = new DA.storage.Store();
   var profiles = new DA.ProfileStore(store);
-  var SCREENS = ['home', 'hub', 'calibrate', 'learn', 'read', 'readtest', 'fieldtest'];
-  var NEEDS_PROFILE = { hub: 1, calibrate: 1, learn: 1, read: 1, readtest: 1, fieldtest: 1 };
+  var SCREENS = ['home', 'hub', 'calibrate', 'learn', 'read', 'readtest', 'fieldtest', 'history'];
+  var NEEDS_PROFILE = { hub: 1, calibrate: 1, learn: 1, read: 1, readtest: 1, fieldtest: 1, history: 1 };
   var cur = null;
 
   var ctx = {
@@ -86,11 +86,29 @@
     SCREENS.forEach(function (s) { DA.screens[s].init(ctx); });
     var p0 = ctx.profile(); DA.eyes.setUsualDistance(p0 && p0.settings.refDistanceCm);
     profiles.sync();
+    ctx.refresh = function () { if (DA.screens[cur] && DA.screens[cur].enter && (cur === 'home' || cur === 'hub' || cur === 'history')) DA.screens[cur].enter(); renderHeader(); };
+    DA.sync.init(ctx, function (msg, warn) { var el = $('syncStatus'); if (el) { el.textContent = msg; el.style.color = warn ? '#b26a00' : ''; } });
     profiles.onChange(renderHeader);
 
     root.addEventListener('hashchange', function () { show(location.hash.slice(1)); });
+    registerOffline();
     var start = location.hash.slice(1) || (ctx.profile() ? 'hub' : 'home');
     show(start);
+  }
+
+  /** Offline support for the standalone site (claude.ai does not allow service workers). */
+  function registerOffline() {
+    if (!('serviceWorker' in navigator) || DA.cloud.available()) return;
+    if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') return;
+    var hadController = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.register('sw.js').then(function () {
+      if (!hadController) {
+        try { if (!localStorage.getItem('da.v1.offlineToast')) { localStorage.setItem('da.v1.offlineToast', '1'); DA.ui.toast(T('📶 עין טובה מוכנה לעבודה גם בלי אינטרנט')); } } catch (e) { /* ignore */ }
+      }
+    }).catch(function () {});
+    navigator.serviceWorker.addEventListener('controllerchange', function () {
+      if (hadController) DA.ui.toast(T('יש גרסה חדשה. היא תופעל בפתיחה הבאה.'));
+    });
   }
 
   DA.main = ctx;
