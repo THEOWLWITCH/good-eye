@@ -174,3 +174,7 @@ button.pf:hover:not(:disabled) { border-color: var(--cyan); }
 .brand-wrap { display: flex; flex-direction: column; min-width: 0; }
 .brand-sub { font-size: 12px; line-height: 1.3; color: #ffd27a; max-width: 560px; }
 @media (max-width: 760px) { .brand-sub { font-size: 11px; } .brand small { display: none; } }
+/* gauge icons */
+.gauge { position: relative; }
+.gauge .g-icon { font-size: 26px; line-height: 1; margin-top: 2px; filter: drop-shadow(0 0 6px rgba(56, 214, 255, .45)); }
+.gauge svg { margin-top: -4px; }
