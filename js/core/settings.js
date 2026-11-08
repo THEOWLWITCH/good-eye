@@ -11,8 +11,9 @@
     { id: 'rubik', label: T('רוביק'), family: "'Rubik', Arial, sans-serif" },
     { id: 'assistant', label: T('אסיסטנט'), family: "'Assistant', Arial, sans-serif" },
     { id: 'round', label: T('עגול'), family: "'Varela Round', 'Comic Neue', Arial, sans-serif" },
-    { id: 'atkinson', label: T('אטקינסון (קריא במיוחד)'), family: "'Atkinson Hyperlegible', 'Rubik', Arial, sans-serif" },
-    { id: 'lexend', label: T('לקסנד (מרווח)'), family: "'Lexend', 'Heebo', Arial, sans-serif" },
+    { id: 'plex', label: T('פלקס (ברור ומודרני)'), family: "'IBM Plex Sans Hebrew', 'Heebo', Arial, sans-serif" },
+    { id: 'atkinson', label: T('אטקינסון (לאנגלית בלבד)'), family: "'Atkinson Hyperlegible', 'Rubik', Arial, sans-serif" },
+    { id: 'lexend', label: T('לקסנד (לאנגלית בלבד)'), family: "'Lexend', 'Heebo', Arial, sans-serif" },
     { id: 'serif', label: T('עם תגים (פרנק רוהל)'), family: "'Frank Ruhl Libre', 'Noto Serif', Georgia, serif" },
     { id: 'arial', label: T('אריאל'), family: 'Arial, sans-serif' }
   ];
@@ -56,6 +57,7 @@
     // reading aids
     ruler: 'off',          // off | band | mask
     lineMarker: false,     // coloured bar at the start of each line (field loss)
+    lineMarkerEnd: false,  // coloured bar at the end of each line (reading into the side seen less)
     shiftX: 0, shiftY: 0,  // move content within the view (eccentric viewing), fraction of view
     speechRate: 0.9,
     speechHighlight: true, // highlight each word while reading aloud
@@ -73,6 +75,8 @@
     dictionary: true,      // double-tap a word for a picture and to hear it
     copilot: true,         // show the navigator (Yanshufi the owl) with short guidance
     copilotVoice: false,   // the navigator reads its guidance aloud
+    uiContrast: 'auto',    // interface look: auto (follows the device) | high (light, high contrast) | normal
+    uiScale: 1,            // interface size (buttons, labels): 1 | 1.15 | 1.3 | 1.5
     gamePace: 'normal',    // pause after each answer: slow | normal | fast | manual (a Next button)
     gameVoice: true,       // the game speaks: questions, praise, pause and what happens at the end
     // eye tracking (standalone version only)
@@ -82,8 +86,8 @@
 
   var RANGES = {
     fontSize: [12, 120], letterSpacing: [-0.02, 0.4], wordSpacing: [0, 1.2], lineHeight: [1.1, 3],
-    lineChars: [15, 90], imageContrast: [0.6, 2.2], warpStrength: [0, 1.5], sharpen: [0, 1.5],
-    brightness: [0.4, 1], warmth: [0, 1],
+    lineChars: [15, 90], imageContrast: [0.6, 2.2], warpStrength: [0, 1], sharpen: [0, 1.5],
+    brightness: [0.4, 1], warmth: [0, 1], uiScale: [1, 1.5],
     zoom: [0.5, 4], shiftX: [-0.35, 0.35], shiftY: [-0.35, 0.35], speechRate: [0.5, 1.5]
   };
 

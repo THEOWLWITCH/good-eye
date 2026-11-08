@@ -123,6 +123,13 @@
         if (y) { DA.sync.disable(); renderSync(); }
       });
     };
+    $('syncDelete').onclick = function () {
+      DA.ui.ask(T('למחוק את נתוני המשפחה מהשרת? הנתונים בכל מכשיר נשארים במכשיר, אבל הם יפסיקו להסתנכרן. אי אפשר לבטל.'), T('מחיקה מהשרת')).then(function (y) {
+        if (!y) return;
+        DA.sync.deleteRemote().then(function () { DA.ui.toast(T('הנתונים נמחקו מהשרת')); renderSync(); },
+          function () { DA.ui.tell(T('המחיקה לא הצליחה כרגע. נסו שוב כשיש אינטרנט.')); });
+      });
+    };
     renderSync();
   }
   function renderSync() {
@@ -184,7 +191,7 @@
     var hasCal = !!ctx.opsFor(p.settings);
     // guide the first steps
     var tip;
-    if (!sessions.length) tip = T('לפני ההמראה עושים <b>טיסת ניסוי ראשונה</b> (פעם אחת בלבד, כ־3 דקות). היא מכוונת את המכשירים בשבילך.');
+    if (!sessions.length) tip = T('לפני ההמראה עושים <b>טיסת ניסוי ראשונה</b> (פעם אחת בלבד, כ־4 דקות). היא מכוונת את המכשירים בשבילך.');
     else if (p.kind === 'adult' && !hasCal) tip = T('רואים קווים עקומים או גלים? אפשר לעשות את <b>טיסת הניסוי השנייה: כיול עיוות</b>. אם לא, אפשר להמריא ישר אל <b>לקרוא</b>.');
     else tip = T('הכול מוכן להמראה! בוחרים יעד: <b>לקרוא</b> או <b>לראות</b>.');
     $('hubTip').innerHTML = tip;
@@ -193,9 +200,10 @@
     var played = sessions.some(function (x) { return !x.kind || x.kind === 'learn'; });
     $('pfLearnCheck').textContent = played ? '✓' : '';
     var lastPlay = sessions.filter(function (x) { return !x.kind || x.kind === 'learn'; })[0];
-    $('tileLearnSub').textContent = lastPlay
-      ? T('✓ בוצע') + ' ' + new Date(lastPlay.startedAt).toLocaleDateString(DA.i18n.locale) + ' · ' + T('לא צריך לחזור')
-      : T('פעם אחת בלבד · כ־3 דקות');
+    var halfYear = lastPlay && (Date.now() - new Date(lastPlay.startedAt).getTime() > 182 * 864e5);
+    $('tileLearnSub').textContent = !lastPlay ? T('פעם אחת · כ־4 דקות')
+      : halfYear ? T('עברה כחצי שנה. השתנה משהו? אפשר לטוס שוב')
+      : T('✓ בוצע') + ' ' + new Date(lastPlay.startedAt).toLocaleDateString(DA.i18n.locale) + ' · ' + T('טסים שוב רק אם משהו השתנה');
     $('pfCalCheck').textContent = hasCal ? '✓' : '';
     DA.cockpit.render($('gauges'), DA.settings.normalize(p.settings), hasCal);
     $('tileLearnBadge').style.display = sessions.length ? 'none' : '';

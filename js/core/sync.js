@@ -201,6 +201,14 @@
     clearTimeout(timer);
   }
 
+  /** Remove this family's encrypted data from the server, then disconnect this device. */
+  function deleteRemote() {
+    var c = code();
+    if (!c) return Promise.resolve({ ok: false });
+    return keys(c).then(function (k) { return api(k.id, { method: 'DELETE' }); })
+      .then(function (res) { if (!res.ok) throw new Error('http ' + res.status); disable(); return { ok: true }; });
+  }
+
   function init(c, onStatus) {
     ctx = c;
     statusFn = onStatus || statusFn;
@@ -212,7 +220,7 @@
 
   DA.sync = {
     init: init, available: available, code: code, newCode: newCode, normalize: normalize,
-    enable: enable, disable: disable, syncNow: syncNow, touch: touch, tomb: tomb,
+    enable: enable, disable: disable, deleteRemote: deleteRemote, syncNow: syncNow, touch: touch, tomb: tomb,
     lastSync: function () { return lsGet(LAST_KEY, null); },
     // exposed for tests
     _keys: keys, _encrypt: encrypt, _decrypt: decrypt, _merge: merge

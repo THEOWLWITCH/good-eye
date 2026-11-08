@@ -264,8 +264,8 @@
     var verdict = '';
     if (w && wo && w.result && wo.result && wo.result.mrsWpm) {
       var gain = Math.round((w.result.mrsWpm - wo.result.mrsWpm) / wo.result.mrsWpm * 100);
-      verdict = '<p>' + (gain > 8 ? '<b class="good">' + T('עם ההגדרות קוראים מהר יותר ב־') + gain + '% ✓</b>'
-        : gain < -8 ? '<span class="bad">' + T('בלי ההגדרות הקריאה הייתה מהירה יותר. כדאי לבדוק את ההגדרות.') + '</span>'
+      verdict = '<p>' + (gain > 25 ? '<b class="good">' + T('עם ההגדרות קוראים מהר יותר ב־') + gain + '% ✓</b>'
+        : gain < -25 ? '<span class="bad">' + T('בלי ההגדרות הקריאה הייתה מהירה יותר. כדאי לבדוק את ההגדרות.') + '</span>'
         : T('מהירות דומה עם ההגדרות ובלעדיהן.')) + '</p>';
     }
     return '<p class="muted">' + T('גודל קריאה נוח') + ' · ' + new Date(s.startedAt).toLocaleString(DA.i18n.locale) + ' · ' + s.distanceCm + T(' ס״מ') +

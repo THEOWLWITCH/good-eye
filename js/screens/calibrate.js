@@ -557,6 +557,7 @@
   function enter() {
     visible = true;
     var prof = ctx.profile();
+    if (prof) setTimeout(function () { DA.safety.askNew(prof.id); }, 300);   // a NEW distortion needs a doctor before a correction
     var calm = !!(prof && prof.settings.calm);
     grid.setSettings({ soft: calm });
     if (calm && grid.settings.density > 7) grid.setSettings({ density: 7 });

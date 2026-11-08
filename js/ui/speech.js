@@ -9,7 +9,7 @@
   'use strict';
   var DA = root.DA;
   var ctx;
-  var STATIC = '.lead, .lab-help, .glasses-note, .device-note, .device-tip, #hubTip, #tlHelp, .learn-setup > p.muted:not(.no-say), .scope-card, .next-card, .disclaimer, #ftSetup > p.muted, #rtSetup > p.muted';
+  var STATIC = '.lead, .lab-help, .glasses-note, .device-note, .device-tip, #hubTip, #tlHelp, .learn-setup > p.muted:not(.no-say), .scope-card, .next-card, .referral-note p, .disclaimer, #ftSetup > p.muted, #rtSetup > p.muted';
   var LIVE = ['learnPrompt', 'rtPrompt', 'askText', 'promptText', 'status'];
 
   function clean(t) {

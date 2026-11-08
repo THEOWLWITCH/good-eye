@@ -55,7 +55,7 @@
         </div>
         <div id="syncOn" style="display:none">
           <p>קוד המשפחה: <b id="syncCodeShow" dir="ltr" class="sync-code"></b> <button id="syncCopy" class="small">העתקה</button></p>
-          <div class="row wrap"><button id="syncNowBtn"><i data-icon="sync"></i> לסנכרן עכשיו</button><button id="syncLeave" class="danger small">ניתוק המכשיר הזה</button></div>
+          <div class="row wrap"><button id="syncNowBtn"><i data-icon="sync"></i> לסנכרן עכשיו</button><button id="syncLeave" class="danger small">ניתוק המכשיר הזה</button><button id="syncDelete" class="danger small">מחיקת נתוני המשפחה מהשרת</button></div>
           <p id="syncStatus" class="muted small"></p>
         </div>
       </div>
@@ -67,7 +67,7 @@
       </div>
     </details>
     <p class="disclaimer" role="note"><b>עין טובה היא כלי עזר ללמידה ולחיי היומיום.</b> היא לא מכשיר רפואי, לא מאבחנת ולא מחליפה בדיקה אצל איש מקצוע. אין להסתמך על התוצאות שלה לצורך קביעה רפואית כלשהי.</p>
-    <p class="credits"><span class="credits-thanks">הכלי פותח לטובתכם. נשמח לקבל משוב והערות כדי שנוכל להמשיך ולשפר אותו.</span><br>פיתוח: פרופ' דני ברנס וד"ר יעל שדה · <a href="tel:+972523969417" dir="ltr">052-3969417</a></p>
+    <p class="credits"><span class="credits-thanks">הכלי פותח לטובתכם. נשמח לקבל משוב והערות כדי שנוכל להמשיך ולשפר אותו.</span><br>פיתוח: פרופ' דני ברנס וד"ר יעל שדה · <a href="tel:+972523969417" dir="ltr">052-3969417</a> · <a href="mailto:yael.sade@gmail.com" dir="ltr">yael.sade@gmail.com</a><br><span class="muted small">בפנייה אלינו אין ייעוץ רפואי.</span> · <button type="button" class="link a11y-link">הצהרת נגישות</button></p>
     <div class="home-actions">
       <form id="codeForm" class="code-form">
         <label>כבר נרשמתם? הקוד האישי <input id="codeInput" inputmode="numeric" maxlength="6" placeholder="1234"></label>
@@ -139,11 +139,11 @@
     <section class="block">
       <h2 class="sec-title">יומן הטיסה</h2>
       <div class="log-grid">
-        <div class="glass"><h3>מה למדנו עליך</h3><div id="hubLearned"></div></div>
+        <div class="glass"><h3>ההגדרות שלך</h3><div id="hubLearned"></div></div>
         <div class="glass"><h3>היסטוריה</h3><p class="muted small">אם רוצים, התוצאות נשמרות לאורך זמן ומוצגות בגרפים פשוטים.</p><button id="hubHistToggle" class="eye-switch"></button></div>
       </div>
     </section>
-    <p class="credits"><span class="credits-thanks">הכלי פותח לטובתכם. נשמח לקבל משוב והערות כדי שנוכל להמשיך ולשפר אותו.</span><br>פיתוח: פרופ' דני ברנס וד"ר יעל שדה · <a href="tel:+972523969417" dir="ltr">052-3969417</a></p>
+    <p class="credits"><span class="credits-thanks">הכלי פותח לטובתכם. נשמח לקבל משוב והערות כדי שנוכל להמשיך ולשפר אותו.</span><br>פיתוח: פרופ' דני ברנס וד"ר יעל שדה · <a href="tel:+972523969417" dir="ltr">052-3969417</a> · <a href="mailto:yael.sade@gmail.com" dir="ltr">yael.sade@gmail.com</a><br><span class="muted small">בפנייה אלינו אין ייעוץ רפואי.</span> · <button type="button" class="link a11y-link">הצהרת נגישות</button></p>
   </section>
 
   <!-- ============ CALIBRATE (grid) ============ -->
@@ -274,7 +274,7 @@
     </div>
 
     <footer class="statusbar">
-      <span id="status">תפסו נקודה על קו שנראה עקום וגררו עד שייראה ישר.</span>
+      <span id="status">מכסים את העין השנייה ומסתכלים כל הזמן על הנקודה שבמרכז. תופסים נקודה על קו שנראה עקום וגוררים עד שייראה ישר.</span>
       <span id="quality"></span>
     </footer>
 
@@ -297,18 +297,18 @@
         <div><b id="learnPlayedWhen"></b><br>אין צורך לטוס אותה שוב: ההגדרות שמורות. טסים שוב רק אם משהו השתנה, למשל משקפיים חדשים, או פעם בכמה חודשים.</div>
         <button id="learnGoRead" class="primary"><i data-icon="book"></i> לקרוא</button>
       </div>
-      <button id="quickGame" class="primary huge">ממריאים (כ־3 דקות)</button>
+      <button id="quickGame" class="primary huge">ממריאים (כ־4 דקות)</button>
       <p id="learnOnce" class="once-note"><i data-icon="once"></i> טיסת הניסוי נעשית <b>פעם אחת בלבד</b>. ההגדרות נשמרות, ובפעמים הבאות נכנסים ישר לקריאה.</p>
       <p class="muted small no-say">אפשר לעצור ⏸ בכל רגע ולהמשיך אחר כך מאותו מקום.</p>
       <div class="scope-card">
-        <h3>מה טיסת הניסוי בודקת, ומה לא</h3>
+        <h3>מה מנסים למצוא בטיסת הניסוי, ומה לא</h3>
         <ul class="scope-list">
           <li class="yes">אם קווים ישרים נראים לך עקומים או חסרים, בכל עין לחוד</li>
           <li class="yes">באיזה גודל אותיות הכי נוח לך לקרוא, עם ההגדרות שלך ובלעדיהן</li>
           <li class="yes">אם קשה לך לראות אותיות חיוורות</li>
           <li class="yes">אם קשה להבדיל בין צבעים מסוימים</li>
           <li class="yes">אילו צבעים, ריווח ובהירות הכי נוחים לך, ואם תיקון העיוות עוזר</li>
-          <li class="no">היא לא מתקנת עיוות בעצמה: אם רואים קווים עקומים, ממשיכים ל<b>טיסת הניסוי השנייה: כיול עיוות</b>. הוא גם לא בודק שדה ראייה מלא, ראייה כפולה או מהירות קריאה (לאלה יש כלים נפרדים בתא הטייס).</li>
+          <li class="no">טיסת הניסוי לא בודקת את בריאות העין ולא מחליפה בדיקה אצל רופא/ת עיניים. היא גם לא מתקנת עיוות בעצמה: אם קווים נראים עקומים, אפשר להמשיך ל<b>טיסת הניסוי השנייה: כיול עיוות</b>.</li>
           <li class="no">זה כלי עזר ולא בדיקה רפואית. התוצאות רק מציעות הגדרות נוחות.</li>
         </ul>
       </div>
@@ -318,7 +318,7 @@
       <p id="learnHasCal" class="muted small">טיפ: אחרי כיול עיוות, טיסת הניסוי בודקת גם אם התיקון עוזר.</p>
       <details class="adult">
         <summary>אפשרויות למבוגר</summary>
-        <p class="muted small">בדיקת זיהוי (גודל הסף, עם ההגדרות האישיות ובלעדיהן, לסירוגין):</p>
+        <p class="muted small">זיהוי (הגודל הקטן שהצלחת לקרוא, עם ההגדרות האישיות ובלעדיהן, לסירוגין):</p>
         <div id="catChecks" class="chips"></div>
         <p class="muted small">העדפות להשוואה (שני נוסחים זה לצד זה):</p>
         <div id="prefChecks" class="chips">
@@ -370,7 +370,7 @@
     <div id="learnEnd" class="learn-end" style="display:none">
       <h1 id="learnEndTitle" class="big-title">טיסת הניסוי הושלמה!</h1>
       <p id="learnEndSay" class="end-say"></p>
-      <p class="once-note"><i data-icon="once"></i> זהו, את טיסת הניסוי לא צריך לעשות שוב. בפעם הבאה נכנסים ישר לקריאה, וההגדרות כבר יחכו.</p>
+      <p class="once-note"><i data-icon="once"></i> זהו. בפעם הבאה נכנסים ישר לקריאה, וההגדרות כבר יחכו. טסים שוב רק אם משהו השתנה: משקפיים חדשים, הראייה השתנתה, או עברה כחצי שנה.</p>
       <div class="row wrap center end-actions">
         <button id="learnApplyBest" class="primary big"><i data-icon="star"></i> לשמור כמצב הקבוע שלי</button>
         <button id="learnApply">להשתמש בהן עכשיו, בלי לשנות את "המצב שלי"</button>
@@ -381,9 +381,10 @@
         <p id="learnNextQ">קווים ישרים, כמו משקוף, שורות במחברת או קצה של שולחן, נראים לך לפעמים עקומים, גליים או עם חלק חסר?</p>
         <div class="row wrap center">
           <button id="learnNextYes" class="primary">כן, לפעמים ← לכיול עיוות (כ־10 דקות)</button>
+          <button id="learnNextMap" style="display:none">למפת הנוחות</button>
           <button id="learnNextNo">לא ← אפשר לצאת לקרוא</button>
         </div>
-        <p id="learnNextPro" class="pro-note" style="display:none"></p>
+        <div id="learnNextPro" class="pro-note" style="display:none"></div>
         <p id="learnNextHasCal" class="muted small" style="display:none">✓ יש לך כבר כיול עיוות, וטיסת הניסוי בדקה אם הוא עוזר. אפשר לחדש אותו מתא הטייס.</p>
       </div>
       <details class="end-details"><summary>מה גילינו? (פירוט)</summary><div id="learnEndSummary"></div></details>
@@ -401,7 +402,8 @@
       </div>
       <button id="rSpeak" class="rb2" title="הקראה"><i data-icon="sound"></i><span>הקראה</span></button>
       <button id="rStar" class="rb2" title="המצב שלי"><i data-icon="star"></i><span>המצב שלי</span></button>
-      <label id="rGlassesWrap" class="rb2 glasses" title="עוצמת תיקון העיוות"><i data-icon="glasses"></i><input id="rGlasses" type="range" min="0" max="1.5" step="0.05"></label>
+      <button id="rOneEye" class="rb2 one-eye" style="display:none"><i data-icon="eye"></i><span id="rOneEyeLabel"></span></button>
+      <label id="rGlassesWrap" class="rb2 glasses" title="עוצמת תיקון העיוות"><i data-icon="glasses"></i><input id="rGlasses" type="range" min="0" max="1" step="0.05"></label>
       <span id="readExtra"></span>
       <details class="more" id="rMore">
         <summary class="rb2" title="עוד"><i data-icon="more"></i><span>עוד</span></summary>
@@ -426,7 +428,7 @@
           <div class="row"><button id="srcPasteGo" class="primary">לקרוא ▶</button><button id="srcSample">דוגמה</button></div>
         </div>
         <button id="srcFileBtn" class="src-card"><span class="ti ap"><i data-icon="folder"></i></span><b>קובץ</b><small>טקסט, Word, PDF או תמונה</small></button>
-        <button id="srcPhotoBtn" class="src-card"><span class="ti ap"><i data-icon="camera"></i></span><b>צילום</b><small>לצלם דף בטלפון</small></button>
+        <button id="srcPhotoBtn" class="src-card"><span class="ti ap"><i data-icon="camera"></i></span><b>צילום</b><small>לצלם דף בטלפון. כדי לזהות את הטקסט התמונה נשלחת ל־Claude: לא מצלמים פנים או פרטים אישיים.</small></button>
         <button id="srcCamBtn" class="src-card"><span class="ti ap"><i data-icon="scan"></i></span><b>מצלמה חיה</b><small id="srcCamNote">עובדת מחוץ ל־claude.ai</small></button>
         <button id="srcGenBtn" class="src-card"><span class="ti ap"><i data-icon="sparkle"></i></span><b>טקסט חדש</b><small>לפי רמה ונושא</small><small id="srcGenNote" class="muted">זמין בגרסה שב־claude.ai</small></button>
         <span id="srcGenCard" hidden></span>
@@ -561,7 +563,7 @@
       <p class="lead">מביטים כל הזמן בצלב האדום שבמרכז. נקודות קטנות יהבהבו מסביב. כל פעם שרואים נקודה, לוחצים על המסך או על מקש הרווח. לא מזיזים את המבט אל הנקודה!</p>
       <p class="muted">כך רואים אם יש אזורים במסך שבהם קשה יותר לראות את הנקודות, ומתאימים לפי זה את מיקום הטקסט. לוקח כ־3 דקות.</p>
       <div class="setup-grid">
-        <label>איזו עין? <select id="ftEye"><option value="right">ימין (מכסים את השמאלית)</option><option value="left">שמאל (מכסים את הימנית)</option><option value="both">שתי העיניים</option></select></label>
+        <label>איזו עין? <select id="ftEye"><option value="right">ימין (מכסים את השמאלית)</option><option value="left">שמאל (מכסים את הימנית)</option><option value="both" selected>שתי העיניים</option></select></label>
         <label>מרחק מהמסך (ס״מ) <input id="ftDist" type="number" min="15" max="150"></label>
         <label>גודל הנקודה <select id="ftDotSize"><option value="0.35">קטנה</option><option value="0.5" selected>רגילה</option><option value="0.9">גדולה (לראייה חלשה)</option></select></label>
       </div>
@@ -697,7 +699,7 @@
   <dialog id="profileDialog">
     <form method="dialog">
       <h3 id="profileDialogTitle">קורא/ת חדש/ה</h3>
-      <label>שם <input id="profileName" type="text" maxlength="24" autocomplete="off"></label>
+      <label>שם או כינוי (לא צריך שם מלא) <input id="profileName" type="text" maxlength="24" autocomplete="off"></label>
       <div class="kind-pick">
         <label><input type="radio" name="pkind" value="child" checked> טייס/ת צעיר/ה</label>
         <label><input type="radio" name="pkind" value="adult"> מבוגר/ת</label>
@@ -721,6 +723,22 @@
     </form>
   </dialog>
 
+  <dialog id="a11yDialog" class="wide">
+    <form method="dialog">
+      <h3><i data-icon="info"></i> הצהרת נגישות</h3>
+      <p>עין טובה נבנתה כדי לעזור לאנשים עם לקויות ראייה לקרוא ולראות, ולכן הנגישות היא חלק מהמטרה שלה. אנחנו שואפים לעמוד בתקן הישראלי 5568 וברמה AA של WCAG 2.1.</p>
+      <ul>
+        <li>גודל אותיות, ריווח, ערכות צבעים בניגודיות גבוהה ומצב ממשק בהיר בניגודיות גבוהה.</li>
+        <li>כל הנחיה אפשר לשמוע (כפתור הרמקול), ואפשר להפעיל הקראה אוטומטית של כל ההנחיות.</li>
+        <li>שימוש במקלדת, וכיבוי תנועה לפי הגדרת "הפחתת תנועה" של המכשיר.</li>
+        <li>עברית ואנגלית, מימין לשמאל ומשמאל לימין.</li>
+      </ul>
+      <p><b>מגבלות ידועות:</b> חלק מהמשימות בטיסת הניסוי (מציאת צבע שונה, קווים) חזותיות מעצם טבען, ואפשר לדלג עליהן. מעקב העיניים במצלמה לא מתאים לכולם.</p>
+      <p><b>נתקלתם בבעיית נגישות?</b> נשמח לשמוע: ד"ר יעל שדה · <a href="tel:+972523969417" dir="ltr">052-3969417</a> · <a href="mailto:yael.sade@gmail.com" dir="ltr">yael.sade@gmail.com</a></p>
+      <p class="muted small">עודכן: נובמבר 2026</p>
+      <div class="row"><button value="ok" class="primary">סגירה</button></div>
+    </form>
+  </dialog>
   <dialog id="promptDialog">
     <form method="dialog">
       <p id="promptText"></p>
@@ -745,7 +763,7 @@
           <option value="dialogue">שיחה</option><option value="math">שאלות בחשבון</option>
         </select>
       </label>
-      <label>נושא <input id="genTopic" type="text" placeholder="למשל: דינוזאורים, כדורגל, החלל"></label>
+      <label>נושא <input id="genTopic" type="text" maxlength="60" placeholder="למשל: דינוזאורים, כדורגל, החלל"></label>
       <div class="row">
         <label>שפה <select id="genLang"><option value="he">עברית</option><option value="en">English</option></select></label>
         <label>אורך <select id="genLength"><option value="short">קצר</option><option value="medium">בינוני</option><option value="long">ארוך</option></select></label>
@@ -775,9 +793,10 @@
   <script src="js/core/device.js"></script>
   <script src="js/instruments/grid.js"></script>
   <script src="js/vision/eyes.js"></script>
-  <script>window.DA.VERSION = '1.5.0';</script>
+  <script>window.DA.VERSION = '1.6.0';</script>
   <script src="js/ui/icons.js"></script>
   <script src="js/ui/common.js"></script>
+  <script src="js/ui/safety.js"></script>
   <script src="js/ui/drawer.js"></script>
   <script src="js/ui/cockpit.js"></script>
   <script src="js/ui/copilot.js"></script>

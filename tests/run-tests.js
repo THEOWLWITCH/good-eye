@@ -203,7 +203,9 @@ require(path.join(__dirname, '..', 'js/content/readaids.js'));
 var RA = DA.readaids;
 test('pointed Hebrew splits into syllables; unpointed stays whole', function () {
   var s = RA.syllables('שָׁלוֹם');            // sha-lom
-  ok(s.length === 2 && s.join('') === 'שָׁלוֹם', JSON.stringify(s));
+  ok(s.join('|') === 'שָׁ|לוֹם', JSON.stringify(s));
+  var t = RA.syllables('תַּפּוּחַ');          // ta-pu-ach (furtive patah)
+  ok(t.join('|') === 'תַּ|פּוּחַ', JSON.stringify(t));
   var s2 = RA.syllables('יְלָדִים');           // ye-la-dim
   ok(s2.join('') === 'יְלָדִים' && s2.length >= 2, JSON.stringify(s2));
   ok(RA.syllables('שלום').length === 1);

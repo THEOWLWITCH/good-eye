@@ -27,6 +27,12 @@
       var t = store.getTrial(s.calibrationId);
       return t && t.model && t.model.ops && t.model.ops.length ? t.model.ops : null;
     },
+    /** The eye a calibration was made for ('right' | 'left' | 'both' | null). */
+    calEye: function (s) {
+      if (!s || !s.calibrationId) return null;
+      var t = store.getTrial(s.calibrationId);
+      return t && t.viewing ? t.viewing.eye || 'right' : 'right';
+    },
     /** Merge a patch into the reader's settings, save, and refresh what is on screen. */
     updateSettings: function (patch) {
       var p = ctx.profile();
@@ -63,8 +69,17 @@
     var scr = $('screen-' + name); if (scr && document.activeElement && document.activeElement.tagName === 'BODY') scr.focus({ preventScroll: true });
   }
 
+  /** Interface look for low vision: high-contrast light mode and a larger interface. */
+  function applyUi(p) {
+    var s = p ? p.settings : {}, mode = s.uiContrast || 'auto';
+    var hc = mode === 'high' || (mode === 'auto' && root.matchMedia && (matchMedia('(prefers-contrast: more)').matches || matchMedia('(forced-colors: active)').matches));
+    document.documentElement.classList.toggle('hc', !!hc);
+    document.documentElement.style.setProperty('--uiz', String(+s.uiScale || 1));
+    document.documentElement.classList.toggle('ui-zoomed', (+s.uiScale || 1) > 1);
+  }
   function renderHeader() {
     var p = ctx.profile();
+    applyUi(p);
     $('whoChip').style.display = p ? '' : 'none';
     if (p) { $('whoEmoji').innerHTML = DA.ui.avatar(p, 'xs'); $('whoName').textContent = p.name; }
     $('navHome').style.display = cur === 'hub' || cur === 'home' ? 'none' : '';
@@ -73,6 +88,7 @@
   function boot() {
     DA.i18n.apply(document.body);
     accessibility();
+    document.querySelectorAll('.a11y-link').forEach(function (b) { b.onclick = function () { document.getElementById('a11yDialog').showModal(); }; });
     var bar = document.querySelector('.topbar');
     var setHdr = function () { if (bar) document.documentElement.style.setProperty('--hdr', bar.offsetHeight + 'px'); };
     setHdr();

@@ -24,7 +24,7 @@
   var ctx, stageLens, sess, queue, work, plainSettings, step, stepStart, done = 0, total = 0, paused = false;
   var SAVE = 'da.learn.paused.', lastPraise = -1;
 
-  var PLAIN = { font: 'arial', theme: 'white', letterSpacing: 0, wordSpacing: 0.05, lineHeight: 1.4, warpStrength: 0, sharpen: 0, bold: false, ruler: 'off', shiftX: 0, shiftY: 0, lineMarker: false };
+  var PLAIN = { font: 'arial', theme: 'white', letterSpacing: 0, wordSpacing: 0.05, lineHeight: 1.4, warpStrength: 0, sharpen: 0, bold: false, ruler: 'off', shiftX: 0, shiftY: 0, lineMarker: false, lineMarkerEnd: false, brightness: 1, warmth: 0, calm: false, cvd: 'none' };
 
   var START = { digit: 40, 'letter-he': 40, 'letter-en': 40, 'word-he': 34, 'word-en': 34, 'sentence-he': 26, 'sentence-en': 26, silhouette: 70, line: 70, color: 70 };
   // ---------------- voice & sound ----------------
@@ -101,58 +101,81 @@
   Tournament.prototype.units = function () { return (this.rest ? this.rest.length : 0) + (this._used || 0); };
   Search.prototype.units = function () { return this.maxTrials; };
 
-  /** Faint letters: the digit gets fainter after two right answers, stronger after a miss. */
-  function Contrast(maxTrials) { this.k = 'K'; this.c = 0.35; this.n = 0; this.run = 0; this.lastDir = 0; this.rev = []; this.maxTrials = maxTrials; this.correct = 0; }
+  /**
+   * Faint letters: Weber contrast of a grey digit on a fixed white background (no theme, no filters).
+   * Fast start (halve after each right answer until the first miss), then 2-down/1-up in 0.15-log steps.
+   */
+  function Contrast(maxTrials) { this.k = 'K'; this.c = 0.5; this.n = 0; this.run = 0; this.lastDir = 0; this.rev = []; this.maxTrials = maxTrials; this.correct = 0; this.fast = true; }
   Contrast.prototype.done = function () { return this.n >= this.maxTrials; };
   Contrast.prototype.answer = function (ok) {
     this.n++; var dir = 0;
-    if (ok) { this.correct++; this.run++; if (this.run >= 2) { dir = -1; this.run = 0; } } else { dir = 1; this.run = 0; }
+    if (ok) { this.correct++; this.run++; if (this.fast || this.run >= 2) { dir = -1; this.run = 0; } } else { dir = 1; this.run = 0; this.fast = false; }
     if (dir) {
       if (this.lastDir && dir !== this.lastDir) this.rev.push(this.c);
       this.lastDir = dir;
-      this.c = Math.max(0.02, Math.min(1, this.c * (dir < 0 ? 0.55 : 1.8)));
+      this.c = Math.max(0.02, Math.min(1, this.c * (dir < 0 ? (this.fast ? 0.5 : 0.7) : 1.43)));
     }
   };
+  /** Weber contrast threshold, or null when not reached reliably (fewer than 2 reversals after the first). */
   Contrast.prototype.threshold = function () {
-    var r = this.rev.length ? this.rev : [this.c];
+    var r = this.rev.slice(1);
+    if (r.length < 2) return this.correct === this.n && this.n ? this.c : null;   // never missed: at least this faint
     return Math.round(Math.exp(r.reduce(function (a, v) { return a + Math.log(v); }, 0) / r.length) * 1000) / 1000;
   };
-  /** Colours: find the circle that is a different colour (red–green twice, blue–green once). */
-  function ColorCheck() { this.k = 'D'; this.pairs = ['rg', 'by', 'rg']; this.n = 0; this.miss = { rg: 0, by: 0 }; this.maxTrials = 3; }
+  /** sRGB grey for a digit with Weber contrast c on white. */
+  function greyFor(c) {
+    var L = Math.max(0, 1 - c), v = L <= 0.0031308 ? 12.92 * L : 1.055 * Math.pow(L, 1 / 2.4) - 0.055, g = Math.round(v * 255);
+    return 'rgb(' + g + ',' + g + ',' + g + ')';
+  }
+  /** Colours: find the circle that is a different colour (red–green four times, blue–green twice), with brightness jitter. */
+  function ColorCheck() {
+    this.k = 'D'; this.pairs = shuffleArr(['rg', 'rg', 'rg', 'rg', 'by', 'by']); this.n = 0; this.miss = { rg: 0, by: 0 }; this.maxTrials = 6;
+  }
   ColorCheck.prototype.done = function () { return this.n >= this.maxTrials; };
   ColorCheck.prototype.answer = function (ok) { if (!ok) this.miss[this.pairs[this.n]]++; this.n++; };
-  ColorCheck.prototype.hint = function () { return this.miss.rg >= 2 ? 'rg' : this.miss.by >= 1 && this.miss.rg === 0 ? 'by' : null; };
+  /** Only a hint for a suggestion; never a label and never applied automatically. */
+  ColorCheck.prototype.hint = function () { return this.miss.rg >= 3 ? 'rg' : (this.miss.by >= 2 && this.miss.rg <= 1) ? 'by' : null; };
+  function shuffleArr(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
   /** Straight lines: one look with each eye at a grid. */
-  function LinesCheck() { this.k = 'L'; this.eyes = ['right', 'left']; this.n = 0; this.answers = {}; this.maxTrials = 2; }
+  function LinesCheck() { this.k = 'L'; this.eyes = Math.random() < 0.5 ? ['right', 'left'] : ['left', 'right']; this.n = 0; this.answers = {}; this.maxTrials = 2; }
   LinesCheck.prototype.done = function () { return this.n >= this.maxTrials; };
   LinesCheck.prototype.answer = function (v) { this.answers[this.eyes[this.n]] = v; this.n++; };
 
   // ---------------- staircase (recognition) ----------------
-  function Staircase(category, condition, start, maxTrials) {
+  /**
+   * Size staircase. Fast start: ×0.6 after every right answer until the first miss, then 2-down/1-up
+   * (×0.8 / ×1.25). With two answer choices (CVI mode) it is 3-down/1-up, because guessing is 50%.
+   * The threshold is the geometric mean of the reversals after the first; without 2 such reversals
+   * there is no reliable threshold and nothing is recommended from it.
+   */
+  function Staircase(category, condition, start, maxTrials, down) {
     this.k = 'C'; this.category = category; this.condition = condition;
-    this.size = start; this.run = 0; this.lastDir = 0; this.reversals = [];
+    this.size = start; this.run = 0; this.lastDir = 0; this.reversals = []; this.fast = true; this.down = down || 2;
     this.n = 0; this.correct = 0; this.rts = []; this.maxTrials = maxTrials;
   }
-  Staircase.prototype.done = function () { return this.n >= this.maxTrials || this.reversals.length >= 4; };
+  Staircase.prototype.done = function () { return this.n >= this.maxTrials || this.reversals.length >= 7; };
   Staircase.prototype.answer = function (ok, rt) {
     this.n++; this.rts.push(rt);
     var dir = 0;
-    if (ok) { this.correct++; this.run++; if (this.run >= 2) { dir = -1; this.run = 0; } }
-    else { dir = 1; this.run = 0; }
+    if (ok) { this.correct++; this.run++; if (this.fast || this.run >= this.down) { dir = -1; this.run = 0; } }
+    else { dir = 1; this.run = 0; this.fast = false; }
     if (dir) {
       if (this.lastDir && dir !== this.lastDir) this.reversals.push(this.size);
       this.lastDir = dir;
-      this.size = Math.max(6, Math.min(200, this.size * (dir < 0 ? 0.8 : 1.25)));
+      this.size = Math.max(6, Math.min(200, this.size * (dir < 0 ? (this.fast ? 0.6 : 0.8) : 1.25)));
     }
   };
+  Staircase.prototype.reliable = function () { return this.reversals.length >= 3; };
   Staircase.prototype.threshold = function () {
-    var r = this.reversals.slice(-4);
-    if (!r.length) return this.lastDir < 0 || this.correct === this.n ? this.size / 0.8 * 0.9 : this.size;
+    var r = this.reversals.slice(1).slice(-4);
+    if (r.length < 2) return null;
     return Math.exp(r.reduce(function (a, v) { return a + Math.log(v); }, 0) / r.length);
   };
   Staircase.prototype.summary = function () {
     var med = this.rts.slice().sort(function (a, b) { return a - b; })[Math.floor(this.rts.length / 2)] || null;
-    return { threshold: Math.round(this.threshold() * 10) / 10, trials: this.n, correct: this.correct, medianRtMs: med, reversals: this.reversals.length };
+    var th = this.threshold();
+    return { threshold: th == null ? null : Math.round(th * 10) / 10, below: th == null && this.correct === this.n ? Math.round(this.size * 10) / 10 : null,
+      trials: this.n, correct: this.correct, medianRtMs: med, reversals: this.reversals.length };
   };
 
   // ---------------- setup ----------------
@@ -215,7 +238,7 @@
     $('learnPlayed').style.display = prev ? '' : 'none';
     $('learnOnce').style.display = prev ? 'none' : '';
     $('quickGame').classList.toggle('huge', !prev);
-    $('quickGame').textContent = prev ? T('לטוס שוב בכל זאת') : T('ממריאים (כ־3 דקות)');
+    $('quickGame').textContent = prev ? T('לטוס שוב בכל זאת') : T('ממריאים (כ־4 דקות)');
     if (prev) $('learnPlayedWhen').textContent = T('✓ טיסת הניסוי כבר נעשתה ב־') + new Date(prev.startedAt).toLocaleDateString(DA.i18n.locale);
     document.querySelectorAll('#catChecks input').forEach(function (i) {
       var def = defaultCats(p.kind === 'adult');
@@ -277,12 +300,12 @@
   function quickPlan() {
     var adult = ctx.profile() && ctx.profile().kind === 'adult';
     var L = DA.i18n.content;
-    // two size stations (main one also WITHOUT the personal settings, for comparison), separated by other activities
-    return adult
-      ? { name: 'quick-adult', size: [['sentence-' + L], ['letter-' + L]], plainFor: 'sentence-' + L, checks: ['lines', 'contrast', 'color'],
-          prefs: ['theme', 'font', 'letterSpacing', 'brightness', 'warp'], maxTrials: 5, plainTrials: 4, prefTrials: 2, themes: 3 }
-      : { name: 'quick-child', size: [['word-' + L], ['digit']], plainFor: 'word-' + L, checks: ['lines', 'contrast', 'color'],
-          prefs: ['theme', 'letterSpacing', 'brightness', 'warp'], maxTrials: 5, plainTrials: 4, prefTrials: 2, themes: 3 };
+    // Size on symbols that do not depend on reading skill (digits for children, letters for adults);
+    // the comfortable sentence size comes from the reading-size test. With and without settings, interleaved.
+    var cat = adult ? 'letter-' + L : 'digit';
+    return { name: adult ? 'quick-adult' : 'quick-child', size: [[cat]], plainFor: cat, checks: ['lines', 'contrast', 'color'],
+      prefs: adult ? ['theme', 'font', 'letterSpacing', 'brightness', 'warp'] : ['theme', 'letterSpacing', 'brightness', 'warp'],
+      maxTrials: 12, plainTrials: 10, prefTrials: 2, themes: 4 };
   }
   /** Default recognition categories, in the interface language. */
   function defaultCats(adult) {
@@ -330,14 +353,15 @@
     plan.size.forEach(function (group) {
       group.forEach(function (cat) {
         var prev = lastThreshold(cat);
-        var s0 = prev ? Math.max(START[cat] * 0.5, prev * 1.6) : START[cat];
-        stairs.push(new Staircase(cat, 'corrected', s0, plan.maxTrials));
-        if (plan.plainFor === '*' || plan.plainFor === cat) stairs.push(new Staircase(cat, 'plain', s0, plan.plainTrials || plan.maxTrials));
+        var s0 = prev ? Math.min(START[cat], Math.max(12, prev * 1.6)) : START[cat];
+        var down = work.cvi ? 3 : 2;
+        stairs.push(new Staircase(cat, 'corrected', s0, plan.maxTrials, down));
+        if (plan.plainFor === '*' || plan.plainFor === cat) stairs.push(new Staircase(cat, 'plain', s0, plan.plainTrials || plan.maxTrials, down));
       });
     });
     var checks = {};
     if (k_has(plan.checks, 'lines')) checks.lines = new LinesCheck();
-    if (k_has(plan.checks, 'contrast')) checks.contrast = new Contrast(4);
+    if (k_has(plan.checks, 'contrast')) checks.contrast = new Contrast(8);
     if (k_has(plan.checks, 'color')) checks.color = new ColorCheck();
     // the journey: alternate kinds of activity
     var st = [];
@@ -407,7 +431,8 @@
     if (sess._intro !== sess._si) { showIntro(stn); return; }
     if (stn.id === 'size') {
       var open = sess._stairs.filter(function (x) { return stn.cats.indexOf(x.category) >= 0 && !x.done(); });
-      if (Math.random() < 0.12) { showRecognize(open[0], true); return; } // catch trial: big & easy, checks attention
+      sess._recN = (sess._recN || 0) + 1;
+      if (sess._recN % 5 === 0) { showRecognize(open[Math.floor(Math.random() * open.length)], true); return; } // catch trial: big & easy, checks attention
       showRecognize(open[Math.floor(Math.random() * open.length)]);
       return;
     }
@@ -443,13 +468,13 @@
 
   // ----- lines (each eye) -----
   function gridSvg(px) {
-    var n = 10, g = '';
+    var n = 20, g = '';   // 20×20 like an Amsler grid
     for (var i = 0; i <= n; i++) {
       var v = (i / n * 100).toFixed(1);
       g += '<line x1="' + v + '" y1="0" x2="' + v + '" y2="100"/><line x1="0" y1="' + v + '" x2="100" y2="' + v + '"/>';
     }
     return '<svg class="amsler" viewBox="-1 -1 102 102" width="' + px + '" height="' + px + '" aria-hidden="true"><rect x="0" y="0" width="100" height="100" fill="#fff"/>' +
-      '<g stroke="#111" stroke-width="0.5">' + g + '</g><circle cx="50" cy="50" r="1.8" fill="#e0242b"/></svg>';
+      '<g stroke="#111" stroke-width="0.35">' + g + '</g><circle cx="50" cy="50" r="1.8" fill="#e0242b"/></svg>';
   }
   function showLines(ch) {
     var eye = ch.eyes[ch.n];
@@ -458,8 +483,8 @@
     var px = Math.round(Math.min($('learnStage').clientWidth, $('learnStage').clientHeight) * 0.86);
     $('learnContent').innerHTML = '<div class="stim-wrap">' + gridSvg(px) + '</div>';
     $('learnPrompt').innerHTML = eye === 'right'
-      ? T('מכסים את העין <b>השמאלית</b> ביד, ומסתכלים בעין ימין על הנקודה האדומה. איך נראים הקווים?')
-      : T('עכשיו מכסים את העין <b>הימנית</b>, ומסתכלים בעין שמאל על הנקודה האדומה. איך נראים הקווים?');
+      ? T('מכסים את העין <b>השמאלית</b> בכף יד מקומרת, בלי ללחוץ על העין, ומסתכלים בעין ימין על הנקודה האדומה. בלי להזיז את המבט: איך נראים הקווים מסביב?')
+      : T('מכסים את העין <b>הימנית</b> בכף יד מקומרת, בלי ללחוץ על העין, ומסתכלים בעין שמאל על הנקודה האדומה. בלי להזיז את המבט: איך נראים הקווים מסביב?');
     choices([
       { html: T('כולם ישרים'), cls: 'answer wide', fn: function () { answerLines('straight'); } },
       { html: T('חלק עקומים או גליים'), cls: 'answer wide', fn: function () { answerLines('wavy'); } },
@@ -477,13 +502,14 @@
 
   // ----- faint letters (contrast) -----
   function showContrast(ch) {
-    applySizeFromStairs();   // provisional comfortable size from what we know so far
-    stageLens.apply(work, ctx.opsFor(work));
+    // fixed white background, black-based grey digit, no theme and no comfort filters
+    stageLens.apply(DA.settings.normalize(Object.assign({}, plainSettings, { theme: 'white', sharpen: 0, bold: false })), null);
     $('learnStage').classList.remove('cvi');
     var trial = makeFresh('digit');
-    var size = Math.max(48, Math.min(110, (work.fontSize || 24) * 1.6));
+    var dg = sess._stairs.filter(function (x) { return x.condition === 'corrected' && x.threshold() != null; })[0];
+    var size = Math.max(44, Math.min(100, dg ? dg.threshold() * 3 : 64));
     step = { type: 'contrast', ch: ch, trial: trial };
-    $('learnContent').innerHTML = '<div class="stim-wrap" style="opacity:' + ch.c + '">' + trial.html(Math.round(size)) + '</div>';
+    $('learnContent').innerHTML = '<div class="stim-wrap contrast-stim" style="color:' + greyFor(ch.c) + '">' + trial.html(Math.round(size)) + '</div>';
     $('learnPrompt').textContent = T('איזה מספר מסתתר בערפל?');
     choices(trial.choices.map(function (o) { return { html: o.html, cls: 'answer glyph', fn: function () { answerContrast(o.key); } }; }));
     stepStart = performance.now();
@@ -491,20 +517,26 @@
   function answerContrast(key) {
     if (!step || step.type !== 'contrast') return;
     var ok = key === step.trial.answer;
-    sess.log.push({ category: 'contrast', opacity: step.ch.c, target: step.trial.answer, response: key, correct: ok, rtMs: Math.round(performance.now() - stepStart) });
+    sess.log.push({ category: 'contrast', weber: step.ch.c, target: step.trial.answer, response: key, correct: ok, rtMs: Math.round(performance.now() - stepStart) });
     step.ch.answer(ok);
     feedback(praise());
   }
 
   // ----- colours: odd one out -----
   var PAIRS = { rg: ['#b8743a', '#7f9440'], by: ['#4a86c8', '#4aa39a'] };
+  /** Scale a colour's brightness so that brightness is not a reliable cue. */
+  function jitter(hex) {
+    var k = 0.85 + Math.random() * 0.3, n = parseInt(hex.slice(1), 16);
+    var r = Math.min(255, Math.round(((n >> 16) & 255) * k)), g = Math.min(255, Math.round(((n >> 8) & 255) * k)), b = Math.min(255, Math.round((n & 255) * k));
+    return 'rgb(' + r + ',' + g + ',' + b + ')';
+  }
   function showColor(ch) {
-    stageLens.apply(plainSettings, null);
+    stageLens.apply(plainSettings, null);   // no warmth, brightness or colour filters during this round
     var pair = PAIRS[ch.pairs[ch.n]], odd = Math.floor(Math.random() * 4), flip = Math.random() < 0.5;
     var base = flip ? pair[1] : pair[0], other = flip ? pair[0] : pair[1];
     step = { type: 'color', ch: ch, odd: odd };
     var html = '<div class="odd-grid">';
-    for (var i = 0; i < 4; i++) html += '<button class="odd-dot" data-i="' + i + '" style="background:' + (i === odd ? other : base) + '" aria-label="' + T('עיגול') + ' ' + (i + 1) + '"></button>';
+    for (var i = 0; i < 4; i++) html += '<button class="odd-dot" data-i="' + i + '" style="background:' + jitter(i === odd ? other : base) + '" aria-label="' + T('עיגול') + ' ' + (i + 1) + '"></button>';
     $('learnContent').innerHTML = html + '</div>';
     $('learnContent').querySelectorAll('.odd-dot').forEach(function (b) { b.onclick = function () { answerColor(+b.getAttribute('data-i')); }; });
     $('learnPrompt').textContent = T('איזה עיגול בצבע אחר? גע בו');
@@ -534,11 +566,15 @@
     return PRAISE[pi];
   }
 
-  /** Comfortable reading size ≈ critical print size: ~2.5× the smallest recognised glyph size. */
+  /**
+   * Starting size for reading ≈ 2.5× the smallest symbol read reliably (an acuity reserve; 3× in CVI mode).
+   * Only reliable thresholds count, and the median is used. The reading-size test gives the final size.
+   */
   function applySizeFromStairs() {
-    var th = sess._stairs.filter(function (s) { return s.condition === 'corrected' && s.n && /letter|word|sentence|digit/.test(s.category); })
-      .map(function (s) { return s.threshold() * (/sentence/.test(s.category) ? 1.6 : 2.5); });
-    if (th.length) work.fontSize = Math.round(Math.min(96, Math.max(18, Math.max.apply(null, th))));
+    var k = work.cvi ? 3 : 2.5;
+    var th = sess._stairs.filter(function (s) { return s.condition === 'corrected' && s.threshold() != null; })
+      .map(function (s) { return s.threshold() * (/sentence/.test(s.category) ? 1.6 : k); }).sort(function (a, b) { return a - b; });
+    if (th.length) work.fontSize = Math.round(Math.min(96, Math.max(18, th[Math.floor((th.length - 1) / 2)])));
   }
 
   function doneUnits() {
@@ -719,14 +755,10 @@
     var ck = sess._checks || {};
     if (ck.contrast && ck.contrast.n) {
       var thr = ck.contrast.threshold();
-      sess.contrast = { threshold: thr, trials: ck.contrast.n, needsMore: thr > 0.15 };
-      if (thr > 0.15) work.bold = true;   // faint text is hard: thicker letters help
+      sess.contrast = { threshold: thr, trials: ck.contrast.n, needsMore: thr != null && thr > 0.1 };
+      if (sess.contrast.needsMore) work.bold = true;   // thicker letters are usually more comfortable then
     }
-    if (ck.color && ck.color.n >= 2) {
-      sess.colorHint = ck.color.hint();
-      if (sess.colorHint === 'rg' && work.cvd === 'none') work.cvd = 'deutan';
-      if (sess.colorHint === 'by' && work.cvd === 'none') work.cvd = 'tritan';
-    }
+    if (ck.color && ck.color.n >= 4) sess.colorHint = ck.color.hint();   // a suggestion only, never switched on automatically
     if (ck.lines && ck.lines.n) sess.lines = ck.lines.answers;
     // suggested reading size: ~2.5× the smallest recognised text size (comfortable print size)
     if (!sess._sized) applySizeFromStairs();
@@ -742,7 +774,7 @@
       };
       if (sess.viewing.distanceCmMedian) work.refDistanceCm = sess.viewing.distanceCmMedian;
     }
-    if (sess.catchTrials) sess.attention = Math.round((1 - (sess.catchMisses || 0) / sess.catchTrials) * 100);
+    if (sess.catchTrials) { sess.attention = Math.round((1 - (sess.catchMisses || 0) / sess.catchTrials) * 100); sess.attentionLow = (sess.catchMisses || 0) >= 2; }
     sess.after = DA.settings.normalize(work);
     sess.endedAt = new Date().toISOString();
     sess.early = !!early;
@@ -754,40 +786,50 @@
     $('learnEndSummary').innerHTML = summaryHtml(sess);
     var endMsg = early
       ? T('עצרנו כאן, וזה בסדר גמור. גם ממה שהספקנו למדנו משהו חשוב עליך. רוצים לשמור? לחצו על הכפתור הגדול עם הכוכב.')
-      : T('מצאנו בשבילך את הדרך הכי נוחה לקרוא. לחצו על הכפתור הגדול עם הכוכב, ומעכשיו כל טקסט באפליקציה ייראה בדיוק ככה.');
+      : T('מצאנו הגדרות שכדאי לנסות. לחצו על הכפתור הגדול עם הכוכב, ומעכשיו כל טקסט באפליקציה ייראה ככה. תמיד אפשר לשנות.');
     var endTitle = early ? T('נחתנו באמצע, וזה בסדר') : T('טיסת הניסוי הושלמה!');
     $('learnEndTitle').innerHTML = '<span class="end-badge">' + DA.icons.svg(early ? 'pin' : 'trophy') + '</span>' + esc(endTitle);
     var hasCal = !!ctx.opsFor(ctx.profile().settings);
     var la = sess.lines || {}, vals = Object.keys(la).map(function (k) { return la[k]; });
     var wavy = vals.indexOf('wavy') >= 0, missing = vals.indexOf('missing') >= 0;
     var straight = vals.length === 2 && vals.every(function (v) { return v === 'straight'; });
-    var q, nextSay, pro = '';
-    if (wavy || missing) {
-      q = (wavy ? T('ראית קווים עקומים או גליים') : T('ראית שחסר חלק מהרשת')) + T(' בעין אחת לפחות. ') +
-        (hasCal ? T('כדאי לחדש את כיול העיוות, כדי שהתיקון יתאים בדיוק.') : T('כדאי לעשות כיול עיוות: הוא מיישר את מה שנראה עקום, ומתאים את הטקסט בדיוק לעין שלך.')) +
-        (missing ? T(' ובשביל חלק שחסר, יש גם את "מפת נוחות" בכל הכלים.') : '');
-      pro = T('כדאי לבדוק את זה גם אצל רופא/ת עיניים או אופטומטריסט/ית, במיוחד אם זה חדש או השתנה.');
-      nextSay = ' ' + q + ' ' + pro;
+    var q, nextSay = '', ref = false;
+    $('learnNextMap').style.display = 'none';
+    if (missing) {
+      // a missing area is not corrected by warping: reading aids first, never the distortion calibration alone
+      q = T('ראית שחלק מהרשת חסר או שיש בה כתם, בעין אחת לפחות. כתם כזה לא מיישרים בכיול, אבל אפשר להקל על הקריאה: אותיות גדולות יותר, מילה אחרי מילה והקראה. במפת הנוחות אפשר לראות איפה נוח למקם את הטקסט.') +
+        (wavy ? ' ' + T('ובשביל הקווים העקומים יש גם כיול עיוות.') : '');
+      ref = true;
+      $('learnNextMap').style.display = '';
+    } else if (wavy) {
+      q = T('ראית קווים עקומים או גליים בעין אחת לפחות. ') +
+        (hasCal ? T('אפשר לחדש את כיול העיוות, כדי שהתיקון יתאים בדיוק.') : T('אפשר לנסות כיול עיוות: הוא מיישר את מה שנראה עקום, ומתאים את הטקסט לעין שלך.'));
+      ref = true;
     } else if (straight) {
-      q = T('הקווים נראו לך ישרים בשתי העיניים, אז אין צורך בכיול עיוות. אפשר לצאת לקרוא!');
-      nextSay = ' ' + q;
+      q = T('הקווים נראו לך ישרים בשתי העיניים, אז אין צורך בכיול עיוות. אפשר לצאת לקרוא!') + ' ' + T('אם זה ישתנה בעתיד, כדאי להתייעץ עם רופא/ת עיניים.');
+    } else if (vals.indexOf('unsure') >= 0) {
+      q = T('לא היית בטוח/ה איך נראו הקווים. אפשר לבדוק שוב בעזרת קווים בבית: משקוף, שורות במחברת או קצה של שולחן, בכל עין לחוד.');
+      ref = true;
     } else {
       q = T('קווים ישרים, כמו משקוף, שורות במחברת או קצה של שולחן, נראים לך לפעמים עקומים, גליים או עם חלק חסר?');
       nextSay = hasCal ? '' : ' ' + T('ושאלה אחת לסיום: קווים ישרים נראים לך לפעמים עקומים, גליים או עם חלק חסר? אם כן, כדאי לעשות גם כיול עיוות.');
     }
+    if (!nextSay) nextSay = ' ' + q;
+    if (ref) nextSay += ' ' + DA.safety.text();
     $('learnNextQ').textContent = q;
-    $('learnNextPro').textContent = pro;
-    $('learnNextPro').style.display = pro ? '' : 'none';
+    $('learnNextPro').innerHTML = ref ? DA.safety.html() : '';
+    $('learnNextPro').style.display = ref ? '' : 'none';
     $('learnNextQ').style.display = '';
     $('learnNextHasCal').style.display = 'none';
-    var showCal = wavy || missing || (!straight && !hasCal);
+    var showCal = wavy || (!straight && !missing && !hasCal && vals.indexOf('unsure') < 0);
     $('learnNextYes').style.display = showCal ? '' : 'none';
-    $('learnNextYes').textContent = wavy || missing ? (hasCal ? T('לחדש את כיול העיוות') : T('לכיול עיוות (כ־10 דקות)')) : T('כן, לפעמים ← לכיול עיוות (כ־10 דקות)');
-    $('learnNextNo').textContent = straight || wavy || missing ? T('לצאת לקרוא') : T('לא ← אפשר לצאת לקרוא');
+    $('learnNextYes').textContent = wavy ? (hasCal ? T('לחדש את כיול העיוות') : T('לכיול עיוות (כ־10 דקות)')) : T('כן, לפעמים ← לכיול עיוות (כ־10 דקות)');
+    $('learnNextNo').textContent = straight || wavy || missing || vals.length ? T('לצאת לקרוא') : T('לא ← אפשר לצאת לקרוא');
     $('learnNextYes').onclick = function () { ctx.updateSettings(last.after); ctx.go('calibrate'); };
+    $('learnNextMap').onclick = function () { ctx.updateSettings(last.after); ctx.go('fieldtest'); };
     $('learnNextNo').onclick = function () { ctx.updateSettings(last.after); ctx.store.setPref('read.intent', 'read'); ctx.go('read'); };
     $('learnEndSay').textContent = endMsg;
-    setTimeout(function () { speak(endTitle + ' ' + endMsg + ' ' + T('את טיסת הניסוי לא צריך לעשות שוב. בפעם הבאה נכנסים ישר לקריאה.') + nextSay); }, 300);
+    setTimeout(function () { speak(endTitle + ' ' + endMsg + ' ' + T('בפעם הבאה נכנסים ישר לקריאה. טסים שוב רק אם משהו השתנה: משקפיים חדשים, הראייה השתנתה, או עברה כחצי שנה.') + nextSay); }, 300);
     $('learnApplyBest').onclick = function () {
       ctx.updateSettings(sess.after);
       ctx.profiles.setBest(ctx.profile(), sess.after);
@@ -805,23 +847,32 @@
 
   /** Friendly summary of a session (also shown on the hub). */
   function summaryHtml(s) {
+    function cell(r) { return !r ? '—' : r.threshold != null ? r.threshold + 'px' : r.below != null ? '≤ ' + r.below + 'px' : T('לא נמדד בדיוק'); }
     var rows = Object.keys(s.recognition || {}).map(function (k) {
-      var r = s.recognition[k], c = r.corrected, pl = r.plain;
-      var gain = c && pl && pl.threshold ? Math.round((pl.threshold - c.threshold) / pl.threshold * 100) : null;
-      return '<tr><td>' + esc(CAT_LABEL[k] || k) + '</td><td>' + (c ? c.threshold + 'px' : '—') + '</td><td>' + (pl ? pl.threshold + 'px' : '—') + '</td><td>' +
-        (gain == null ? '—' : gain > 5 ? T('<b class="good">קטן יותר ב-') + gain + '% ✓</b>' : gain < -5 ? T('<span class="bad">גדול יותר ב-') + (-gain) + '%</span>' : T('בערך אותו דבר')) + '</td></tr>';
+      var r = s.recognition[k], c = r.corrected, pl = r.plain, verdict = '—';
+      if (c && pl && c.threshold != null && pl.threshold != null && c.reversals >= 3 && pl.reversals >= 3) {
+        var lg = Math.log10(pl.threshold / c.threshold);          // 0.2 log = two steps: smaller differences are noise
+        verdict = lg >= 0.2 ? T('<b class="good">קטן יותר ב-') + Math.round((1 - c.threshold / pl.threshold) * 100) + '% ✓</b>'
+          : lg <= -0.2 ? T('<span class="bad">גדול יותר ב-') + Math.round((c.threshold / pl.threshold - 1) * 100) + '%</span>' : T('לא נמצא הבדל שאפשר למדוד');
+      } else if (c && pl) verdict = T('לא נמצא הבדל שאפשר למדוד');
+      return '<tr><td>' + esc(CAT_LABEL[k] || k) + '</td><td>' + cell(c) + '</td><td>' + cell(pl) + '</td><td>' + verdict + '</td></tr>';
     }).join('');
     var LINES = { straight: T('ישרים'), wavy: T('עקומים או גליים'), missing: T('חסר חלק'), unsure: T('לא בטוח') };
     var extra = '';
     if (s.lines) extra += T('<p>קווים: ') + T('עין ימין') + ' – ' + (LINES[s.lines.right] || '—') + ' · ' + T('עין שמאל') + ' – ' + (LINES[s.lines.left] || '—') + '</p>';
-    if (s.contrast) extra += T('<p>אותיות בערפל: ') + (s.contrast.needsMore ? T('קשה יותר לראות אותיות חיוורות, ולכן הפעלנו אותיות עבות.') : T('ראית היטב גם אותיות חיוורות.')) + '</p>';
-    if (s.colorHint !== undefined) extra += T('<p>צבעים: ') + (s.colorHint === 'rg' ? T('היה קשה להבדיל בין אדום לירוק, ולכן הפעלנו מסנן צבעים שעוזר להבדיל ביניהם.') : s.colorHint === 'by' ? T('היה קשה להבדיל בין כחול לירוק, ולכן הפעלנו מסנן צבעים מתאים.') : T('מצאת את כל הצבעים השונים.')) + '</p>';
+    if (s.contrast) extra += T('<p>אותיות בערפל: ') + (s.contrast.threshold == null ? T('לא הספקנו למדוד בדיוק.')
+      : s.contrast.needsMore ? T('אותיות חיוורות היו פחות נוחות, ולכן הפעלנו אותיות עבות, שעשויות להיות נוחות יותר. אפשר לשנות בהגדרות.')
+      : T('ראית גם אותיות חיוורות.')) + '</p>';
+    if (s.colorHint !== undefined) extra += T('<p>צבעים: ') + (s.colorHint ? T('בחלק מהזוגות היה קשה למצוא את העיגול השונה. אם רוצים, אפשר לנסות מסנן צבעים לתמונות בהגדרות. זו לא בדיקת ראיית צבעים.')
+      : T('מצאת את העיגולים השונים.')) + '</p>';
     var warp = s.warpVerdict ? T('<p>תיקון העיוות: ') + ({ helps: T('נבחר כברור יותר ✓'), 'does-not-help': T('לא עזר בבדיקה הזו'), unclear: T('לא חד־משמעי') })[s.warpVerdict] + '</p>' : '';
+    var tired = s.attentionLow || (s.attentionLow === undefined && s.attention != null && s.catchMisses >= 2);
     return '<p class="muted">' + new Date(s.startedAt).toLocaleString(DA.i18n.locale) + (s.early ? T(' · הופסק באמצע') : '') + '</p>' +
-      (rows ? T('<table class="sum"><tr><th>מה ראינו</th><th>הגודל הקטן ביותר שזוהה — עם ההגדרות שלי</th><th>בלי</th><th>שיפור</th></tr>') + rows + '</table>' : '') +
-      extra + warp + (s.viewing && s.viewing.distanceCmMedian ? T('<p>מרחק צפייה ממוצע: ') + s.viewing.distanceCmMedian + T(' ס״מ') +
-        (s.viewing.gazeCenteredPct != null ? T(' · מבט במרכז ') + s.viewing.gazeCenteredPct + T('% מהזמן') : '') + '</p>' : '') + (s.attention != null && s.attention < 70 ? T('<p class="bad">בבדיקות הקלות היו טעויות — ייתכן שהייתה עייפות. כדאי לחזור על טיסת הניסוי ביום אחר.</p>') : '') +
-      T('<p><b>ההגדרות שנלמדו:</b> ') + esc(DA.settings.describe(s.after || s.before)) + '</p>';
+      (rows ? T('<table class="sum"><tr><th>מה ראינו</th><th>הגודל הקטן שהצלחת לקרוא — עם ההגדרות שלי</th><th>בלי</th><th>הבדל</th></tr>') + rows + '</table>' : '') +
+      extra + warp + (s.viewing && s.viewing.distanceCmMedian ? T('<p>מרחק צפייה ממוצע: ') + s.viewing.distanceCmMedian + T(' ס״מ') + '</p>' : '') +
+      (tired ? T('<p class="bad">בשאלות הקלות היו כמה טעויות, אולי מעייפות. כדאי לחזור על טיסת הניסוי ביום אחר.</p>') : '') +
+      T('<p><b>ההגדרות שנלמדו:</b> ') + esc(DA.settings.describe(s.after || s.before)) + '</p>' +
+      '<p class="muted small">' + T('הגודל לקריאה הוא נקודת התחלה. את הגודל הנוח לקריאת משפטים מוצאים ב"גודל קריאה נוח" בכל הכלים.') + '</p>';
   }
 
   DA.screens.learn = { init: init, enter: enter, leave: leave, summaryHtml: summaryHtml };

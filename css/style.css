@@ -111,6 +111,7 @@ table.sum th { color: #44515d; font-weight: 600; font-size: 13px; }
 .lens .read-text p, .lens .read-title { max-width: var(--lc, 45ch); margin: 0 auto .8em; }
 .lens .read-title { font-size: 1.15em; }
 .lens.line-marker .read-text p { border-inline-start: .25em solid #e0218a; padding-inline-start: .45em; }
+.lens.line-marker-end .read-text p { border-inline-end: .25em solid #1b6ef3; padding-inline-end: .45em; }
 .lens img.lens-img { display: block; margin: 0 auto 12px; width: calc(var(--zoom, 1) * 100%); max-width: none; filter: contrast(var(--imgc, 1)) invert(var(--inv, 0)); }
 .lens .stim-svg, .lens .ab-pics svg { color: var(--fg); }
 .lens-ruler { position: absolute; left: 0; right: 0; pointer-events: none; display: none; z-index: 5; }

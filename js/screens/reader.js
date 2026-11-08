@@ -20,6 +20,12 @@
     // kid toolbar
     $('rSmaller').onclick = function () { bump('fontSize', 1 / 1.15); };
     $('rBigger').onclick = function () { bump('fontSize', 1.15); };
+    $('rOneEye').onclick = function () {
+      var p = ctx.profile(), k = 'read.oneEye.' + p.id, on = !ctx.store.getPref(k, false);
+      ctx.store.setPref(k, on);
+      refresh();
+      if (on) DA.ui.toast(T('כסו את העין השנייה. התיקון מדויק כשמסתכלים על מרכז הטקסט, ובמצב "מילה אחרי מילה" הוא מדויק יותר.'));
+    };
     $('rGlasses').oninput = function () { ctx.previewSettings(Object.assign({}, ctx.profile().settings, { warpStrength: +this.value })); };
     $('rGlasses').onchange = function () { ctx.updateSettings({ warpStrength: +this.value }); };
     $('rStar').onclick = function () {
@@ -134,6 +140,7 @@
     var p = ctx.profile();
     if (!p) { ctx.go('home'); return; }
     refresh();
+    mode = ctx.store.getPref('read.mode', 'page'); $('rMode').value = mode;
     var intent = ctx.store.getPref('read.intent', null);
     ctx.store.setPref('read.intent', null);
     $('readSources').classList.toggle('see', intent === 'see');
@@ -195,10 +202,14 @@
     var p = ctx.profile();
     if (!p) return;
     var s = effective(previewSettings || p.settings);
-    lens.apply(s, ctx.opsFor(s));
+    var hasCal = !!ctx.opsFor(s), oneEye = hasCal && ctx.store.getPref('read.oneEye.' + p.id, false);
+    lens.apply(s, oneEye ? ctx.opsFor(s) : null);
     if (doc && lastSyl !== !!s.syllables) { lastSyl = !!s.syllables; render(); }
-    var hasCal = !!ctx.opsFor(s);
-    $('rGlassesWrap').style.display = hasCal ? '' : 'none';
+    var eye = ctx.calEye(s);
+    $('rOneEye').style.display = hasCal ? '' : 'none';
+    $('rOneEye').classList.toggle('on', !!oneEye);
+    $('rOneEyeLabel').textContent = (eye === 'left' ? T('תיקון לעין שמאל') : eye === 'both' ? T('תיקון עיוות') : T('תיקון לעין ימין')) + (oneEye ? ' ✓' : '');
+    $('rGlassesWrap').style.display = oneEye ? '' : 'none';
     $('rGlasses').value = s.warpStrength;
     $('rRuler').classList.toggle('on', s.ruler !== 'off');
     $('rSizeVal').textContent = s.fontSize;
@@ -302,7 +313,7 @@
       $('camVideo').srcObject = s;
       $('readExtra').innerHTML = T('<button id="camFreeze" class="big">להקפיא</button>');
       $('camFreeze').onclick = freezeFrame;
-      setMode('page');
+      setMode('page', true);
     }).catch(camFallback);
   }
   function camFallback() {
@@ -502,8 +513,9 @@
     DA.loader.mathjax().then(function (MJ) { return MJ.typesetPromise([el]); }).catch(function () {});
   }
 
-  function setMode(m) {
+  function setMode(m, keep) {
     mode = m; segIdx = 0; stopRsvp();
+    if (!keep) ctx.store.setPref('read.mode', m);   // remembered (also set by the comfort map's suggestion)
     $('rMode').value = m;
     if (doc) render();
   }

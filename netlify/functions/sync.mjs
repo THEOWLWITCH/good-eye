@@ -7,6 +7,7 @@
  *
  *   GET  /api/sync?id=<64 hex>   -> 200 { iv, data, updatedAt } | 404
  *   PUT  /api/sync?id=<64 hex>   body { iv, data, updatedAt }  -> 200 { ok: true, updatedAt }
+ *   DELETE /api/sync?id=<64 hex>  -> 200 { ok: true }   (the family removes its data from the server)
  */
 const MAX_BYTES = 6 * 1024 * 1024;
 const ID_RE = /^[0-9a-f]{64}$/;
@@ -18,7 +19,7 @@ function json(status, body) {
   });
 }
 
-/** Request handler; `store` needs get(key, {type:'json'}) and setJSON(key, value). */
+/** Request handler; `store` needs get(key, {type:'json'}), setJSON(key, value) and delete(key). */
 export async function handle(req, store) {
   const url = new URL(req.url);
   const id = url.searchParams.get('id') || '';
@@ -40,6 +41,11 @@ export async function handle(req, store) {
     const updatedAt = new Date().toISOString();
     await store.setJSON(id, { v: 1, iv: body.iv, data: body.data, updatedAt });
     return json(200, { ok: true, updatedAt });
+  }
+
+  if (req.method === 'DELETE') {
+    await store.delete(id);
+    return json(200, { ok: true });
   }
 
   return json(405, { error: 'method not allowed' });

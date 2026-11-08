@@ -57,12 +57,15 @@
     DA.eyes.on(updateSwitches);
     DA.eyes.on(maybeLeanAlert);
     // resume automatically if this reader turned it on before (camera permission is asked by the browser)
-    if (DA.eyes.supported() && pref()) DA.eyes.start().catch(function () { /* stays off */ });
+    var p0 = ctx.profile && ctx.profile();
+    if (DA.eyes.supported() && pref() && p0 && p0.kind === 'adult') DA.eyes.start().catch(function () { /* stays off */ });
     render(DA.eyes.state);
   }
 
-  function pref() { return ctx.store.getPref('eyesOn', false); }
-  function setPref(v) { ctx.store.setPref('eyesOn', !!v); }
+  /** Per reader: one reader turning the camera on does not turn it on for the others. */
+  function prefKey() { var p = ctx.profile && ctx.profile(); return 'eyesOn.' + (p ? p.id : 'none'); }
+  function pref() { return ctx.store.getPref(prefKey(), false); }
+  function setPref(v) { ctx.store.setPref(prefKey(), !!v); }
 
   /** Called from settings / hub: explain first, then ask an adult to approve. */
   function offer() {

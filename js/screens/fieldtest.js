@@ -1,11 +1,11 @@
 /*
- * עין טובה — Visual-field mapping (a simple screen "perimetry" for reading support).
- * The reader looks at a red cross in the middle; small dots flash around it at known visual angles.
- * Each time a dot is seen the reader taps (or presses space). Points missed twice are marked as a
- * probable blind area (scotoma). From the map the app suggests reading aids:
- *   - central blind area → move the text away from it (eccentric viewing);
- *   - one whole side missing (e.g. after a stroke) → line-start marker and shorter lines.
- * NOT a medical visual-field test: no fixed luminance, no fixation monitoring hardware.
+ * עין טובה — Comfort map for placing text (not perimetry, not a medical visual-field test).
+ * The reader looks at a red cross in the middle; small dots flash around it at known visual angles,
+ * and the reader taps when a dot is seen. Blind-spot probes check that the gaze stayed on the cross,
+ * bright catch dots check attention, and blank trials count taps without a dot.
+ * From a reliable map the app suggests reading aids (shorter lines, line-start or line-end markers by
+ * reading direction, one word at a time) and always shows the same advice to see an eye doctor when
+ * an area seen less is new or changed.
  */
 (function (root) {
   'use strict';
@@ -87,8 +87,18 @@
       };
       sess.dotPx = Math.max(5, DA.device.degToPx(dotDeg, dist));
       $('ftDot').style.width = $('ftDot').style.height = sess.dotPx + 'px';
+      // Fixation check: the natural blind spot is ~15° to the temporal side and 1.5° down.
+      // A dot there should NOT be seen with one eye; seeing it means the gaze moved.
+      sess.fixChecks = 0; sess.fixLosses = 0; sess.catchShown = 0; sess.catchMissed = 0;
+      var extra = [];
+      if (sess.eye !== 'both') {
+        var bx = sess.eye === 'left' ? -15 : 15, bpx = DA.device.degToPx(bx, dist), bpy = DA.device.degToPx(1.5, dist);
+        if (Math.abs(bpx) < W / 2 - margin && Math.abs(bpy) < H / 2 - margin) extra.push({ blindSpot: true, xDeg: bx, yDeg: 1.5 }, { blindSpot: true, xDeg: bx, yDeg: 1.5 }, { blindSpot: true, xDeg: bx, yDeg: 1.5 });
+      }
+      // Bright, large catch dots near the centre: everyone should see them.
+      [[2, 0], [-2, 0], [0, 2]].forEach(function (c) { extra.push({ catchDot: true, xDeg: c[0], yDeg: c[1] }); });
       pass = 1;
-      trials = shuffle(sess.points.map(function (q, i) { return { i: i }; }).concat([{ blank: true }, { blank: true }, { blank: true }, { blank: true }, { blank: true }, { blank: true }]));
+      trials = shuffle(sess.points.map(function (q, i) { return { i: i }; }).concat([{ blank: true }, { blank: true }, { blank: true }, { blank: true }, { blank: true }, { blank: true }], extra));
       idx = 0; paused = false; running = false;
       $('ftIntro').style.display = '';
       count();
@@ -111,7 +121,14 @@
     responded = false;
     onsetT = performance.now();
     var dot = $('ftDot'), stage = $('ftStage');
-    if (!current.blank) {
+    if (current.blindSpot || current.catchDot) {
+      var cxs = stage.clientWidth / 2, cys = stage.clientHeight / 2, size = current.catchDot ? sess.dotPx * 2 : sess.dotPx;
+      dot.style.width = dot.style.height = size + 'px';
+      dot.style.left = (cxs + DA.device.degToPx(current.xDeg, sess.distanceCm) - size / 2) + 'px';
+      dot.style.top = (cys + DA.device.degToPx(current.yDeg, sess.distanceCm) - size / 2) + 'px';
+      dot.style.display = 'block';
+      setTimeout(function () { dot.style.display = 'none'; dot.style.width = dot.style.height = sess.dotPx + 'px'; }, 200);
+    } else if (!current.blank) {
       var q = sess.points[current.i];
       var cx = stage.clientWidth / 2, cy = stage.clientHeight / 2;
       var px = DA.device.degToPx(q.xDeg, sess.distanceCm), py = DA.device.degToPx(q.yDeg, sess.distanceCm);
@@ -140,8 +157,10 @@
     if (!current) return;
     var eyes = DA.eyes.snapshot();
     if (current.blank) { sess.blanks++; if (responded) sess.falseAlarms++; }
+    else if (current.blindSpot) { sess.fixChecks++; if (responded) sess.fixLosses++; }
+    else if (current.catchDot) { sess.catchShown++; if (!responded) sess.catchMissed++; }
     else sess.points[current.i].seen.push(responded);
-    sess.log.push({ pass: pass, point: current.blank ? null : current.i, seen: responded, eyes: eyes });
+    sess.log.push({ pass: pass, point: current.blank || current.blindSpot || current.catchDot ? null : current.i, kind: current.blank ? 'blank' : current.blindSpot ? 'blindspot' : current.catchDot ? 'catch' : 'point', seen: responded, eyes: eyes });
     current = null;
     idx++;
     schedule();
@@ -182,25 +201,32 @@
     var left = side(-1), right = side(1);
     var central = defect.filter(function (q) { return q.ecc <= 7; });
     var res = { tested: pts.length, defects: defect.length, unsure: unsure.length, leftMissPct: Math.round(left * 100), rightMissPct: Math.round(right * 100),
-      falseAlarmPct: s.blanks ? Math.round(s.falseAlarms / s.blanks * 100) : 0, pattern: 'none', suggest: {} };
+      falseAlarmPct: s.blanks ? Math.round(s.falseAlarms / s.blanks * 100) : 0, pattern: 'none', suggest: {},
+      fixLossPct: s.fixChecks ? Math.round(s.fixLosses / s.fixChecks * 100) : null,
+      catchMissPct: s.catchShown ? Math.round(s.catchMissed / s.catchShown * 100) : null };
+    res.unreliable = res.falseAlarmPct > 33 || (res.fixLossPct != null && res.fixLossPct > 33) || (res.catchMissPct != null && res.catchMissPct > 33);
     if (left >= 0.5 && right <= 0.15) res.pattern = 'hemi-left';
     else if (right >= 0.5 && left <= 0.15) res.pattern = 'hemi-right';
     else if (central.length) res.pattern = 'central';
     else if (outer(defect, pts)) res.pattern = 'periphery';
     else if (defect.length) res.pattern = 'scattered';
+    res.maxEcc = pts.reduce(function (a, q) { return Math.max(a, q.ecc); }, 0);
     if (res.pattern === 'periphery') { res.suggest.lineChars = 26; res.suggest.maxFont = 40; }
     if (res.pattern === 'central') {
+      // Moving the text does not help: the eyes follow the text and the area moves with them.
+      // Reading aids that reduce eye movements help more: one word at a time, larger letters, read-aloud.
+      res.suggest.readMode = 'word';
       var cx = central.reduce(function (a, q) { return a + q.xDeg; }, 0) / central.length;
       var cy = central.reduce(function (a, q) { return a + q.yDeg; }, 0) / central.length;
-      var mag = Math.hypot(cx, cy) || 1;
-      // place text on the seeing side: opposite to the blind area's centre
-      res.suggest.shiftX = Math.round(Math.max(-0.3, Math.min(0.3, -cx / mag * 0.18)) * 100) / 100;
-      res.suggest.shiftY = Math.round(Math.max(-0.3, Math.min(0.3, -cy / mag * 0.12)) * 100) / 100;
       res.centroid = { xDeg: r1(cx), yDeg: r1(cy) };
     }
     if (res.pattern === 'hemi-left' || res.pattern === 'hemi-right') {
-      res.suggest.lineMarker = true;
+      // which end of the line falls in the area seen less depends on the reading direction
+      var rtl = DA.i18n.content !== 'en';
+      var startSide = rtl ? 'hemi-right' : 'hemi-left';
+      if (res.pattern === startSide) res.suggest.lineMarker = true; else res.suggest.lineMarkerEnd = true;
       res.suggest.lineChars = 32;
+      res.lineEnd = res.pattern === startSide ? 'start' : 'end';
     }
     return res;
   }
@@ -225,12 +251,13 @@
     ctx.profiles.saveSession(sess);
     $('ftEnd').style.display = '';
     $('ftSummary').innerHTML = summaryHtml(sess, true);
-    var sug = sess.result.suggest;
+    var sug = sess.result.unreliable ? {} : sess.result.suggest;
     var has = Object.keys(sug).length;
     $('ftApply').style.display = has ? '' : 'none';
     $('ftApply').onclick = function () {
       var p2 = ctx.profile(), patch = Object.assign({}, sug);
       if (patch.maxFont) { if (p2.settings.fontSize > patch.maxFont) patch.fontSize = patch.maxFont; delete patch.maxFont; }
+      if (patch.readMode) { ctx.store.setPref('read.mode', patch.readMode); delete patch.readMode; }
       ctx.updateSettings(patch); DA.ui.toast(T('ההמלצות הופעלו בקריאה')); ctx.go('hub'); };
     $('ftKeep').onclick = function () { ctx.go('hub'); };
   }
@@ -252,29 +279,35 @@
     return svg + '</svg>';
   }
 
-  var PATTERN = {
-    none: T('לא נמצאו אזורים שלא רואים בהם, בטווח שנבדק.'),
-    central: T('נקודות קרובות למרכז נראו פחות. אפשר לנסות להזיז את הטקסט לצד שבו הנקודות נראו טוב.'),
-    'hemi-left': T('נקודות בצד שמאל נראו פחות. בעברית זה הצד שבו השורה נגמרת, אז אפשר לנסות סימון שורה ושורות קצרות יותר.'),
-    'hemi-right': T('נקודות בצד ימין נראו פחות. בעברית זה הצד שבו השורה מתחילה, אז אפשר לנסות סימון תחילת שורה ושורות קצרות יותר.'),
-    periphery: T('נקודות רחוקות מהמרכז נראו פחות, והקרובות נראו טוב. אפשר לנסות שורות קצרות ואותיות לא גדולות מדי, כדי שכל השורה תיכנס לאזור שרואים בו.'),
-    scattered: T('כמה נקודות בודדות לא נראו. ייתכן שזה רק רגע של חוסר קשב. כדאי לחזור על הבדיקה.')
-  };
+  /** Neutral words for what was seen; never a diagnosis. */
+  function patternText(r) {
+    if (r.pattern === 'none') return T('בטווח שנבדק (עד כ־') + Math.round(r.maxEcc || 13) + T('° מהמרכז), עם נקודות בולטות, כל הנקודות נראו. זה לא שולל בעיה בשדה הראייה.');
+    var where = { central: T('נקודות קרובות למרכז נראו פחות.'), 'hemi-left': T('נקודות בצד שמאל נראו פחות.'), 'hemi-right': T('נקודות בצד ימין נראו פחות.'),
+      periphery: T('נקודות רחוקות מהמרכז נראו פחות, והקרובות נראו טוב.'), scattered: T('כמה נקודות בודדות נראו פחות.') }[r.pattern] || '';
+    var tip = '';
+    if (r.pattern === 'central') tip = T('לקריאה: מילה אחרי מילה, אותיות גדולות יותר והקראה מקטינים את הצורך להזיז את העיניים.');
+    else if (r.lineEnd === 'start') tip = T('זה הצד שבו השורה מתחילה, ולכן סימון תחילת שורה ושורות קצרות יותר עוזרים למצוא את השורה הבאה.');
+    else if (r.lineEnd === 'end') tip = T('זה הצד שבו השורה נגמרת, ולכן קוראים לתוכו. סימון סוף השורה, שורות קצרות יותר ומילה אחרי מילה עוזרים.');
+    else if (r.pattern === 'periphery') tip = T('שורות קצרות ואותיות לא גדולות מדי עוזרות שכל השורה תיכנס לאזור שרואים בו.');
+    else if (r.pattern === 'scattered') tip = T('ייתכן שזה רגע של חוסר קשב. כדאי לחזור על המפה ביום אחר.');
+    return where + ' ' + tip;
+  }
 
   function summaryHtml(s, full) {
     var r = s.result || analyze(s);
     var eye = { right: T('עין ימין'), left: T('עין שמאל'), both: T('שתי העיניים') }[s.eye] || '';
     var out = '<p class="muted">' + T('מפת נוחות צפייה') + ' · ' + eye + ' · ' + new Date(s.startedAt).toLocaleString(DA.i18n.locale) + (s.early ? T(' · הופסק באמצע') : '') + '</p>' +
-      '<p><b>' + PATTERN[r.pattern] + '</b></p>';
+      '<p><b>' + esc(patternText(r)) + '</b></p>' + (r.pattern !== 'none' ? DA.safety.html('field') : '');
     if (full) {
       out += '<div class="ft-result">' + mapSvg(s) + '<div class="ft-legend">' +
         '<div><span class="lg ok"></span>' + T('נראה') + '</div><div><span class="lg unsure"></span>' + T('לא נראה פעם אחת (לא בטוח)') + '</div>' +
         '<div><span class="lg miss">✕</span>' + T('לא נראה פעמיים') + '</div>' +
         '<p class="muted small">' + T('נקודות שנבדקו: ') + r.tested + T(' · לחיצות בלי נקודה: ') + r.falseAlarmPct + '%</p>' +
-        (r.falseAlarmPct > 33 ? '<p class="bad small">' + T('היו הרבה לחיצות כשלא הופיעה נקודה, ולכן התוצאה פחות אמינה.') + '</p>' : '') +
+        (r.fixLossPct != null ? '<p class="muted small">' + T('בדיקת מבט (נקודות בכתם העיוור הטבעי שנראו): ') + r.fixLossPct + '%' + (r.catchMissPct != null ? T(' · נקודות בולטות שלא נראו: ') + r.catchMissPct + '%' : '') + '</p>' : '') +
+        (r.unreliable ? '<p class="bad small">' + T('המבט זז, או שהיו לחיצות בלי נקודה או נקודות בולטות שלא נראו, ולכן התוצאה פחות אמינה. כדאי לחזור על המפה ביום אחר, לפני שמשנים משהו.') + '</p>' : '') +
         (Object.keys(r.suggest).length ? '<p>' + T('ההמלצה לקריאה: ') + esc(describeSuggest(r.suggest)) + '</p>' : '') +
         '</div></div>' +
-        '<p class="muted small">' + T('זה לא כלי רפואי ולא בדיקה. המפה רק עוזרת להחליט איפה נוח למקם טקסט.') + '</p>';
+        '<p class="muted small">' + T('זה לא כלי רפואי ולא בדיקת שדה ראייה, ולא מתאים לקביעת כשירות לנהיגה או לעבודה. המפה רק עוזרת להחליט איך נוח לקרוא.') + '</p>';
     }
     return out;
   }
@@ -283,6 +316,8 @@
     var parts = [];
     if (g.shiftX || g.shiftY) parts.push(T('להזיז את הטקסט ') + (g.shiftX < 0 ? T('שמאלה') : g.shiftX > 0 ? T('ימינה') : '') + (g.shiftY < 0 ? T(' ולמעלה') : g.shiftY > 0 ? T(' ולמטה') : ''));
     if (g.lineMarker) parts.push(T('סימון תחילת שורה'));
+    if (g.lineMarkerEnd) parts.push(T('סימון סוף שורה'));
+    if (g.readMode === 'word') parts.push(T('מילה אחרי מילה'));
     if (g.lineChars) parts.push(T('שורות קצרות יותר'));
     if (g.maxFont) parts.push(T('אותיות לא גדולות מדי'));
     return parts.join(' · ');

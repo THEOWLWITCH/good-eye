@@ -26,7 +26,7 @@
     showControls: true,
     clamp: true,               // prevent folds by limiting drag length relative to radius
     dark: false,               // false: black lines on white; true: white lines on black
-    fixation: false,
+    fixation: true,            // calibration needs a steady gaze: the fixation point is on by default
     fixationPos: 'c',          // c | n | s | e | w | ne | nw | se | sw  (spec 7.1: nine gaze points)
     figure: 'grid'             // grid | circle | rings | square | rect | triangle  (spec 4.3)
   };

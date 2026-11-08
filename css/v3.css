@@ -233,3 +233,73 @@ html[lang="he"] .stn-step, html[lang="he"] .eyebrow, html[lang="he"] .sec-title 
 .engine-grid > * { min-width: 0; }
 .lab-body canvas { max-width: 100% !important; height: auto !important; }
 .code-form { flex-wrap: wrap; } .code-form input { min-width: 0; max-width: 100%; }
+
+/* ---------- the safety message ---------- */
+.referral-note { display: flex; gap: 12px; align-items: flex-start; text-align: start; margin: 12px auto 0; max-width: 620px; padding: 12px 14px; border-radius: 16px;
+  background: rgba(255, 213, 154, .09); box-shadow: inset 0 0 0 1px rgba(255, 213, 154, .45); }
+.referral-note .ref-icon { flex: none; width: 26px; height: 26px; }
+.referral-note .ref-icon .ic { width: 26px; height: 26px; }
+.referral-note p { margin: 0; line-height: 1.6; font-size: 15.5px; color: var(--ink); }
+.pro-note { border-top: 0 !important; padding-top: 0 !important; }
+.credits .link, .a11y-link { background: none !important; border: 0 !important; padding: 0; color: var(--ice); text-decoration: underline; font: inherit; cursor: pointer; }
+#a11yDialog ul { padding-inline-start: 20px; line-height: 1.6; }
+.rb2.one-eye.on { box-shadow: inset 0 0 0 1.5px var(--champ) !important; color: var(--champ); }
+
+/* =====================================================================
+   Accessibility: interface size (zoom on the chrome only, never on reading or calibration canvases)
+   ===================================================================== */
+html.ui-zoomed .topbar, html.ui-zoomed #screen-home, html.ui-zoomed #screen-hub, html.ui-zoomed .learn-setup, html.ui-zoomed .learn-end,
+html.ui-zoomed .learn-top, html.ui-zoomed .learn-prompt, html.ui-zoomed .learn-choices, html.ui-zoomed .read-bar, html.ui-zoomed .seg-nav,
+html.ui-zoomed .drawer, html.ui-zoomed dialog, html.ui-zoomed .copilot, html.ui-zoomed #rtSetup, html.ui-zoomed #ftSetup, html.ui-zoomed #rtEnd,
+html.ui-zoomed #ftEnd, html.ui-zoomed #screen-history, html.ui-zoomed .read-sources { zoom: var(--uiz); }
+
+/* =====================================================================
+   High-contrast light interface (WCAG AA+): black on white, solid 2px borders, no glows or art.
+   The reading lens keeps the reader's own colours.
+   ===================================================================== */
+html.hc { --ink: #000; --ink2: #1d1d1d; --ink3: #333; --surface: #fff; --surface2: #f2f2f2; --hair: #000; --hair2: #000;
+  --edge: linear-gradient(#000, #000); --ice: #0047b3; --lav: #4b2bb3; --champ: #8a4b00; --lumen: linear-gradient(#000, #000); color-scheme: light; }
+html.hc body { background: #fff !important; color: #000 !important; font-size: 17px; }
+html.hc body::before, html.hc body::after { display: none !important; }
+html.hc .topbar { background: #fff !important; border-bottom: 2px solid #000 !important; border-image: none !important; backdrop-filter: none !important; }
+html.hc .brand span { background: none !important; -webkit-background-clip: border-box !important; background-clip: border-box !important; color: #000 !important; }
+html.hc .brand-sub { color: #000 !important; font-weight: 600; }
+html.hc .muted, html.hc .hint, html.hc small, html.hc .g2-label, html.hc .hero-meta, html.hc .dest2-text small, html.hc .fp-text small { color: #1d1d1d !important; }
+html.hc .dest2, html.hc .tool2, html.hc .glass, html.hc .gauge2, html.hc .scope-card, html.hc .next-card, html.hc .once-card, html.hc .reg-card, html.hc .profile-card,
+html.hc .briefing, html.hc .paused-box, html.hc .resume-card, html.hc .src-card, html.hc .learn-end, html.hc .hub-tip, html.hc .glasses-note, html.hc .device-note,
+html.hc .device-tip, html.hc .disclaimer, html.hc .seg-nav, html.hc .eye-panel, html.hc .drawer, html.hc dialog, html.hc .copilot, html.hc .card, html.hc .read-bar,
+html.hc .learn-feedback, html.hc .toast, html.hc .more-pop {
+  background: #fff !important; color: #000 !important; border: 2px solid #000 !important; box-shadow: none !important; backdrop-filter: none !important; }
+html.hc .dest2::after, html.hc .reg-card::before { display: none !important; }
+html.hc button, html.hc .rb2, html.hc select, html.hc input, html.hc textarea, html.hc summary.rb2 { background: #fff !important; color: #000 !important; border: 2px solid #000 !important; box-shadow: none !important; }
+html.hc button.primary, html.hc .next-btn, html.hc #segPlay { background: #000 !important; color: #fff !important; border: 2px solid #000 !important; }
+html.hc button:focus-visible, html.hc a:focus-visible, html.hc select:focus-visible, html.hc input:focus-visible { outline: 4px solid #0047b3 !important; outline-offset: 2px; }
+html.hc a, html.hc .link, html.hc .a11y-link { color: #0047b3 !important; }
+html.hc .lumen { stroke: currentColor !important; filter: none !important; }
+html.hc .lumen .f { fill: currentColor !important; opacity: .12; }
+html.hc .lumen .n { fill: currentColor !important; }
+html.hc .lumen .k { fill: #fff !important; }
+html.hc .ap, html.hc .dest2-icon, html.hc .fp-dot, html.hc .reg-icon, html.hc .stn-intro .stn-icon, html.hc .title-badge, html.hc .once-card .once-icon, html.hc .end-badge, html.hc .fb-ic {
+  background: #fff !important; color: #000 !important; box-shadow: inset 0 0 0 2px #000 !important; }
+html.hc .ap::before, html.hc .dest2-icon::before, html.hc .fp-dot::before, html.hc .reg-icon::before, html.hc .stn-intro .stn-icon::before, html.hc .title-badge::before,
+html.hc .once-card .once-icon::before, html.hc .end-badge::before, html.hc .fb-ic::before, html.hc .ap::after, html.hc .dest2-icon::after, html.hc .fp-dot::after,
+html.hc .reg-icon::after, html.hc .stn-intro .stn-icon::after, html.hc .title-badge::after { display: none !important; }
+html.hc .sec-title { color: #000 !important; opacity: 1; }
+html.hc .sec-title::after { background: #000 !important; }
+html.hc .g2-track { stroke: #d0d0d0 !important; }
+html.hc .g2-fill { filter: none !important; stroke: #000 !important; }
+html.hc .fp-check, html.hc .fp-step .badge { background: #000 !important; color: #fff !important; }
+html.hc .flightpath::before { background: #000 !important; }
+html.hc .stn { background: #fff !important; box-shadow: inset 0 0 0 2px #000 !important; opacity: 1; }
+html.hc .stn.now { box-shadow: inset 0 0 0 3px #0047b3 !important; }
+html.hc #screen-learn .progress { background: #fff !important; box-shadow: inset 0 0 0 2px #000 !important; }
+html.hc #screen-learn .progress div { background: #000 !important; box-shadow: none !important; }
+html.hc .referral-note { background: #fff8e6 !important; box-shadow: inset 0 0 0 2px #8a4b00 !important; }
+html.hc .mono-av { box-shadow: 0 0 0 2px #000 !important; }
+html.hc #learnStage.intro .lens-content, html.hc #learnStage.intro .stn-intro { color: #000 !important; }
+html.hc .paused-card { background: rgba(255, 255, 255, .92) !important; }
+html.hc .copilot-mini .ap { background: #fff !important; }
+@media (forced-colors: active) { .lumen { stroke: CanvasText !important; } .lumen .f, .lumen .n { fill: CanvasText !important; } }
+
+/* larger minimum text for labels in the normal dark look too */
+.g2-label, .fp-text small, .tool2 b, .hero-meta, .sec-title { font-size: max(14px, 1em); }

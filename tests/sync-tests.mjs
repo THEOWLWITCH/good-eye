@@ -19,7 +19,7 @@ function ok(c, m) { if (!c) throw new Error(m || 'assertion failed'); }
 
 function memStore() {
   const m = new Map();
-  return { get: async (k) => (m.has(k) ? JSON.parse(m.get(k)) : null), setJSON: async (k, v) => { m.set(k, JSON.stringify(v)); }, m };
+  return { get: async (k) => (m.has(k) ? JSON.parse(m.get(k)) : null), setJSON: async (k, v) => { m.set(k, JSON.stringify(v)); }, delete: async (k) => { m.delete(k); }, m };
 }
 const ID = 'a'.repeat(64);
 
@@ -40,7 +40,14 @@ await test('rejects oversized bodies and other methods', async () => {
   const st = memStore();
   const big = await handle(new Request('https://x/api/sync?id=' + ID, { method: 'PUT', body: 'x'.repeat(6 * 1024 * 1024 + 10) }), st);
   ok(big.status === 413);
-  ok((await handle(new Request('https://x/api/sync?id=' + ID, { method: 'DELETE' }), st)).status === 405);
+  ok((await handle(new Request('https://x/api/sync?id=' + ID, { method: 'POST' }), st)).status === 405);
+});
+
+await test('a family can delete its data from the server', async () => {
+  const st = memStore();
+  await handle(new Request('https://x/api/sync?id=' + ID, { method: 'PUT', body: JSON.stringify({ iv: 'aaaa', data: 'bbbb' }) }), st);
+  ok((await handle(new Request('https://x/api/sync?id=' + ID, { method: 'DELETE' }), st)).status === 200);
+  ok((await handle(new Request('https://x/api/sync?id=' + ID), st)).status === 404);
 });
 
 console.log('Encryption');

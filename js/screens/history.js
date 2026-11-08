@@ -78,15 +78,10 @@
     }
     var learn = ss.filter(function (s) { return !s.kind || s.kind === 'learn'; });
     var cats = {};
-    learn.forEach(function (s) { Object.keys(s.recognition || {}).forEach(function (k) { if (s.recognition[k].corrected) (cats[k] = cats[k] || []).push({ t: s.startedAt, v: s.recognition[k].corrected.threshold }); }); });
+    learn.forEach(function (s) { Object.keys(s.recognition || {}).forEach(function (k) { if (s.recognition[k].corrected && s.recognition[k].corrected.threshold != null) (cats[k] = cats[k] || []).push({ t: s.startedAt, v: s.recognition[k].corrected.threshold }); }); });
     var CAT = {}; DA.stimuli.CATEGORIES.forEach(function (c) { CAT[c.id] = c.label; });
     Object.keys(cats).forEach(function (k) { parts.push(section('' + T('הגודל הקטן שזוהה בטיסת הניסוי: ') + (CAT[k] || k), cats[k])); });
-    var fm = ss.filter(function (s) { return s.kind === 'fieldmap' && s.result; }).map(function (s) { return { t: s.startedAt, v: s.result.defects }; });
-    if (fm.length) parts.push(section(T('מפת נוחות: נקודות שנראו פחות'), fm));
-    var trials = ctx.store.allTrials().filter(function (t) { return t.profileId === p.id && t.model && t.model.quality; })
-      .sort(function (a, b) { return a.savedAt < b.savedAt ? -1 : 1; })
-      .map(function (t) { return { t: t.savedAt, v: Math.round(t.model.quality.maxDisplacement * ((t.display && t.display.stimulusSizePx) || 600)) }; });
-    if (trials.length) parts.push(section(T('כיול עיוות: התזוזה הגדולה ביותר (פיקסלים)'), trials));
+    // No trends of distortion or field results over time: that would be monitoring an eye condition.
     box.innerHTML = parts.length ? parts.join('') : '<p class="muted">' + T('עוד אין מספיק נתונים. אחרי כמה טיסות ניסוי או מדידות יופיעו כאן גרפים.') + '</p>';
   }
 

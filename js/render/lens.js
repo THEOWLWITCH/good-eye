@@ -73,6 +73,7 @@
     st.setProperty('--inv', s.imageInvert && t.reversed ? '1' : '0');
     st.setProperty('--zoom', String(s.zoom));
     this.el.classList.toggle('line-marker', !!s.lineMarker);
+    this.el.classList.toggle('line-marker-end', !!s.lineMarkerEnd);
     this.el.classList.toggle('reversed', !!t.reversed);
     // calm mode: softer text contrast and more air between lines
     this.el.classList.toggle('calm', !!s.calm);

@@ -10,6 +10,10 @@
   var ctx, previewLens, work;
 
   var GROUPS = [
+    { title: T('נגישות הממשק'), items: [
+      { k: 'uiContrast', label: T('מראה הממשק'), type: 'select', options: function () { return [['auto', T('לפי המכשיר')], ['high', T('בהיר בניגודיות גבוהה')], ['normal', T('כהה (רגיל)')]]; } },
+      { k: 'uiScale', label: T('גודל הממשק (כפתורים וכיתוב)'), type: 'select', options: function () { return [['1', '100%'], ['1.15', '115%'], ['1.3', '130%'], ['1.5', '150%']]; } }
+    ] },
     { title: T('הנווט והקראת הנחיות'), items: [
       { k: 'copilot', label: T('להציג את הנווט, שמסביר כל צעד'), type: 'check' },
       { k: 'gamePace', label: T('קצב טיסת הניסוי'), type: 'select', options: function () { return PACE_OPTS(); } },
@@ -47,6 +51,7 @@
     { title: T('עזרי קריאה'), items: [
       { k: 'ruler', label: T('סרגל קריאה'), type: 'select', options: function () { return [['off', T('כבוי')], ['band', T('פס מודגש')], ['mask', T('חלון (מחשיך את השאר)')]]; } },
       { k: 'lineMarker', label: T('סימון תחילת שורה'), type: 'check' },
+      { k: 'lineMarkerEnd', label: T('סימון סוף שורה'), type: 'check' },
       { k: 'shiftX', label: T('הזזת הטקסט לצדדים'), type: 'range', min: -0.35, max: 0.35, step: 0.01, fmt: pct },
       { k: 'shiftY', label: T('הזזת הטקסט למעלה/למטה'), type: 'range', min: -0.35, max: 0.35, step: 0.01, fmt: pct },
       { k: 'syllables', label: T('הברות בצבעים מתחלפים (בקירוב, לעברית מנוקדת ולאנגלית)'), type: 'check' },

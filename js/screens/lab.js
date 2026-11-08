@@ -199,7 +199,7 @@
   function deblurTab(body) {
     var psf = ctx.profile().settings.psf || PRESETS.gauss, method = 'unsharp', stim = 'edges';
     var prm = { amount: 1, radius: 1.5, K: 0.01, iterations: 10 };
-    body.appendChild(el('<p class="lab-help">' + T('משמאל המקור, מימין אחרי עיבוד. העיבוד "מחדד מראש" לפי צורת הטשטוש שלכם, כדי שאחרי הטשטוש בעין זה ייראה ברור יותר. משווים שיטות, מדרגים, ובוחרים מה להפעיל בתמונות.') + '</p>'));
+    body.appendChild(el('<p class="lab-help">' + T('משמאל המקור, מימין אחרי עיבוד. העיבוד עשוי להפוך קצוות ופרטים לחדים יותר לפי צורת הטשטוש שבחרתם. הוא לא מתקן את העין, ובמקרה של טשטוש מהמשקפיים הפתרון הוא משקפיים מתאימים.') + '</p>'));
     if (!ctx.profile().settings.psf) body.appendChild(el('<p class="muted small">' + T('טיפ: קודם שומרים צורת טשטוש בלשונית "צורת הטשטוש" ולוחצים "להשתמש". בינתיים משתמשים בטשטוש עגול רגיל.') + '</p>'));
     var row = el('<div class="lab-pair"></div>'), A = canvas(260, 260), B = canvas(260, 260);
     row.appendChild(wrapCap(A, T('המקור'))); row.appendChild(wrapCap(B, T('אחרי עיבוד')));

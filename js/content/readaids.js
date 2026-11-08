@@ -8,7 +8,7 @@
   var DA = (root.DA = root.DA || {});
   var HEB_LETTER = /[א-ת]/;
   var MARK = /[֑-ׇ]/;
-  var VOWEL = /[ֱ-ׇֻ]/;            // hataf vowels … qubuts, qamats qatan (not shva 05B0)
+  var VOWEL = /[ֱ-ׇֻ]/;   // hataf vowels … qubuts, qamats qatan (not shva 05B0, not dagesh 05BC or shin/sin dots)
 
   function hebrewSyllables(word) {
     if (!/[ְ-ׇּ]/.test(word)) return [word];          // no nikud: leave as is
@@ -22,11 +22,22 @@
       if (VOWEL.test(u)) return true;
       if (u[0] === 'ו' && /ּ/.test(u) && !/[ְ-ֻ]/.test(u)) return true;   // shuruk
       if (u[0] === 'ו' && /ֹ/.test(u)) return true;                                  // holam male
+      if (/ו[ֹּ]/.test(u.slice(1))) return true;                        // a vowel-carrying vav merged into this consonant
       return false;
     };
+    // A vav that only carries a vowel (holam male / shuruk) belongs to the consonant before it: שָׁ|לוֹם, תַּ|פּוּחַ
+    var own = function (u) { return VOWEL.test(u) && !(u[0] === 'ו' && (/ֹ/.test(u) || /ּ/.test(u)) && !/[ְ-ֻ]/.test(u)); };
+    for (var j = units.length - 1; j > 0; j--) {
+      var w = units[j], prev = units[j - 1];
+      var mater = w[0] === 'ו' && (/ֹ/.test(w) || (/ּ/.test(w) && !/[ְ-ֻ]/.test(w))) && !/[ְ-ֻ]/.test(w.replace('ֹ', ''));
+      if (mater && HEB_LETTER.test(prev[0]) && !own(prev)) { units[j - 1] = prev + w; units.splice(j, 1); }
+    }
+    // furtive patah under a final ח / ע / הּ is read before the consonant: no syllable of its own
+    var last = units[units.length - 1];
+    var furtive = units.length > 1 && /^[חעה]/.test(last) && /ַ/.test(last) && !/[ְ-ֶָ-ֻ]/.test(last);
     var out = [], cur = '', curV = false;
-    units.forEach(function (u) {
-      var v = HEB_LETTER.test(u[0]) && hasV(u);
+    units.forEach(function (u, idx) {
+      var v = HEB_LETTER.test(u[0]) && hasV(u) && !(furtive && idx === units.length - 1);
       if (v && curV) { out.push(cur); cur = ''; curV = false; }
       cur += u; if (v) curV = true;
     });
@@ -36,7 +47,17 @@
 
   function englishSyllables(word) {
     var m = word.match(/[^aeiouy]*[aeiouy]+(?:[^aeiouy]*$|[^aeiouy](?=[^aeiouy]))?/gi);
-    return m && m.join('') === word ? m : [word];
+    if (!m || m.join('') !== word) return [word];
+    // keep ph / th / sh / ch / wh together: e|le|phant, not e|lep|hant
+    for (var i = 0; i < m.length - 1; i++) {
+      if (/[ptscw]$/i.test(m[i]) && /^h/i.test(m[i + 1]) && m[i].length > 1) { m[i + 1] = m[i].slice(-1) + m[i + 1]; m[i] = m[i].slice(0, -1); }
+    }
+    var n = m.length;
+    // consonant + "le" at the end is a syllable of its own: ta|ble
+    if (n > 1 && /^le$/i.test(m[n - 1]) && /[^aeiouy]$/i.test(m[n - 2])) { m[n - 1] = m[n - 2].slice(-1) + m[n - 1]; m[n - 2] = m[n - 2].slice(0, -1); }
+    // silent final e: cake is one syllable
+    else if (n > 1 && /^[^aeiouy]+e$/i.test(m[n - 1])) { m[n - 2] += m[n - 1]; m.pop(); }
+    return m.filter(Boolean);
   }
 
   function syllables(word) {
