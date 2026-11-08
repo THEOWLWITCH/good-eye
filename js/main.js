@@ -68,7 +68,7 @@
   function boot() {
     DA.i18n.apply(document.body);
     document.title = T('עין טובה');
-    $('langBtn').textContent = DA.i18n.lang === 'he' ? 'English' : 'עברית';
+    $('langBtn').textContent = DA.i18n.lang === 'he' ? 'English' : 'עברית'; // "עברית" — always shown in Hebrew
     $('langBtn').onclick = function () { DA.i18n.setLang(DA.i18n.lang === 'he' ? 'en' : 'he'); };
     DA.settings.loadFonts();
     $('version').textContent = 'v' + DA.VERSION;

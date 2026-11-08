@@ -64,6 +64,15 @@
         DA.stimuli.SENTENCES.slice(0, 5).map(function (s) { return s.en + '.'; }).join(' ') + T('\n\nחשבון: $3 + 4 = 7$ ו־$\\frac{1}{2} + \\frac{1}{4} = \\frac{3}{4}$') });
     };
     $('aiStop').onclick = function () { if (aiCtl) aiCtl.abort(); };
+    // tap (or click) a word to hear just that word — handy for young readers
+    $('readContent').addEventListener('click', function (e) {
+      var w = e.target.closest && e.target.closest('.w');
+      if (!w || !root.speechSynthesis || speechSynthesis.speaking) return;
+      if (ctx.profile().settings.ruler !== 'off') return; // ruler taps move the ruler
+      say(w.textContent, 'word');
+      w.classList.add('speaking');
+      setTimeout(function () { w.classList.remove('speaking'); }, 900);
+    });
     var lastT = 0;
     DA.eyes.on(function (e) {
       if (ctx.current() !== 'read' || !e.distanceCm) return;
@@ -76,7 +85,7 @@
     });
 
     document.addEventListener('keydown', function (e) {
-      if (ctx.current() !== 'read' || e.target.matches('input, textarea, select')) return;
+      if (ctx.current() !== 'read' || (e.target.matches && e.target.matches('input, textarea, select'))) return;
       if (e.key === 'ArrowDown') { lens.moveRuler(1); e.preventDefault(); }
       else if (e.key === 'ArrowUp') { lens.moveRuler(-1); e.preventDefault(); }
       else if (mode !== 'page' && e.key === 'ArrowLeft') stepSeg(DA.i18n.dir === 'rtl' ? 1 : -1);
@@ -308,7 +317,9 @@
     }
     if (text == null) return;
     if (mode === 'page') {
-      box.innerHTML = (doc.title ? '<h2 class="read-title" dir="auto">' + esc(doc.title) + '</h2>' : '') + '<div class="read-text">' + paragraphs(text) + '</div>';
+      var w = wordsHtml(text);
+      speechMap = w;
+      box.innerHTML = (doc.title ? '<h2 class="read-title" dir="auto">' + esc(doc.title) + '</h2>' : '') + '<div class="read-text">' + w.html + '</div>';
       typesetMath(box);
     } else {
       segs = mode === 'sentence' ? sentences(text) : text.split(/\s+/).filter(Boolean);
@@ -324,6 +335,36 @@
       return '<p dir="auto">' + esc(p.trim()).replace(/\n/g, '<br>') + '</p>';
     }).join('');
   }
+  /**
+   * Page text with every word in its own <span data-s="offset">, plus the exact string that is
+   * read aloud, so speech "boundary" events (character offsets) can highlight the current word.
+   * Paragraphs with math ($…$) are shown as-is (MathJax needs the raw text) and read without the math.
+   */
+  var speechMap = null;
+  function wordsHtml(text) {
+    var speech = '', html = '';
+    String(text).split(/\n\s*\n|\r\n\s*\r\n/).forEach(function (p, pi) {
+      p = p.trim();
+      if (!p) return;
+      if (pi && speech) speech += '\n\n';
+      if (/\$/.test(p)) {
+        html += '<p dir="auto">' + esc(p).replace(/\n/g, '<br>') + '</p>';
+        speech += p.replace(/\$\$?[^$]*\$\$?/g, ' ');
+        return;
+      }
+      var lines = p.split(/\n/).map(function (line) {
+        return line.split(/\s+/).filter(Boolean).map(function (word) {
+          if (speech && !/\s$/.test(speech)) speech += ' ';
+          var start = speech.length;
+          speech += word;
+          return '<span class="w" data-s="' + start + '">' + esc(word) + '</span>';
+        }).join(' ');
+      });
+      html += '<p dir="auto">' + lines.join('<br>') + '</p>';
+    });
+    return { html: html, text: speech };
+  }
+
   function sentences(text) {
     return String(text).replace(/\s+/g, ' ').match(/[^.!?。؟\n]+[.!?؟]*["”׳]?\s*/g) || [text];
   }
@@ -365,16 +406,61 @@
   function speak() {
     var synth = root.speechSynthesis;
     if (!synth) { DA.ui.toast(T('הקראה לא זמינה בדפדפן הזה')); return; }
-    if (synth.speaking) { synth.cancel(); return; }
-    var text = mode === 'page' ? docText() : segs[segIdx];
+    if (synth.speaking) { synth.cancel(); clearSpeaking(); return; }
+    var pageMode = mode === 'page' && speechMap && $('readContent').querySelector('.w');
+    var text = pageMode ? speechMap.text : mode === 'page' ? docText() : segs[segIdx];
     if (!text) return;
+    say(text, pageMode ? 'page' : 'seg');
+  }
+
+  var fallbackTimer = null, gotBoundary = false;
+  function clearSpeaking() {
+    clearInterval(fallbackTimer); fallbackTimer = null;
+    $('readContent').querySelectorAll('.speaking').forEach(function (e) { e.classList.remove('speaking'); });
+    $('rSpeak').classList.remove('on');
+  }
+  function highlightAt(charIndex) {
+    var spans = $('readContent').querySelectorAll('.w'), hit = null;
+    for (var i = 0; i < spans.length; i++) { if (+spans[i].getAttribute('data-s') <= charIndex) hit = spans[i]; else break; }
+    if (!hit || hit.classList.contains('speaking')) return;
+    $('readContent').querySelectorAll('.w.speaking').forEach(function (e) { e.classList.remove('speaking'); });
+    hit.classList.add('speaking');
+    var r = hit.getBoundingClientRect(), v = $('readScroll').getBoundingClientRect();
+    if (r.top < v.top + 20 || r.bottom > v.bottom - 20) hit.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  }
+
+  /** Speak text; kind 'page' highlights word by word, 'seg' highlights the shown segment, 'word' nothing. */
+  function say(text, kind) {
+    var synth = root.speechSynthesis;
+    var s = ctx.profile().settings;
+    var light = s.speechHighlight !== false;
+    synth.cancel(); clearSpeaking();
     var u = new SpeechSynthesisUtterance(text.replace(/\$[^$]*\$/g, ' '));
     var he = /[֐-׿]/.test(text);
     u.lang = he ? 'he-IL' : 'en-US';
     var v = synth.getVoices().filter(function (x) { return x.lang && x.lang.toLowerCase().indexOf(he ? 'he' : 'en') === 0; })[0];
     if (v) u.voice = v;
     else if (he) DA.ui.toast(T('לא נמצא קול בעברית במכשיר הזה'));
-    u.rate = ctx.profile().settings.speechRate;
+    u.rate = s.speechRate;
+    gotBoundary = false;
+    if (kind !== 'word') $('rSpeak').classList.add('on');
+    if (light && kind === 'page') {
+      u.onboundary = function (e) { if (e.name === 'word' || e.name === undefined) { gotBoundary = true; highlightAt(e.charIndex); } };
+      u.onstart = function () {
+        // some voices never report word boundaries: estimate the pace instead
+        setTimeout(function () {
+          if (gotBoundary || !synth.speaking) return;
+          var spans = $('readContent').querySelectorAll('.w'), i = 0;
+          var perWord = 60000 / (150 * s.speechRate);
+          fallbackTimer = setInterval(function () {
+            if (i >= spans.length || !synth.speaking) { clearInterval(fallbackTimer); return; }
+            highlightAt(+spans[i].getAttribute('data-s')); i++;
+          }, perWord);
+        }, 900);
+      };
+    }
+    if (light && kind === 'seg') { var segEl = $('readContent').querySelector('.seg'); if (segEl) segEl.classList.add('speaking'); }
+    u.onend = u.onerror = function () { clearSpeaking(); };
     synth.speak(u);
   }
 

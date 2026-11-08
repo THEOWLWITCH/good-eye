@@ -24,6 +24,12 @@
       { k: 'imageContrast', label: T('ניגודיות תמונות'), type: 'range', min: 0.6, max: 2.2, step: 0.05, fmt: f2 },
       { k: 'imageInvert', label: T('היפוך תמונות ברקע כהה'), type: 'check' }
     ] },
+    { title: T('נוחות ורגישויות'), items: [
+      { k: 'brightness', label: T('בהירות (עמעום לסנוור ורגישות לאור)'), type: 'range', min: 0.4, max: 1, step: 0.05, fmt: pct },
+      { k: 'warmth', label: T('אור חם (פחות כחול)'), type: 'range', min: 0, max: 1, step: 0.05, fmt: pct },
+      { k: 'cvd', label: T('עזרה בעיוורון צבעים (בתמונות ובתרשימים)'), type: 'select', options: function () { return [['none', T('כבוי')], ['protan', T('אדום־ירוק (פרוטנופיה)')], ['deutan', T('ירוק־אדום (דאוטרנופיה, הנפוץ ביותר)')], ['tritan', T('כחול־צהוב (טריטנופיה)')]]; } },
+      { k: 'calm', label: T('מצב רגוע: ניגודיות רכה ובלי פסים צפופים (מיגרנה, רגישות לדגמים)'), type: 'check' }
+    ] },
     { title: T('תיקון עיוות וחדות'), items: [
       { k: 'calibrationId', label: T('כיול רשת פעיל'), type: 'select', options: calibrationOptions },
       { k: 'warpStrength', label: T('עוצמת תיקון העיוות'), type: 'range', min: 0, max: 1.5, step: 0.05, fmt: pct },
@@ -35,6 +41,7 @@
       { k: 'lineMarker', label: T('סימון תחילת שורה'), type: 'check' },
       { k: 'shiftX', label: T('הזזת הטקסט לצדדים'), type: 'range', min: -0.35, max: 0.35, step: 0.01, fmt: pct },
       { k: 'shiftY', label: T('הזזת הטקסט למעלה/למטה'), type: 'range', min: -0.35, max: 0.35, step: 0.01, fmt: pct },
+      { k: 'speechHighlight', label: T('להדגיש כל מילה בזמן ההקראה'), type: 'check' },
       { k: 'speechRate', label: T('מהירות הקראה'), type: 'range', min: 0.5, max: 1.5, step: 0.05, fmt: f2 }
     ] },
     { title: T('👁️ מעקב עיניים (באתר העצמאי, לא חובה)'), items: [

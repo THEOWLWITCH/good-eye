@@ -20,8 +20,14 @@
   grid = new DA.GridInstrument($('canvas'), {
     settings: store.getPref('gridSettings', {}),
     onCommit: onCommit,
-    onLive: onLive
+    onLive: onLive,
+    onSelect: onSelect
   });
+  // arrow pad: move a tapped point without dragging (tremor, touch screens, precision)
+  [['nudgeUp', 0, -1], ['nudgeDown', 0, 1], ['nudgeLeft', -1, 0], ['nudgeRight', 1, 0]].forEach(function (b) {
+    $(b[0]).onclick = function () { nudge(b[1], b[2]); };
+  });
+  $('nudgeClear').onclick = function () { grid.select(null); };
 
   function uid() {
     var d = new Date(), p = function (n) { return String(n).padStart(2, '0'); };
@@ -61,6 +67,15 @@
     changed();
     var msg = T('נשמרה פעולת גרירה #') + record.seq + ' (' + Math.round(record.distance * grid.S) + T(' פיקסלים)');
     setStatus(record.clamped ? msg + T(' — הגרירה הוגבלה כדי למנוע קיפול. הגדילו את הרדיוס לתיקון גדול יותר.') : msg, record.clamped);
+  }
+
+  function nudge(x, y) {
+    var step = +$('nudgeStep').value || 2;
+    if (!grid.nudge(x * step, y * step)) { setStatus(T('קודם לוחצים (בלי לגרור) על נקודה בקו שנראה עקום.'), true); }
+  }
+  function onSelect(sel) {
+    $('nudgePad').classList.toggle('active', !!sel);
+    if (sel) setStatus(T('נבחרה נקודה. הזיזו אותה עם החצים (או מקשי החצים במקלדת) עד שהקו נראה ישר.'));
   }
 
   function onLive(op, clamped) {
@@ -408,7 +423,12 @@
 
   document.addEventListener('keydown', function (e) {
     if (!visible) return;
-    if (e.target.matches('input[type=text], input[type=number], textarea')) return;
+    if (grid.selected && !(e.target.matches && e.target.matches('input, textarea, select'))) {
+      var dirs = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0] };
+      if (dirs[e.key]) { e.preventDefault(); nudge(dirs[e.key][0], dirs[e.key][1]); return; }
+      if (e.key === 'Escape') { grid.select(null); return; }
+    }
+    if ((e.target.matches && e.target.matches('input[type=text], input[type=number], textarea'))) return;
     var k = e.key.toLowerCase(), mod = e.ctrlKey || e.metaKey;
     if (mod && k === 'z' && !e.shiftKey) { e.preventDefault(); undo(); }
     else if (mod && (k === 'y' || (k === 'z' && e.shiftKey))) { e.preventDefault(); redo(); }
@@ -446,6 +466,10 @@
   /** Called when the screen is shown: restore this reader's draft (or start fresh). */
   function enter() {
     visible = true;
+    var prof = ctx.profile();
+    var calm = !!(prof && prof.settings.calm);
+    grid.setSettings({ soft: calm });
+    if (calm && grid.settings.density > 7) grid.setSettings({ density: 7 });
     var pid = ctx.profile() ? ctx.profile().id : 'none';
     if (!trial || (trial.profileId || 'none') !== pid) {
       var draft = store.getPref('calDraft.' + pid, null);

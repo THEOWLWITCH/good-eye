@@ -147,5 +147,23 @@ test('settings keep eye-tracking fields', function () {
   ok(s.eyesKeepAngle === true && s.refDistanceCm === 45);
 });
 
+console.log('Colour-vision help & comfort settings');
+test('daltonize keeps grays gray and makes red visible to a deutan viewer', function () {
+  var src = require('fs').readFileSync(path.join(__dirname, '..', 'js/render/lens.js'), 'utf8');
+  var tables = src.slice(src.indexOf('var CVD_SIM'), src.indexOf('/** D = I'));
+  var fn = src.slice(src.indexOf('function daltonizeMatrix'), src.indexOf('var cvdReady'));
+  var dalt = new Function(tables + fn + 'return daltonizeMatrix;')();
+  ['protan', 'deutan', 'tritan'].forEach(function (t) {
+    var D = dalt(t);
+    for (var r = 0; r < 3; r++) near(D[r][0] + D[r][1] + D[r][2], 1, 5e-3, t + ' row ' + r);
+  });
+  var D = dalt('deutan');
+  ok(Math.abs(D[2][0]) > 0.1, 'red gains a blue component');
+});
+test('comfort settings are kept within range', function () {
+  var s = DA.settings.normalize({ brightness: 0.1, warmth: 3, cvd: 'xyz', calm: true });
+  ok(s.brightness === 0.4 && s.warmth === 1 && s.cvd === 'none' && s.calm === true);
+});
+
 console.log('\n' + passed + ' passed, ' + failed + ' failed');
 process.exit(failed ? 1 : 0);

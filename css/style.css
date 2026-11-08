@@ -317,3 +317,23 @@ dialog.wide { width: min(640px, 94vw); max-height: 88vh; overflow-y: auto; }
 .lang-btn { margin-inline-start: auto; border-radius: 999px; padding: 4px 12px; font-size: 14px; }
 .lang-btn + .who-chip { margin-inline-start: 6px; }
 .cal-screen output { float: inline-end; }
+
+/* ---------- v0.4: comfort, colour-vision help, calm mode, read-along ---------- */
+.lens.calm { color: color-mix(in srgb, var(--fg) 78%, var(--bg)); }
+.lens.calm .lens-ruler.on.mask { box-shadow: 0 0 0 200vmax rgba(0, 0, 0, .35); }
+.lens.cvd-protan img, .lens.cvd-protan video, .lens.cvd-protan .stim-emoji, .lens.cvd-protan .ab-pics span { filter: url(#daCvd-protan) contrast(var(--imgc, 1)) invert(var(--inv, 0)); }
+.lens.cvd-deutan img, .lens.cvd-deutan video, .lens.cvd-deutan .stim-emoji, .lens.cvd-deutan .ab-pics span { filter: url(#daCvd-deutan) contrast(var(--imgc, 1)) invert(var(--inv, 0)); }
+.lens.cvd-tritan img, .lens.cvd-tritan video, .lens.cvd-tritan .stim-emoji, .lens.cvd-tritan .ab-pics span { filter: url(#daCvd-tritan) contrast(var(--imgc, 1)) invert(var(--inv, 0)); }
+.lens .w { border-radius: .15em; transition: background .1s; cursor: pointer; }
+.lens .w.speaking { background: rgba(255, 210, 0, .55); box-shadow: 0 0 0 .08em rgba(255, 170, 0, .8); }
+.lens.reversed .w.speaking { background: rgba(255, 210, 0, .35); }
+
+.seg.speaking { background: rgba(255, 210, 0, .25); border-radius: .3em; }
+.rb.on#rSpeak { background: #fff6cc; border-color: #e0a800; }
+
+/* arrow pad for calibration without dragging */
+.nudge-pad { border: 1px dashed #c5ced6; border-radius: 10px; padding: 8px; margin-bottom: 8px; }
+.nudge-pad.active { border: 2px solid #7a3cdc; background: #f6f1ff; }
+.nudge-pad .pad { display: grid; grid-template-columns: repeat(3, 56px); grid-template-rows: repeat(3, 48px); gap: 4px; justify-content: center; margin: 8px 0; direction: ltr; }
+.nudge-pad .pad button { font-size: 22px; padding: 0; border-radius: 10px; }
+.nudge-pad .pad #nudgeClear { font-size: 16px; color: #6d7a86; }

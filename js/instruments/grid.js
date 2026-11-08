@@ -39,6 +39,8 @@
     this.hover = null;
     this.onCommit = (opts && opts.onCommit) || function () {};
     this.onLive = (opts && opts.onLive) || function () {};
+    this.onSelect = (opts && opts.onSelect) || function () {};
+    this.selected = null;     // point chosen for arrow-button nudging (no dragging needed)
     this.S = 100; this.ox = 0; this.oy = 0;
     this._bind();
     this.resize();
@@ -47,7 +49,40 @@
   GridInstrument.DEFAULTS = DEFAULTS;
   GridInstrument.MARGIN = MARGIN;
 
-  GridInstrument.prototype.setOps = function (ops) { this.ops = ops || []; this.render(); };
+  GridInstrument.prototype.setOps = function (ops) {
+    ops = ops || [];
+    if (this.selected && ops.length < this.ops.length) { this.selected = null; this.onSelect(null); } // undo/reset
+    this.ops = ops; this.render();
+  };
+
+  /** Select a point on a line by a simple tap — then move it with arrow buttons or keys. */
+  GridInstrument.prototype.select = function (hit) {
+    this.selected = hit ? { x: hit.x, y: hit.y, lineId: hit.lineId, original: hit.original, param: hit.param } : null;
+    this.onSelect(this.selected);
+    this.render();
+  };
+
+  /** Move the selected point by (dxPx, dyPx) screen pixels as one small correction (for tremor / no dragging). */
+  GridInstrument.prototype.nudge = function (dxPx, dyPx) {
+    var sel = this.selected;
+    if (!sel) return false;
+    var s = this.settings, dx = dxPx / this.S, dy = dyPx / this.S, clamped = false;
+    if (s.clamp) { var cl = DEF.clampDelta(dx, dy, s.radius); dx = cl.dx; dy = cl.dy; clamped = cl.clamped; }
+    var op = { ax: r6(sel.x), ay: r6(sel.y), dx: r6(dx), dy: r6(dy), r: r6(s.radius) };
+    var record = {
+      type: 'nudge', lineId: sel.lineId, lineParam: r6(sel.param),
+      original: { x: r6(sel.original.x), y: r6(sel.original.y) },
+      from: { x: op.ax, y: op.ay }, to: { x: r6(sel.x + dx), y: r6(sel.y + dy) },
+      dx: op.dx, dy: op.dy, distance: r6(Math.hypot(dx, dy)),
+      directionDeg: Math.round((Math.atan2(dy, dx) * 180) / Math.PI * 10) / 10,
+      radius: op.r, gridDensity: s.density,
+      displayMode: s.mode === 'single' ? 'single:' + s.singleOrient + s.singleIndex : s.mode,
+      clamped: clamped, durationMs: 0, pointerType: 'buttons'
+    };
+    sel.x += dx; sel.y += dy;               // the selected point follows its correction
+    this.onCommit(op, record);
+    return true;
+  };
   GridInstrument.prototype.setCompare = function (ops) { this.compareOps = ops; this.render(); };
   GridInstrument.prototype.setSettings = function (patch) {
     Object.assign(this.settings, patch);
@@ -198,7 +233,9 @@
       self.drag = null; self.live = null;
       c.style.cursor = 'grab';
       var minMove = 0.5 / self.S;
+      if (!cancel && Math.hypot(op.dx, op.dy) < minMove) { self.select(d.hit); self.onLive(null, false); return; }
       if (!cancel && Math.hypot(op.dx, op.dy) >= minMove) {
+        self.selected = null; self.onSelect(null);
         var s = self.settings;
         var record = {
           type: 'drag',
@@ -230,7 +267,7 @@
   // ---------- rendering ----------
   GridInstrument.prototype.render = function () {
     var ctx = this.ctx, s = this.settings, S = this.S, dpr = this.dpr || 1;
-    var fg = s.dark ? '#ffffff' : '#000000';
+    var fg = s.soft ? (s.dark ? '#b0b0b0' : '#5a5a5a') : s.dark ? '#ffffff' : '#000000';
     var bg = s.dark ? '#000000' : '#ffffff';
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -276,6 +313,15 @@
     }
 
     // live drag or hover: control point + influence radius
+    if (this.selected && !this.live) {
+      var sx = this.selected.x * S, sy = this.selected.y * S;
+      ctx.strokeStyle = 'rgba(120,60,220,0.9)'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(sx, sy, 11, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(sx - 18, sy); ctx.lineTo(sx - 13, sy); ctx.moveTo(sx + 13, sy); ctx.lineTo(sx + 18, sy);
+      ctx.moveTo(sx, sy - 18); ctx.lineTo(sx, sy - 13); ctx.moveTo(sx, sy + 13); ctx.lineTo(sx, sy + 18); ctx.stroke();
+      ctx.setLineDash([5, 4]); ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(120,60,220,0.45)';
+      ctx.beginPath(); ctx.arc(sx, sy, s.radius * S, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]);
+    }
     var focus = this.live ? { x: this.live.ax + this.live.dx, y: this.live.ay + this.live.dy, r: this.live.r }
       : this.hover ? { x: this.hover.x, y: this.hover.y, r: s.radius } : null;
     if (focus) {

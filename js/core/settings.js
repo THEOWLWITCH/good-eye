@@ -58,6 +58,12 @@
     lineMarker: false,     // coloured bar at the start of each line (field loss)
     shiftX: 0, shiftY: 0,  // move content within the view (eccentric viewing), fraction of view
     speechRate: 0.9,
+    speechHighlight: true, // highlight each word while reading aloud
+    // comfort & colour
+    brightness: 1,         // 0.4..1 — dim the view (glare, light sensitivity)
+    warmth: 0,             // 0..1 — warmer light (less blue)
+    cvd: 'none',           // colour-vision help for pictures: none | protan | deutan | tritan
+    calm: false,           // calm mode: softer contrast, no dense stripes (pattern glare, migraine)
     // eye tracking (standalone version only)
     eyesKeepAngle: false,  // keep letters the same size for the eye when the reader moves closer/farther
     refDistanceCm: null    // viewing distance at which fontSize was chosen/learned
@@ -66,6 +72,7 @@
   var RANGES = {
     fontSize: [12, 120], letterSpacing: [-0.02, 0.4], wordSpacing: [0, 1.2], lineHeight: [1.1, 3],
     lineChars: [15, 90], imageContrast: [0.6, 2.2], warpStrength: [0, 1.5], sharpen: [0, 1.5],
+    brightness: [0.4, 1], warmth: [0, 1],
     zoom: [0.5, 4], shiftX: [-0.35, 0.35], shiftY: [-0.35, 0.35], speechRate: [0.5, 1.5]
   };
 
@@ -77,6 +84,7 @@
     });
     if (!FONTS.some(function (f) { return f.id === out.font; })) out.font = DEFAULTS.font;
     if (!THEMES.some(function (t) { return t.id === out.theme; })) out.theme = DEFAULTS.theme;
+    if (['none', 'protan', 'deutan', 'tritan'].indexOf(out.cvd) < 0) out.cvd = 'none';
     return out;
   }
 
@@ -90,7 +98,11 @@
       s.fontSize + 'px', font(s.font).label, theme(s.theme).label,
       s.letterSpacing > 0.06 ? T('ריווח אותיות ') + s.letterSpacing.toFixed(2) : null,
       s.warpStrength > 0 && s.calibrationId ? T('תיקון עיוות ') + Math.round(s.warpStrength * 100) + '%' : null,
-      s.ruler !== 'off' ? T('סרגל קריאה') : null
+      s.ruler !== 'off' ? T('סרגל קריאה') : null,
+      s.brightness < 0.95 ? T('מעומעם') : null,
+      s.warmth > 0.05 ? T('אור חם') : null,
+      s.cvd !== 'none' ? T('צבעים לעיוורון צבעים') : null,
+      s.calm ? T('מצב רגוע') : null
     ].filter(Boolean).join(' · ');
   }
 

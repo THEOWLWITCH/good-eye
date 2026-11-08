@@ -74,6 +74,12 @@
     st.setProperty('--zoom', String(s.zoom));
     this.el.classList.toggle('line-marker', !!s.lineMarker);
     this.el.classList.toggle('reversed', !!t.reversed);
+    // calm mode: softer text contrast and more air between lines
+    this.el.classList.toggle('calm', !!s.calm);
+    if (s.calm) st.setProperty('--lh', String(Math.max(s.lineHeight, 1.8)));
+    // colour-vision help applies to pictures, photos, pages and drawings
+    this.el.classList.remove('cvd-protan', 'cvd-deutan', 'cvd-tritan');
+    if (s.cvd && s.cvd !== 'none') { ensureCvdFilters(); this.el.classList.add('cvd-' + s.cvd); }
     this.content.style.transform = (s.shiftX || s.shiftY)
       ? 'translate(' + (s.shiftX * 100) + '%, ' + (s.shiftY * 100) + '%)' : '';
     this.ruler.className = 'lens-ruler ' + (s.ruler === 'off' ? '' : 'on ' + s.ruler);
@@ -104,7 +110,8 @@
     var w = this.el.clientWidth, h = this.el.clientHeight;
     var useWarp = this.ops && this.ops.length && s.warpStrength > 0 && w > 0 && h > 0;
     var useSharp = s.sharpen > 0.01;
-    if (!useWarp && !useSharp) { this.el.style.filter = ''; return; }
+    var comfort = comfortFilter(s);
+    if (!useWarp && !useSharp) { this.el.style.filter = comfort; return; }
 
     var d = ensureDefs();
     var f = document.getElementById(this.id);
@@ -151,7 +158,7 @@
       dm.setAttribute('yChannelSelector', 'G');
       f.appendChild(dm);
     }
-    this.el.style.filter = 'url(#' + this.id + ')';
+    this.el.style.filter = 'url(#' + this.id + ')' + (comfort ? ' ' + comfort : '');
   };
 
   /** Displacement map (data URL) for a w×h viewport. Cached per ops/strength/size. */
@@ -189,5 +196,58 @@
     return this._map;
   };
 
+  /** Dimming and warm light as CSS filters (applied after the SVG warp/sharpen filter). */
+  function comfortFilter(s) {
+    var f = [];
+    if (s.brightness < 0.99) f.push('brightness(' + s.brightness.toFixed(2) + ')');
+    if (s.warmth > 0.01) f.push('sepia(' + (s.warmth * 0.55).toFixed(2) + ')', 'saturate(' + (1 + s.warmth * 0.3).toFixed(2) + ')');
+    return f.join(' ');
+  }
+
+  // ---------- colour-vision deficiency help ("daltonize") ----------
+  // Simulation matrices (Viénot/Brettel-style, sRGB approximation) and the error-shift matrix of
+  // Fidaner et al.: colours a person cannot tell apart are shifted into channels they can see.
+  var CVD_SIM = {
+    protan: [[0.567, 0.433, 0], [0.558, 0.442, 0], [0, 0.242, 0.758]],
+    deutan: [[0.625, 0.375, 0], [0.7, 0.3, 0], [0, 0.3, 0.7]],
+    tritan: [[0.95, 0.05, 0], [0, 0.433, 0.567], [0, 0.475, 0.525]]
+  };
+  var CVD_SHIFT = {
+    protan: [[0, 0, 0], [0.7, 1, 0], [0.7, 0, 1]],
+    deutan: [[0, 0, 0], [0.7, 1, 0], [0.7, 0, 1]],
+    tritan: [[1, 0, 0.7], [0, 1, 0.7], [0, 0, 0]]
+  };
+  /** D = I + E·(I − S): one linear colour matrix per deficiency. */
+  function daltonizeMatrix(type) {
+    var S = CVD_SIM[type], E = CVD_SHIFT[type], D = [];
+    for (var r = 0; r < 3; r++) {
+      D.push([]);
+      for (var c = 0; c < 3; c++) {
+        var v = r === c ? 1 : 0;
+        for (var k = 0; k < 3; k++) v += E[r][k] * ((k === c ? 1 : 0) - S[k][c]);
+        D[r].push(Math.round(v * 1000) / 1000);
+      }
+    }
+    return D;
+  }
+  var cvdReady = false;
+  function ensureCvdFilters() {
+    if (cvdReady) return;
+    cvdReady = true;
+    var d = ensureDefs();
+    ['protan', 'deutan', 'tritan'].forEach(function (type) {
+      var M = daltonizeMatrix(type);
+      var f = document.createElementNS(SVGNS, 'filter');
+      f.setAttribute('id', 'daCvd-' + type);
+      f.setAttribute('color-interpolation-filters', 'sRGB');
+      var cm = document.createElementNS(SVGNS, 'feColorMatrix');
+      cm.setAttribute('type', 'matrix');
+      cm.setAttribute('values', [M[0].concat([0, 0]), M[1].concat([0, 0]), M[2].concat([0, 0]), [0, 0, 0, 1, 0]].map(function (r) { return r.join(' '); }).join(' '));
+      f.appendChild(cm);
+      d.appendChild(f);
+    });
+  }
+
   DA.Lens = Lens;
+  DA.daltonizeMatrix = daltonizeMatrix;
 })(typeof window !== 'undefined' ? window : globalThis);
