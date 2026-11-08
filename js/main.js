@@ -70,7 +70,7 @@
   function boot() {
     DA.i18n.apply(document.body);
     accessibility();
-    document.title = T('עין טובה');
+    document.title = T('עין טובה · כלי עזר, לא מכשיר רפואי');
     $('langBtn').textContent = DA.i18n.lang === 'he' ? 'English' : String.fromCharCode(0x5E2, 0x5D1, 0x5E8, 0x5D9, 0x5EA); // "עברית" — always shown in Hebrew
     $('langBtn').onclick = function () { DA.i18n.setLang(DA.i18n.lang === 'he' ? 'en' : 'he'); };
     DA.settings.loadFonts();
