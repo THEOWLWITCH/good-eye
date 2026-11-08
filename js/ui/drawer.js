@@ -4,14 +4,17 @@
  */
 (function (root) {
   'use strict';
+  function PACE_OPTS() { return [['slow', T('🐢 לאט ובנחת')], ['normal', T('🚶 רגיל')], ['fast', T('🙂 קצת יותר זריז')], ['manual', T('✋ בקצב שלי (כפתור הבא)')]]; }
   var DA = root.DA;
   var $ = DA.ui.$, esc = DA.ui.esc;
   var ctx, previewLens, work;
 
   var GROUPS = [
-    { title: T('🦉 הנווט'), items: [
+    { title: T('🦉 הנווט והקראת הנחיות'), items: [
       { k: 'copilot', label: T('להציג את הנווט, שמסביר כל צעד'), type: 'check' },
-      { k: 'copilotVoice', label: T('הנווט מקריא את ההסבר בקול'), type: 'check' }
+      { k: 'gamePace', label: T('קצב המשחק'), type: 'select', options: function () { return PACE_OPTS(); } },
+      { k: 'gameVoice', label: T('קול במשחק: שאלות, עידוד ומה קורה בסוף'), type: 'check' },
+      { k: 'copilotVoice', label: T('להקריא את כל ההנחיות אוטומטית (הנווט, המשחק, הכלים והשאלות)'), type: 'check' }
     ] },
     { title: T('טקסט'), items: [
       { k: 'fontSize', label: T('גודל אותיות'), type: 'range', min: 12, max: 96, step: 1, fmt: function (v) { return v + 'px'; } },

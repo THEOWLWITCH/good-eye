@@ -16,16 +16,44 @@
   var DA = root.DA;
   DA.screens = DA.screens || {};
   var $ = DA.ui.$, esc = DA.ui.esc;
-  var ctx, stageLens, sess, queue, work, plainSettings, step, stepStart, done = 0, total = 0;
+  var ctx, stageLens, sess, queue, work, plainSettings, step, stepStart, done = 0, total = 0, paused = false;
+  var SAVE = 'da.learn.paused.', lastPraise = -1;
 
   var PLAIN = { font: 'arial', theme: 'white', letterSpacing: 0, wordSpacing: 0.05, lineHeight: 1.4, warpStrength: 0, sharpen: 0, bold: false, ruler: 'off', shiftX: 0, shiftY: 0, lineMarker: false };
 
   var START = { digit: 40, 'letter-he': 40, 'letter-en': 40, 'word-he': 34, 'word-en': 34, 'sentence-he': 26, 'sentence-en': 26, silhouette: 70, line: 70, color: 70 };
+  // ---------------- voice & sound ----------------
+  function voiceOn() { var p = ctx && ctx.profile(); return !!(p && p.settings.gameVoice !== false); }
+  function speak(t) { if (voiceOn() && DA.speech) DA.speech.say(t); }
+  var actx;
+  /** Soft two-note chime after an answer (no right/wrong sound: we praise effort). */
+  function chime() {
+    if (!voiceOn()) return;
+    try {
+      actx = actx || new (root.AudioContext || root.webkitAudioContext)();
+      [660, 880].forEach(function (f, i) {
+        var o = actx.createOscillator(), g = actx.createGain(), t0 = actx.currentTime + i * 0.09;
+        o.type = 'sine'; o.frequency.value = f;
+        g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(0.12, t0 + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.25);
+        o.connect(g).connect(actx.destination); o.start(t0); o.stop(t0 + 0.3);
+      });
+    } catch (e) { /* no audio: fine */ }
+  }
+  var PACE_MS = { slow: 3600, normal: 2500, fast: 1700 };   // calm on purpose: this is not a race
+  function pace() { var p = ctx && ctx.profile(); var v = p && p.settings.gamePace; return PACE_MS[v] || v === 'manual' ? v : 'normal'; }
+  function renderPace() { var sel = $('learnPace'); if (sel) sel.value = pace(); }
+  function renderVoiceBtn() {
+    var b = $('learnVoice'); if (!b) return;
+    b.textContent = voiceOn() ? '🔊' : '🔇';
+    b.title = voiceOn() ? T('להשתיק את קול המשחק') : T('להפעיל את קול המשחק');
+    b.setAttribute('aria-pressed', voiceOn() ? 'true' : 'false');
+  }
+
   var PRAISE = [T('יפה!'), T('כל הכבוד!'), T('מצוין!'), T('אלוף!'), T('נהדר!'), T('וואו!')];
   
   // ---------------- tuners (preference) ----------------
   function Tournament(param, candidates, label) {
-    this.param = param; this.label = label;
+    this.k = 'T'; this.param = param; this.label = label;
     this.champ = candidates[0]; this.rest = candidates.slice(1);
   }
   Tournament.prototype.next = function () {
@@ -33,13 +61,14 @@
     return { param: this.param, a: this.champ, b: this.rest[0], label: this.label };
   };
   Tournament.prototype.answer = function (winner) {
+    this._used = (this._used || 0) + 1;
     var challenger = this.rest.shift();
     if (winner === 'b') this.champ = challenger;
   };
   Tournament.prototype.result = function () { return this.champ; };
 
   function Search(param, start, stepSize, min, max, maxTrials, label) {
-    this.param = param; this.label = label;
+    this.k = 'S'; this.param = param; this.label = label;
     this.cur = start; this.step = stepSize; this.dir = 1; this.min = min; this.max = max;
     this.n = 0; this.maxTrials = maxTrials;
   }
@@ -60,13 +89,20 @@
   };
   Search.prototype.result = function () { return this.cur; };
 
+  /** Warp check: two with/without comparisons. */
+  function Warp() { this.k = 'W'; this.warp = true; this.n = 0; this.votes = []; }
+  Warp.prototype.next = function () { return this.n < 2 ? { param: 'warp' } : null; };
+  Warp.prototype.units = function () { return 2; };
+  Tournament.prototype.units = function () { return (this.rest ? this.rest.length : 0) + (this._used || 0); };
+  Search.prototype.units = function () { return this.maxTrials; };
+
   // ---------------- staircase (recognition) ----------------
   function Staircase(category, condition, start, maxTrials) {
-    this.category = category; this.condition = condition;
+    this.k = 'C'; this.category = category; this.condition = condition;
     this.size = start; this.run = 0; this.lastDir = 0; this.reversals = [];
     this.n = 0; this.correct = 0; this.rts = []; this.maxTrials = maxTrials;
   }
-  Staircase.prototype.done = function () { return this.n >= this.maxTrials || this.reversals.length >= 5; };
+  Staircase.prototype.done = function () { return this.n >= this.maxTrials || this.reversals.length >= 4; };
   Staircase.prototype.answer = function (ok, rt) {
     this.n++; this.rts.push(rt);
     var dir = 0;
@@ -97,8 +133,23 @@
     DA.eyePanel.bindSwitch($('learnEyes'));
     $('learnExit').onclick = function () {
       if (!sess) { ctx.go('hub'); return; }
-      DA.ui.ask(T('לצאת מהמשחק? מה שכבר למדנו יישמר.'), T('יציאה')).then(function (y) { if (y) finish(true); });
+      DA.ui.ask(T('לסיים עכשיו ולראות את מה שלמדנו עד כאן?'), T('לסיים')).then(function (y) { if (y) { clearSaved(); finish(true); } });
     };
+    $('learnPause').onclick = pause;
+    $('learnPace').onchange = function () {
+      ctx.updateSettings(Object.assign({}, ctx.profile().settings, { gamePace: this.value }));
+      this.blur();
+    };
+    $('learnVoice').onclick = function () {
+      var on = !voiceOn();
+      ctx.updateSettings(Object.assign({}, ctx.profile().settings, { gameVoice: on }));
+      renderVoiceBtn();
+      if (on) speak(T('הקול פועל')); else if (root.speechSynthesis) root.speechSynthesis.cancel();
+    };
+    $('learnResumeBtn').onclick = resume;
+    $('learnPauseLater').onclick = function () { save(); ctx.go('hub'); };
+    $('learnContinue').onclick = function () { if (restore()) { showPlay(); resume(); } };
+    $('learnRestart').onclick = function () { clearSaved(); $('learnResume').style.display = 'none'; };
     var box = $('catChecks');
     DA.stimuli.CATEGORIES.forEach(function (cat) {
       var l = document.createElement('label');
@@ -107,7 +158,8 @@
       box.appendChild(l);
     });
     document.addEventListener('keydown', function (e) {
-      if (ctx.current() !== 'learn' || !step) return;
+      if (ctx.current() !== 'learn' || !step || paused) return;
+      if (e.key === 'Escape' || e.key === 'p') { pause(); return; }
       if (step.type === 'recognize' && /^[1-4]$/.test(e.key)) { var b = $('learnChoices').querySelectorAll('button')[+e.key - 1]; if (b) b.click(); }
     });
   }
@@ -115,10 +167,16 @@
   function enter() {
     var p = ctx.profile();
     if (!p) { ctx.go('home'); return; }
-    sess = null; step = null;
+    sess = null; step = null; paused = false;
     $('learnSetup').style.display = '';
     $('learnPlay').style.display = 'none';
     $('learnEnd').style.display = 'none';
+    $('learnPaused').style.display = 'none';
+    renderVoiceBtn();
+    renderPace();
+    var saved = loadSaved();
+    $('learnResume').style.display = saved ? '' : 'none';
+    if (saved) $('learnResumePct').textContent = Math.round(saved.pct) + '%';
     $('learnHasCal').style.display = ctx.opsFor(p.settings) ? 'none' : '';
     $('learnWhoAvatar').textContent = p.emoji;
     document.querySelectorAll('#catChecks input').forEach(function (i) {
@@ -126,23 +184,72 @@
       i.checked = def.indexOf(i.value) >= 0;
     });
   }
-  function leave() { step = null; }
+  function leave() {
+    if (sess && $('learnPlay').style.display !== 'none') save();   // leaving mid-game: keep the place
+    step = null; sess = null; paused = false;
+  }
+
+  // ---------------- pause & resume ----------------
+  function key() { var p = ctx.profile(); return p ? SAVE + p.id : null; }
+  function pct() { return total ? Math.min(100, doneUnits() / total * 100) : 0; }
+  function save() {
+    if (!sess || !key()) return;
+    try {
+      localStorage.setItem(key(), JSON.stringify({ v: 1, pct: pct(), sess: sess, queue: queue, work: work, plain: plainSettings, prefDone: done, total: total, savedAt: Date.now() }));
+    } catch (e) { /* storage full: pause still works for this visit */ }
+  }
+  function loadSaved() {
+    try {
+      var d = key() && JSON.parse(localStorage.getItem(key()) || 'null');
+      if (!d || d.v !== 1 || Date.now() - d.savedAt > 14 * 864e5) return null;   // older than two weeks: start fresh
+      return d;
+    } catch (e) { return null; }
+  }
+  function clearSaved() { if (key()) localStorage.removeItem(key()); }
+  var PROTO = { T: Tournament.prototype, S: Search.prototype, C: Staircase.prototype, W: Warp.prototype };
+  function revive(o) { return Object.assign(Object.create(PROTO[o.k] || Object.prototype), o); }
+  function restore() {
+    var d = loadSaved();
+    if (!d) return false;
+    sess = d.sess; sess._stairs = (sess._stairs || []).map(revive);
+    queue = d.queue.map(revive);
+    work = d.work; plainSettings = d.plain; done = d.prefDone; total = d.total;
+    return true;
+  }
+  function showPlay() {
+    $('learnSetup').style.display = 'none';
+    $('learnPlay').style.display = '';
+  }
+  function pause() {
+    if (!sess || paused) return;
+    paused = true; step = null;
+    save();
+    if (root.speechSynthesis) root.speechSynthesis.cancel();
+    $('learnPaused').style.display = '';
+    $('learnPausedPct').textContent = Math.round(pct()) + '%';
+    setTimeout(function () { speak(T('המשחק בהפסקה. המקום נשמר. כשתרצו, לחצו להמשיך.')); }, 50);
+  }
+  function resume() {
+    paused = false;
+    $('learnPaused').style.display = 'none';
+    nextStep();
+  }
 
   function quickPlan() {
     var adult = ctx.profile() && ctx.profile().kind === 'adult';
     return adult
-      ? { name: 'quick-adult', prefs: ['theme', 'font', 'letterSpacing', 'lineHeight', 'warp'], categories: defaultCats(true), maxTrials: 7 }
-      : { name: 'quick-child', prefs: ['theme', 'font', 'letterSpacing', 'warp'], categories: defaultCats(false), maxTrials: 6 };
+      ? { name: 'quick-adult', prefs: ['theme', 'font', 'letterSpacing', 'lineHeight', 'warp'], categories: defaultCats(true), maxTrials: 5, prefTrials: 2, themes: 3 }
+      : { name: 'quick-child', prefs: ['theme', 'letterSpacing', 'warp'], categories: defaultCats(false), maxTrials: 5, prefTrials: 2, themes: 3 };
   }
   /** Default recognition categories, in the interface language. */
   function defaultCats(adult) {
     var L = DA.i18n.content;
-    return adult ? ['letter-' + L, 'word-' + L, 'sentence-' + L] : ['digit', 'line', 'word-' + L];
+    return adult ? ['letter-' + L, 'sentence-' + L] : ['digit', 'word-' + L];
   }
   function customPlan() {
     var cats = Array.prototype.map.call(document.querySelectorAll('#catChecks input:checked'), function (i) { return i.value; });
     var prefs = Array.prototype.map.call(document.querySelectorAll('#prefChecks input:checked'), function (i) { return i.value; });
-    return { name: 'custom', prefs: prefs, categories: cats, maxTrials: +$('trialsPer').value || 8 };
+    return { name: 'custom', prefs: prefs, categories: cats, maxTrials: +$('trialsPer').value || 8, prefTrials: 3, themes: 4 };
   }
 
   function lastThreshold(category) {
@@ -156,18 +263,20 @@
 
   function start(plan) {
     var p = ctx.profile();
+    clearSaved(); paused = false;
+    var pt = plan.prefTrials || 3;
     work = DA.settings.normalize(p.settings);
     plainSettings = DA.settings.normalize(Object.assign({}, work, PLAIN));
     var hasWarp = !!ctx.opsFor(work);
     queue = [];
     plan.prefs.forEach(function (k) {
-      if (k === 'theme') queue.push(new Tournament('theme', uniq([work.theme, 'cream', 'dark', 'yellow', 'white']).slice(0, 4), T('צבעים')));
+      if (k === 'theme') queue.push(new Tournament('theme', uniq([work.theme, 'cream', 'dark', 'yellow', 'white']).slice(0, plan.themes || 4), T('צבעים')));
       if (k === 'font') queue.push(new Tournament('font', uniq([work.font, 'round', 'assistant', 'serif', 'rubik']).slice(0, 3), T('גופן'))); // Hebrew-capable fonts only
-      if (k === 'letterSpacing') queue.push(new Search('letterSpacing', work.letterSpacing, 0.08, 0, 0.35, 3, T('ריווח')));
-      if (k === 'lineHeight') queue.push(new Search('lineHeight', work.lineHeight, 0.4, 1.2, 2.6, 3, T('ריווח שורות')));
+      if (k === 'letterSpacing') queue.push(new Search('letterSpacing', work.letterSpacing, 0.08, 0, 0.35, pt, T('ריווח')));
+      if (k === 'lineHeight') queue.push(new Search('lineHeight', work.lineHeight, 0.4, 1.2, 2.6, pt, T('ריווח שורות')));
       if (k === 'bold') queue.push(new Tournament('bold', [work.bold, !work.bold], T('עובי')));
-      if (k === 'sharpen') queue.push(new Search('sharpen', work.sharpen, 0.5, 0, 1.5, 3, T('חדות')));
-      if (k === 'warp' && hasWarp) queue.push({ warp: true, n: 0, votes: [], next: function () { return this.n < 2 ? { param: 'warp' } : null; } });
+      if (k === 'sharpen') queue.push(new Search('sharpen', work.sharpen, 0.5, 0, 1.5, pt, T('חדות')));
+      if (k === 'warp' && hasWarp) queue.push(new Warp());
     });
     var stairs = [];
     plan.categories.forEach(function (cat) {
@@ -185,10 +294,11 @@
       glasses: ctx.glasses()
     };
     sess._stairs = stairs;
-    total = queue.reduce(function (a, t) { return a + (t.warp ? 2 : t.maxTrials || (t.rest ? t.rest.length : 1)); }, 0) + stairs.length * plan.maxTrials;
+    total = queue.reduce(function (a, t) { return a + t.units(); }, 0) + stairs.length * plan.maxTrials;
     done = 0;
-    $('learnSetup').style.display = 'none';
-    $('learnPlay').style.display = '';
+    showPlay();
+    renderVoiceBtn();
+    renderPace();
     nextStep();
   }
   function uniq(a) { return a.filter(function (v, i) { return a.indexOf(v) === i; }); }
@@ -222,10 +332,16 @@
     if (th.length) work.fontSize = Math.round(Math.min(96, Math.max(18, Math.max.apply(null, th))));
   }
 
+  function doneUnits() {
+    var st = (sess && sess._stairs || []).reduce(function (a, s) { return a + (s.done() ? s.maxTrials : s.n); }, 0);
+    return st + done;
+  }
   function renderProgress() {
-    var pct = total ? Math.min(100, Math.round(done / total * 100)) : 0;
-    $('learnProgress').style.width = pct + '%';
-    $('learnStars').textContent = '⭐'.repeat(Math.floor(pct / 20));
+    var u = doneUnits(), pc = total ? Math.min(100, Math.round(u / total * 100)) : 0;
+    $('learnProgress').style.width = pc + '%';
+    $('learnProgressBar').setAttribute('aria-valuenow', pc);
+    $('learnCount').textContent = Math.min(u + 1, total) + ' / ' + total;
+    $('learnStars').textContent = '⭐'.repeat(Math.floor(pc / 20));
   }
 
   // ----- preference: side by side -----
@@ -314,6 +430,14 @@
     var size = isCatch ? Math.max(st.size * 2.5, START[st.category] * 1.5) : st.size;
     step = { type: 'recognize', st: st, trial: trial, size: size, isCatch: !!isCatch };
     $('learnContent').innerHTML = '<div class="stim-wrap">' + trial.html(Math.round(size)) + '</div>';
+    // a very large word must still fit inside the card: shrink to fit and record the size actually shown
+    var wrap = $('learnContent').firstChild, stageW = $('learnStage').clientWidth * 0.9;
+    if (wrap && stageW && wrap.scrollWidth > stageW) {
+      size = Math.max(6, size * stageW / wrap.scrollWidth);
+      $('learnContent').innerHTML = '<div class="stim-wrap">' + trial.html(Math.round(size)) + '</div>';
+      step.size = size;
+      if (!isCatch) st.size = Math.min(st.size, size);   // the staircase cannot go beyond what fits
+    }
     var q = st.category.indexOf('sentence') === 0 ? T('על מה המשפט? בחרו תמונה') :
       st.category.indexOf('word') === 0 ? T('איזו תמונה מתאימה למילה?') : T('מה ראית? בחרו את התשובה');
     $('learnPrompt').textContent = q;
@@ -327,11 +451,12 @@
   function answerRecognize(key) {
     if (!step || step.type !== 'recognize') return;
     var ok = key === step.trial.answer, rt = Math.round(performance.now() - stepStart);
-    if (!step.isCatch) { step.st.answer(ok, rt); done++; }
+    if (!step.isCatch) step.st.answer(ok, rt);
     else { sess.catchTrials = (sess.catchTrials || 0) + 1; if (!ok) sess.catchMisses = (sess.catchMisses || 0) + 1; }
     sess.log.push({ category: step.st.category, condition: step.st.condition, size: Math.round(step.size * 10) / 10, target: step.trial.answer, response: key, correct: ok, rtMs: rt, catchTrial: step.isCatch, eyes: DA.eyes.snapshot() });
     // praise effort, not correctness (keeps children motivated and honest)
-    feedback('⭐ ' + PRAISE[Math.floor(Math.random() * PRAISE.length)]);
+    var pi; do { pi = Math.floor(Math.random() * PRAISE.length); } while (pi === lastPraise && PRAISE.length > 1); lastPraise = pi;
+    feedback('⭐ ' + PRAISE[pi]);
   }
 
   function choices(list) {
@@ -348,17 +473,30 @@
   }
 
   function feedback(text) {
+    chime();
+    speak(text);
     var f = $('learnFeedback');
     f.textContent = text;
     f.classList.add('show');
     $('learnChoices').querySelectorAll('button').forEach(function (b) { b.disabled = true; });
-    setTimeout(function () { f.classList.remove('show'); nextStep(); }, work && work.cvi ? 1300 : 650);
+    var go = function () { f.classList.remove('show'); if (sess && !paused && ctx.current() === 'learn') nextStep(); };
+    var pc = pace();
+    if (pc === 'manual') {
+      // at the player's own pace: a big Next button (also Enter / space)
+      step = { type: 'wait' };
+      choices([{ html: T('הבא ◀'), cls: 'next-btn', fn: go }]);
+      var nb = $('learnChoices').querySelector('.next-btn'); if (nb) nb.focus();
+      return;
+    }
+    var ms = PACE_MS[pc] + (work && work.cvi ? 600 : 0);
+    setTimeout(go, ms);
   }
 
   // ---------------- end ----------------
   function finish(early) {
     var p = ctx.profile();
-    step = null;
+    step = null; paused = false;
+    clearSaved();
     // finish open tuners with what we have
     queue.forEach(function (t) { if (!t.warp && t.result) work[t.param] = t.result(); });
     var rec = {};
@@ -392,6 +530,21 @@
     $('learnPlay').style.display = 'none';
     $('learnEnd').style.display = '';
     $('learnEndSummary').innerHTML = summaryHtml(sess);
+    var endMsg = early
+      ? T('עצרנו כאן, וזה בסדר גמור. גם ממה שהספקנו למדנו משהו חשוב עליך. רוצים לשמור? לחצו על הכפתור הגדול עם הכוכב.')
+      : T('מצאנו בשבילך את הדרך הכי נוחה לקרוא. לחצו על הכפתור הגדול עם הכוכב, ומעכשיו כל טקסט באפליקציה ייראה בדיוק ככה.');
+    var endTitle = early ? T('🌟 עצרנו לנוח') : T('🏆 כל הכבוד, סיימת!');
+    $('learnEndTitle').textContent = endTitle;
+    var hasCal = !!ctx.opsFor(ctx.profile().settings);
+    $('learnNextQ').style.display = hasCal ? 'none' : '';
+    $('learnNextYes').style.display = hasCal ? 'none' : '';
+    $('learnNextHasCal').style.display = hasCal ? '' : 'none';
+    $('learnNextNo').textContent = hasCal ? T('לצאת לקרוא 📖') : T('לא ← אפשר לצאת לקרוא 📖');
+    $('learnNextYes').onclick = function () { ctx.updateSettings(last.after); ctx.go('calibrate'); };
+    $('learnNextNo').onclick = function () { ctx.updateSettings(last.after); ctx.store.setPref('read.intent', 'read'); ctx.go('read'); };
+    var nextSay = hasCal ? '' : ' ' + T('ושאלה אחת לסיום: קווים ישרים נראים לך לפעמים עקומים, גליים או עם חלק חסר? אם כן, כדאי לעשות גם כיול עיוות.');
+    $('learnEndSay').textContent = endMsg;
+    setTimeout(function () { speak(endTitle + ' ' + endMsg + nextSay); }, 300);
     $('learnApplyBest').onclick = function () {
       ctx.updateSettings(sess.after);
       ctx.profiles.setBest(ctx.profile(), sess.after);

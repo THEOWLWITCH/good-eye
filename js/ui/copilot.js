@@ -9,6 +9,9 @@
   var DA = root.DA;
   var $ = DA.ui.$, esc = DA.ui.esc;
   var ctx, lastKey = null, minimized = false, target = null;
+  // on screens with content (reading, calibration, tools…) the navigator must never cover it:
+  // it waits as a small owl with a dot, and opens only when tapped
+  var COMPACT = { 'read-view': 1, 'read-sources': 1, 'read-see': 1, calibrate: 1, tools: 1, lab: 1, history: 1, home: 1, 'hub-ready': 1, 'learn-end': 1, 'learn-setup': 1 };
 
   function visible(id) { var e = $(id); return !!(e && e.offsetParent !== null && getComputedStyle(e).display !== 'none'); }
   function settings() { var p = ctx.profile(); return p ? p.settings : {}; }
@@ -73,7 +76,7 @@
     ctx = c;
     $('copilotMini').onclick = function () { minimized = false; render(true); };
     $('copilotClose').onclick = function () { minimized = true; render(); };
-    $('copilotSpeak').onclick = function () { speak(currentText, true); };
+    $('copilotSpeak').onclick = function () { DA.speech.say(currentText); };
     setInterval(tick, 900);
   }
 
@@ -81,7 +84,7 @@
   function tick() {
     if (!ctx.current()) return;
     var key = stateKey();
-    if (key !== lastKey) { lastKey = key; minimized = false; render(true); }
+    if (key !== lastKey) { lastKey = key; minimized = !!COMPACT[key]; render(!COMPACT[key]); }
   }
   /** Force a refresh (e.g. after settings change). */
   function update() { lastKey = null; tick(); }
@@ -93,6 +96,8 @@
     if (!m) { box.classList.remove('show'); mini.style.display = 'none'; return; }
     currentText = m.text;
     mini.style.display = minimized ? '' : 'none';
+    mini.classList.toggle('has-msg', minimized && !!COMPACT[lastKey]);
+    mini.title = m.text;
     box.classList.toggle('show', !minimized);
     if (minimized) return;
     $('copilotText').textContent = m.text;
@@ -110,7 +115,7 @@
     ok.onclick = function () { minimized = true; render(); };
     bb.appendChild(ok);
     if (m.target) setTarget($(m.target));
-    if (changed && settings().copilotVoice) speak(m.text, false);
+    if (changed && settings().copilotVoice) DA.speech.say(m.text);
   }
 
   function setTarget(el) {

@@ -10,6 +10,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/cockpit.css">
+  <link rel="stylesheet" href="css/v2.css">
 </head>
 <body>
   <header class="topbar">
@@ -65,6 +66,7 @@
       </div>
     </details>
     <p class="disclaimer" role="note"><b>עין טובה היא כלי עזר ללמידה ולחיי היומיום.</b> היא לא מכשיר רפואי, לא מאבחנת ולא מחליפה בדיקה אצל איש מקצוע. אין להסתמך על התוצאות שלה לצורך קביעה רפואית כלשהי.</p>
+    <p class="credits"><span class="credits-thanks">הכלי פותח לטובתכם. נשמח לקבל משוב והערות כדי שנוכל להמשיך ולשפר אותו.</span><br>פיתוח: פרופ' דני ברנס וד"ר יעל שדה · <a href="tel:+972523969417" dir="ltr">052-3969417</a></p>
     <div class="home-actions">
       <form id="codeForm" class="code-form">
         <label>כבר נרשמתם? הקוד האישי <input id="codeInput" inputmode="numeric" maxlength="6" placeholder="1234"></label>
@@ -75,65 +77,72 @@
 
   <!-- ============ HUB: the reader's cockpit ============ -->
   <section id="screen-hub" class="screen cockpit">
-    <div class="pilot">
-      <span id="hubAvatar" class="avatar xl"></span>
-      <div>
-        <div class="pilot-label">🛩️ תא הטייס של</div>
-        <h1 id="hubHello" class="big-title"></h1>
-        <div class="muted"><span id="hubKind"></span> · קוד טייס: <b id="hubCode"></b> · <button id="editProfileBtn" class="linkish">עריכה או מחיקה</button></div>
+    <header class="hero">
+      <div class="hero-id">
+        <span id="hubAvatar" class="hero-avatar"></span>
+        <div>
+          <div class="eyebrow">תא הטייס</div>
+          <h1 id="hubHello" class="hero-title"></h1>
+          <div class="hero-meta"><span id="hubKind"></span><span class="sep">·</span>קוד <b id="hubCode"></b><span class="sep">·</span><button id="editProfileBtn" class="link">עריכה</button></div>
+        </div>
       </div>
-    </div>
-    <p id="hubTip" class="hub-tip"></p>
-    <p class="glasses-note" data-glasses></p>
+      <details class="briefing">
+        <summary><i data-icon="info"></i> תדריך</summary>
+        <p id="hubTip"></p>
+        <p class="device-tip"><i data-icon="device"></i> כיול, משחק ומדידות: עדיף במחשב או בטאבלט, במרחק קבוע. קריאה, צילום ומצלמה: נוחים גם בטלפון. לכל מכשיר עושים כיול משלו.</p>
+        <p class="glasses-note" data-glasses></p>
+      </details>
+    </header>
 
-    <h2 class="cp-h">🧭 לאן טסים היום?</h2>
-    <div class="destinations">
-      <button id="tileRead" class="dest read"><span class="dest-ring"><span class="ti">📖</span></span><b>לקרוא</b><small>טקסט, ספר או קובץ</small></button>
-      <button id="tileSee" class="dest see"><span class="dest-ring"><span class="ti">👀</span></span><b>לראות</b><small>תמונה, צילום או מצלמה</small></button>
-    </div>
-
-    <p class="device-tip">💻 <b>כיול, משחק ומדידות:</b> עדיף במחשב או בטאבלט, במרחק קבוע מהמסך. 📱 <b>קריאה, צילום ומצלמה:</b> נוחים גם בטלפון. לכל מכשיר עושים כיול משלו.</p>
-    <h2 class="cp-h">✈️ בדיקות לפני ההמראה</h2>
-    <div class="preflight">
-      <button id="tileLearn" class="pf"><span class="pf-num">1</span><span class="ti">🎮</span><span class="pf-text"><b>משחק ההתאמה</b><small>נגלה ביחד מה הכי ברור לך (כ־5 דקות)</small></span><span id="tileLearnBadge" class="badge">מתחילים כאן</span><span id="pfLearnCheck" class="pf-check"></span></button>
-      <button id="tileCalibrate" class="pf"><span class="pf-num">2</span><span class="ti">🎯</span><span class="pf-text"><b>כיול עיוות</b><small id="tileCalSub">למי שרואה קווים עקומים או גלים</small></span><span id="pfCalCheck" class="pf-check"></span></button>
-      <div class="pf eye"><span class="pf-num">3</span><span class="ti">👁️</span><span class="pf-text"><b>מעקב עיניים</b><small>לא חובה · <button id="hubEyesInfo" class="linkish">מה זה?</button></small></span><button id="hubEyesToggle" class="eye-switch" data-short></button></div>
+    <div class="dest-grid">
+      <button id="tileRead" class="dest2 read"><span class="dest2-icon"><i data-icon="book"></i></span><span class="dest2-text"><b>לקרוא</b><small>טקסט, ספר או קובץ</small></span><span class="dest2-go"><i data-icon="arrow"></i></span></button>
+      <button id="tileSee" class="dest2 see"><span class="dest2-icon"><i data-icon="camera"></i></span><span class="dest2-text"><b>לראות</b><small>תמונה, צילום או מצלמה</small></span><span class="dest2-go"><i data-icon="arrow"></i></span></button>
     </div>
 
-    <h2 class="cp-h">🎛️ לוח המכוונים</h2>
-    <div class="dash">
-      <div id="gauges" class="gauges"></div>
-      <div class="dash-actions">
-        <button id="bestBtn" class="primary big">⭐ המצב שלי</button>
-        <button id="pinBtn">📌 לשמור מצב</button>
+    <section class="block">
+      <h2 class="sec-title">לפני ההמראה</h2>
+      <ol class="flightpath">
+        <li><button id="tileLearn" class="fp-step"><span class="fp-dot"><i data-icon="game"></i><span id="pfLearnCheck" class="fp-check"></span></span><span class="fp-text"><b>משחק ההתאמה</b><small>כ־5 דקות</small></span><span id="tileLearnBadge" class="badge">מתחילים כאן</span></button></li>
+        <li><button id="tileCalibrate" class="fp-step"><span class="fp-dot"><i data-icon="grid"></i><span id="pfCalCheck" class="fp-check"></span></span><span class="fp-text"><b>כיול עיוות</b><small id="tileCalSub">למי שרואה קווים עקומים או גלים</small></span></button></li>
+        <li><div class="fp-step eye"><span class="fp-dot"><i data-icon="scan"></i></span><span class="fp-text"><b>מעקב עיניים</b><small>לא חובה · <button id="hubEyesInfo" class="link">מה זה?</button></small></span><button id="hubEyesToggle" class="eye-switch" data-short></button></div></li>
+      </ol>
+    </section>
+
+    <section class="block">
+      <div class="sec-head">
+        <h2 class="sec-title">לוח המכוונים</h2>
+        <div class="sec-actions">
+          <button id="bestBtn" class="primary"><i data-icon="star"></i> המצב שלי</button>
+          <button id="pinBtn" class="ghost"><i data-icon="pin"></i> לשמור מצב</button>
+        </div>
       </div>
-      <h3 class="dash-sub">🧰 כל הכלים</h3>
-      <div class="tool-grid">
-        <button id="settingsBtn" class="tool-btn"><span class="tb-i">🎚️</span><b>כיוונון עדין</b><small>כל ההגדרות</small></button>
-        <button id="hubReadTest" class="tool-btn"><span class="tb-i">⏱️</span><b>גודל קריאה נוח</b><small>קוראים משפטים בקול</small></button>
-        <button id="hubFieldTest" class="tool-btn"><span class="tb-i">🗺️</span><b>מפת נוחות</b><small>איפה הכי נוח לראות</small></button>
-        <button id="hubTools" class="tool-btn"><span class="tb-i">📐</span><b>כלי כיול</b><small>נקודות, מרווחים, גודל</small></button>
-        <button id="hubLab" class="tool-btn"><span class="tb-i">🔬</span><b>מעבדה</b><small>טשטוש, חידוד, תנועה</small></button>
-        <button id="hubCard" class="tool-btn"><span class="tb-i">📏</span><b>גודל המסך</b><small>כיול עם כרטיס</small></button>
-        <button id="hubHistShow" class="tool-btn"><span class="tb-i">📈</span><b>היסטוריה</b><small>גרפים לאורך זמן</small></button>
-      </div>
+      <div id="gauges" class="gauges2"></div>
       <p id="bestInfo" class="muted small"></p>
       <p class="muted small">עכשיו: <span id="hubCurrent"></span></p>
       <div id="pinnedList" class="pinned-list"></div>
-    </div>
+    </section>
 
-    <h2 class="cp-h">📒 יומן הטיסה</h2>
-    <div class="flight-log">
-      <div class="card">
-        <h3>🧠 מה למדנו עליך</h3>
-        <div id="hubLearned"></div>
+    <section class="block">
+      <h2 class="sec-title">כל הכלים</h2>
+      <div class="tool-grid2">
+        <button id="settingsBtn" class="tool2"><i data-icon="sliders"></i><b>כיוונון עדין</b></button>
+        <button id="hubReadTest" class="tool2"><i data-icon="timer"></i><b>גודל קריאה נוח</b></button>
+        <button id="hubFieldTest" class="tool2"><i data-icon="map"></i><b>מפת נוחות</b></button>
+        <button id="hubTools" class="tool2"><i data-icon="target"></i><b>כלי כיול</b></button>
+        <button id="hubLab" class="tool2"><i data-icon="flask"></i><b>מעבדה</b></button>
+        <button id="hubCard" class="tool2"><i data-icon="ruler"></i><b>גודל המסך</b></button>
+        <button id="hubHistShow" class="tool2"><i data-icon="chart"></i><b>היסטוריה</b></button>
       </div>
-      <div class="card">
-        <h3>📈 היסטוריה</h3>
-        <p class="muted small">אם רוצים, התוצאות נשמרות לאורך זמן ומוצגות בגרפים פשוטים.</p>
-        <div class="row wrap"><button id="hubHistToggle" class="eye-switch"></button></div>
+    </section>
+
+    <section class="block">
+      <h2 class="sec-title">יומן הטיסה</h2>
+      <div class="log-grid">
+        <div class="glass"><h3>מה למדנו עליך</h3><div id="hubLearned"></div></div>
+        <div class="glass"><h3>היסטוריה</h3><p class="muted small">אם רוצים, התוצאות נשמרות לאורך זמן ומוצגות בגרפים פשוטים.</p><button id="hubHistToggle" class="eye-switch"></button></div>
       </div>
-    </div>
+    </section>
+    <p class="credits"><span class="credits-thanks">הכלי פותח לטובתכם. נשמח לקבל משוב והערות כדי שנוכל להמשיך ולשפר אותו.</span><br>פיתוח: פרופ' דני ברנס וד"ר יעל שדה · <a href="tel:+972523969417" dir="ltr">052-3969417</a></p>
   </section>
 
   <!-- ============ CALIBRATE (grid) ============ -->
@@ -275,7 +284,24 @@
     <div id="learnSetup" class="learn-setup">
       <h1 class="big-title"><span id="learnWhoAvatar"></span> משחק ההתאמה</h1>
       <p class="lead">נראה לך אותיות, מספרים, ציורים ומילים. את/ה רק בוחר/ת מה ראית, או מה יותר ברור. אין תשובות לא נכונות!</p>
-      <button id="quickGame" class="primary huge">▶️ בואו נשחק (כ־5 דקות)</button>
+      <div id="learnResume" class="resume-card" style="display:none">
+        <b>⏸ יש משחק שעצרת באמצע (<span id="learnResumePct"></span>)</b>
+        <div class="row wrap center">
+          <button id="learnContinue" class="primary big">▶️ להמשיך מאיפה שעצרנו</button>
+          <button id="learnRestart" class="ghost">להתחיל מחדש</button>
+        </div>
+      </div>
+      <button id="quickGame" class="primary huge">▶️ בואו נשחק (כ־3 דקות)</button>
+      <p class="muted small no-say">אפשר לעצור ⏸ בכל רגע ולהמשיך אחר כך מאותו מקום.</p>
+      <div class="scope-card">
+        <h3>מה המשחק בודק, ומה לא</h3>
+        <ul class="scope-list">
+          <li class="yes">באיזה גודל אותיות הכי נוח לך לקרוא</li>
+          <li class="yes">אילו צבעים וריווח הכי ברורים לך</li>
+          <li class="yes">אם כבר עשית כיול עיוות: האם התיקון באמת עוזר</li>
+          <li class="no">הוא לא בודק עיוות: קווים ישרים שנראים עקומים, גליים או עם חלק חסר. בשביל זה יש <b>כיול עיוות</b> נפרד.</li>
+        </ul>
+      </div>
       <p><button id="learnEyes" class="eye-switch"></button></p>
       <p class="glasses-note" data-glasses></p>
       <p class="device-note" data-small-screen></p>
@@ -300,9 +326,26 @@
     </div>
     <div id="learnPlay" class="learn-play" style="display:none">
       <div class="learn-top">
-        <div class="progress"><div id="learnProgress"></div></div>
+        <button id="learnPause" class="small pause-btn" title="הפסקה">⏸ הפסקה</button>
+        <button id="learnVoice" class="small voice-btn"></button>
+        <label class="pace-ctl" title="קצב המשחק"><span aria-hidden="true">⏱</span><select id="learnPace" aria-label="קצב המשחק">
+          <option value="slow">🐢 לאט ובנחת</option><option value="normal">🚶 רגיל</option><option value="fast">🙂 קצת יותר זריז</option><option value="manual">✋ בקצב שלי</option>
+        </select></label>
+        <div id="learnProgressBar" class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-label="התקדמות במשחק"><div id="learnProgress"></div></div>
+        <span id="learnCount" class="learn-count"></span>
         <span id="learnStars" class="stars-line"></span>
-        <button id="learnExit" class="small">✕ יציאה</button>
+        <button id="learnExit" class="small" title="לסיים עכשיו">✕ לסיים</button>
+      </div>
+      <div id="learnPaused" class="paused-card" style="display:none">
+        <div class="paused-box">
+          <div class="paused-icon">⏸</div>
+          <h2>המשחק בהפסקה</h2>
+          <p>עברנו <b id="learnPausedPct"></b> מהדרך. אפשר להמשיך עכשיו, או לחזור בפעם אחרת. המקום נשמר.</p>
+          <div class="row wrap center">
+            <button id="learnResumeBtn" class="primary big">▶️ להמשיך</button>
+            <button id="learnPauseLater" class="ghost">🏠 להמשיך אחר כך</button>
+          </div>
+        </div>
       </div>
       <div id="learnPrompt" class="learn-prompt"></div>
       <div id="learnStage" class="learn-stage"><div class="lens-content" id="learnContent"></div></div>
@@ -310,36 +353,52 @@
       <div id="learnFeedback" class="learn-feedback"></div>
     </div>
     <div id="learnEnd" class="learn-end" style="display:none">
-      <h1 class="big-title">🏆 כל הכבוד!</h1>
-      <div id="learnEndSummary"></div>
-      <div class="row wrap center">
+      <h1 id="learnEndTitle" class="big-title">🏆 כל הכבוד, סיימת!</h1>
+      <p id="learnEndSay" class="end-say"></p>
+      <div class="row wrap center end-actions">
         <button id="learnApplyBest" class="primary big">⭐ לשמור כמצב הקבוע שלי</button>
         <button id="learnApply">👀 להשתמש בהן עכשיו, בלי לשנות את ⭐ המצב שלי</button>
         <button id="learnKeep">↩️ להשאיר את ההגדרות הקודמות</button>
       </div>
+      <div id="learnNext" class="next-card">
+        <h3>ומה הלאה? שאלה אחת</h3>
+        <p id="learnNextQ">קווים ישרים, כמו משקוף, שורות במחברת או קצה של שולחן, נראים לך לפעמים עקומים, גליים או עם חלק חסר?</p>
+        <div class="row wrap center">
+          <button id="learnNextYes" class="primary">כן, לפעמים ← לכיול עיוות (כ־10 דקות)</button>
+          <button id="learnNextNo">לא ← אפשר לצאת לקרוא 📖</button>
+        </div>
+        <p id="learnNextHasCal" class="muted small" style="display:none">✓ יש לך כבר כיול עיוות, והמשחק בדק אם הוא עוזר. אפשר לחדש אותו מתא הטייס.</p>
+      </div>
+      <details class="end-details"><summary>מה גילינו? (פירוט)</summary><div id="learnEndSummary"></div></details>
     </div>
   </section>
 
   <!-- ============ READ ============ -->
   <section id="screen-read" class="screen">
-    <div class="read-bar">
-      <button id="rSources" class="rb" title="מה קוראים?">📂</button>
-      <button id="rSmaller" class="rb" title="אותיות קטנות יותר">A−</button>
-      <button id="rBigger" class="rb" title="אותיות גדולות יותר">A+</button>
-      <label id="rGlassesWrap" class="rb glasses" title="עוצמת תיקון העיוות">👓 <input id="rGlasses" type="range" min="0" max="1.5" step="0.05"></label>
-      <button id="rTheme" class="rb" title="צבעים">🎨</button>
-      <button id="rRuler" class="rb" title="סרגל קריאה">📏</button>
-      <button id="rSpeak" class="rb" title="הקראה">🔊</button>
-      <button id="rStar" class="rb" title="המצב שלי">⭐</button>
-      <select id="rMode" class="rb mode" title="אופן הצגה">
-        <option value="page">📄 עמוד</option>
-        <option value="sentence">➡️ משפט</option>
-        <option value="word">🔎 מילה</option>
-      </select>
-      <button id="rVoice" class="rb" title="פקודות קוליות" style="display:none">🎤</button>
-      <button id="rEyes" class="rb eye-switch" data-short></button>
-      <button id="rSettings" class="rb" title="הגדרות מתקדמות">⚙️</button>
+    <div class="read-bar v2">
+      <button id="rSources" class="rb2" title="מה קוראים?"><i data-icon="folder"></i><span>מקור</span></button>
+      <div class="size-ctl" role="group" aria-label="גודל אותיות">
+        <button id="rSmaller" class="rb2 sq" title="אותיות קטנות יותר">A−</button>
+        <span id="rSizeVal" class="size-val"></span>
+        <button id="rBigger" class="rb2 sq" title="אותיות גדולות יותר">A+</button>
+      </div>
+      <button id="rSpeak" class="rb2" title="הקראה"><i data-icon="sound"></i><span>הקראה</span></button>
+      <button id="rStar" class="rb2" title="המצב שלי"><i data-icon="star"></i><span>המצב שלי</span></button>
+      <label id="rGlassesWrap" class="rb2 glasses" title="עוצמת תיקון העיוות"><i data-icon="glasses"></i><input id="rGlasses" type="range" min="0" max="1.5" step="0.05"></label>
       <span id="readExtra"></span>
+      <details class="more" id="rMore">
+        <summary class="rb2" title="עוד"><i data-icon="more"></i><span>עוד</span></summary>
+        <div class="more-pop">
+          <button id="rTheme" class="rb2"><i data-icon="palette"></i><span>צבעים</span></button>
+          <button id="rRuler" class="rb2"><i data-icon="ruler"></i><span>סרגל קריאה</span></button>
+          <label class="rb2 mode"><i data-icon="text"></i><select id="rMode" title="אופן הצגה">
+            <option value="page">עמוד שלם</option><option value="sentence">משפט אחרי משפט</option><option value="word">מילה אחרי מילה</option>
+          </select></label>
+          <button id="rVoice" class="rb2" style="display:none"><i data-icon="mic"></i><span>פקודות קוליות</span></button>
+          <button id="rEyes" class="rb2 eye-switch" data-short></button>
+          <button id="rSettings" class="rb2"><i data-icon="sliders"></i><span>כל ההגדרות</span></button>
+        </div>
+      </details>
     </div>
     <div id="readSources" class="read-sources">
       <h2>מה נקרא היום?</h2>
@@ -364,10 +423,16 @@
         <div id="readScroll" class="lens-scroll"><div class="lens-content" id="readContent"></div></div>
       </div>
       <div id="segNav" class="seg-nav" style="display:none">
-        <button id="segPrev" class="rb">→</button>
-        <span id="segCount"></span>
-        <button id="segPlay" class="rb">▶️</button>
-        <button id="segNext" class="rb">←</button>
+        <button id="segFirst" class="rb" title="מההתחלה">⏮</button>
+        <button id="segPrev" class="rb" title="הקודם">→</button>
+        <button id="segPlay" class="rb play" title="התקדמות אוטומטית">▶</button>
+        <button id="segNext" class="rb" title="הבא">←</button>
+        <span id="segCount" class="seg-count"></span>
+        <label class="seg-every">⏱ <select id="segEvery" title="כל כמה שניות להתקדם">
+          <option value="auto">קצב לפי האורך</option>
+          <option value="1">כל שנייה</option><option value="2">כל 2 שניות</option><option value="3">כל 3 שניות</option>
+          <option value="5">כל 5 שניות</option><option value="8">כל 8 שניות</option><option value="12">כל 12 שניות</option>
+        </select></label>
       </div>
     </div>
   </section>
@@ -693,11 +758,13 @@
   <script src="js/core/device.js"></script>
   <script src="js/instruments/grid.js"></script>
   <script src="js/vision/eyes.js"></script>
-  <script>window.DA.VERSION = '1.1.1';</script>
+  <script>window.DA.VERSION = '1.2.0';</script>
+  <script src="js/ui/icons.js"></script>
   <script src="js/ui/common.js"></script>
   <script src="js/ui/drawer.js"></script>
   <script src="js/ui/cockpit.js"></script>
   <script src="js/ui/copilot.js"></script>
+  <script src="js/ui/speech.js"></script>
   <script src="js/ui/eyepanel.js"></script>
   <script src="js/screens/calibrate.js"></script>
   <script src="js/screens/home.js"></script>

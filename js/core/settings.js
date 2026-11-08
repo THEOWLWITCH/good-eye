@@ -18,7 +18,7 @@
   ];
   var FONTS_CSS = 'https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&family=Assistant:wght@400;600;800' +
     '&family=Varela+Round&family=Comic+Neue:wght@400;700&family=Atkinson+Hyperlegible:wght@400;700' +
-    '&family=Lexend:wght@400;600&family=Heebo:wght@400;600;800&family=Frank+Ruhl+Libre:wght@400;700' +
+    '&family=Lexend:wght@400;600&family=Heebo:wght@400;500;600;700;800;900&family=Frank+Ruhl+Libre:wght@400;700' +
     '&family=Noto+Serif:wght@400;700&display=swap';
 
   // Colour themes: polarity + tint. fg/bg used for text; "reversed" also inverts images on request.
@@ -73,6 +73,8 @@
     dictionary: true,      // double-tap a word for a picture and to hear it
     copilot: true,         // show the navigator (Yanshufi the owl) with short guidance
     copilotVoice: false,   // the navigator reads its guidance aloud
+    gamePace: 'normal',    // pause after each answer: slow | normal | fast | manual (a Next button)
+    gameVoice: true,       // the game speaks: questions, praise, pause and what happens at the end
     // eye tracking (standalone version only)
     eyesKeepAngle: false,  // keep letters the same size for the eye when the reader moves closer/farther
     refDistanceCm: null    // viewing distance at which fontSize was chosen/learned

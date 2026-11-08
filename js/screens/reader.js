@@ -35,12 +35,20 @@
     $('rSpeak').onclick = speak;
     $('rSettings').onclick = function () { DA.drawer.open(); };
     $('rSources').onclick = showSources;
+    $('rMore').querySelectorAll('button').forEach(function (b) { b.addEventListener('click', function () { setTimeout(function () { $('rMore').open = false; }, 150); }); });
+    document.addEventListener('click', function (e) { if ($('rMore').open && !$('rMore').contains(e.target)) $('rMore').open = false; });
     DA.eyePanel.bindSwitch($('rEyes'));
     $('rMode').onchange = function () { setMode(this.value); };
     if (DA.i18n.dir === 'ltr') { $('segPrev').textContent = '←'; $('segNext').textContent = '→'; }
     $('segPrev').onclick = function () { stepSeg(-1); };
     $('segNext').onclick = function () { stepSeg(1); };
     $('segPlay').onclick = toggleRsvp;
+    $('segFirst').onclick = restart;
+    $('segEvery').value = ctx.store.getPref('read.every', 'auto');
+    $('segEvery').onchange = function () {
+      ctx.store.setPref('read.every', this.value);
+      if (rsvpTimer) { stopRsvp(); toggleRsvp(); }      // apply the new pace at once
+    };
 
     // sources
     $('srcPasteGo').onclick = function () {
@@ -112,7 +120,10 @@
       else if (e.key === 'ArrowUp') { lens.moveRuler(-1); e.preventDefault(); }
       else if (mode !== 'page' && e.key === 'ArrowLeft') stepSeg(DA.i18n.dir === 'rtl' ? 1 : -1);
       else if (mode !== 'page' && e.key === 'ArrowRight') stepSeg(DA.i18n.dir === 'rtl' ? -1 : 1);
-      else if (e.key === ' ' && mode === 'word') { toggleRsvp(); e.preventDefault(); }
+      else if (e.key === ' ') { toggleRsvp(); e.preventDefault(); }
+      else if (e.key === 'PageDown') { stepSeg(1); e.preventDefault(); }
+      else if (e.key === 'PageUp') { stepSeg(-1); e.preventDefault(); }
+      else if (e.key === 'Home') { restart(); e.preventDefault(); }
     });
 
     DA.ai.available().then(function (ok) { $('srcGenCard').classList.toggle('disabled', !ok); $('srcGenNote').style.display = ok ? 'none' : ''; });
@@ -190,6 +201,7 @@
     $('rGlassesWrap').style.display = hasCal ? '' : 'none';
     $('rGlasses').value = s.warpStrength;
     $('rRuler').classList.toggle('on', s.ruler !== 'off');
+    $('rSizeVal').textContent = s.fontSize;
   }
 
   function bump(k, f) {
@@ -394,7 +406,9 @@
       return;
     }
     if (text == null) return;
+    $('segNav').style.display = '';
     if (mode === 'page') {
+      $('segCount').textContent = '';
       var w = wordsHtml(text);
       speechMap = w;
       box.innerHTML = (doc.title ? '<h2 class="read-title" dir="auto">' + esc(doc.title) + '</h2>' : '') + '<div class="read-text">' + w.html + '</div>';
@@ -402,8 +416,6 @@
     } else {
       segs = mode === 'sentence' ? sentences(text) : text.split(/\s+/).filter(Boolean);
       segIdx = Math.min(segIdx, Math.max(0, segs.length - 1));
-      $('segNav').style.display = '';
-      $('segPlay').style.display = mode === 'word' ? '' : 'none';
       showSeg();
     }
   }
@@ -501,22 +513,54 @@
     $('segCount').textContent = (segIdx + 1) + ' / ' + segs.length;
     typesetMath(box);
   }
+  /** Next / previous: a sentence or word, or (whole-page mode) one screen of text. */
   function stepSeg(d) {
+    if (mode === 'page') {
+      var sc = $('readScroll');
+      sc.scrollBy({ top: d * sc.clientHeight * 0.8, behavior: 'smooth' });
+      return;
+    }
     segIdx = Math.max(0, Math.min(segs.length - 1, segIdx + d));
     showSeg();
   }
+  /** Back to the beginning. */
+  function restart() {
+    var playing = !!rsvpTimer;
+    stopRsvp();
+    if (mode === 'page') $('readScroll').scrollTo({ top: 0, behavior: 'smooth' });
+    else { segIdx = 0; showSeg(); }
+    if (playing) toggleRsvp();
+  }
+  /** Seconds to wait before the next step: the chosen pace, or by length ("auto"). */
+  function stepDelay() {
+    var every = ctx.store.getPref('read.every', 'auto'), rate = ctx.profile().settings.speechRate || 1;
+    if (every !== 'auto') return +every * 1000;
+    if (mode === 'word') return (380 + (segs[segIdx] || '').length * 45) / rate;
+    if (mode === 'sentence') return (900 + (segs[segIdx] || '').length * 75) / rate;
+    return 2500 / rate;                                   // page: one line every ~2.5 s
+  }
+  /** Automatic advance: next sentence / word, or in page mode scroll one line. */
   function toggleRsvp() {
     if (rsvpTimer) { stopRsvp(); return; }
     $('segPlay').textContent = '⏸';
+    $('segPlay').classList.add('on');
     var tick = function () {
-      if (segIdx >= segs.length - 1) { stopRsvp(); return; }
-      segIdx++; showSeg();
-      var w = segs[segIdx] || '';
-      rsvpTimer = setTimeout(tick, (380 + w.length * 45) / ctx.profile().settings.speechRate);
+      if (mode === 'page') {
+        var sc = $('readScroll'), s = ctx.profile().settings;
+        if (sc.scrollTop + sc.clientHeight >= sc.scrollHeight - 2) { stopRsvp(); return; }
+        sc.scrollBy({ top: s.fontSize * s.lineHeight, behavior: 'smooth' });
+      } else {
+        if (segIdx >= segs.length - 1) { stopRsvp(); return; }
+        segIdx++; showSeg();
+      }
+      rsvpTimer = setTimeout(tick, stepDelay());
     };
-    rsvpTimer = setTimeout(tick, 500);
+    rsvpTimer = setTimeout(tick, stepDelay());
   }
-  function stopRsvp() { clearTimeout(rsvpTimer); rsvpTimer = null; if ($('segPlay')) $('segPlay').textContent = '▶️'; }
+  function stopRsvp() {
+    clearTimeout(rsvpTimer); rsvpTimer = null;
+    if ($('segPlay')) { $('segPlay').textContent = '▶'; $('segPlay').classList.remove('on'); }
+  }
 
   // ---------------- read aloud ----------------
   function speak() {

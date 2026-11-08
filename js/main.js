@@ -58,7 +58,7 @@
     DA.screens[name].enter();
     glassesNotes();
     smallScreenNotes();
-    setTimeout(function () { DA.copilot.update(); }, 60);
+    setTimeout(function () { DA.copilot.update(); DA.speech.attach(); }, 60);
     root.scrollTo(0, 0);
     var scr = $('screen-' + name); if (scr && document.activeElement && document.activeElement.tagName === 'BODY') scr.focus({ preventScroll: true });
   }
@@ -73,6 +73,11 @@
   function boot() {
     DA.i18n.apply(document.body);
     accessibility();
+    var bar = document.querySelector('.topbar');
+    var setHdr = function () { if (bar) document.documentElement.style.setProperty('--hdr', bar.offsetHeight + 'px'); };
+    setHdr();
+    window.addEventListener('resize', setHdr);
+    if (root.ResizeObserver && bar) new ResizeObserver(setHdr).observe(bar);
     document.title = T('עין טובה · כלי עזר, לא מכשיר רפואי');
     $('langBtn').textContent = DA.i18n.lang === 'he' ? 'English' : String.fromCharCode(0x5E2, 0x5D1, 0x5E8, 0x5D9, 0x5EA); // "עברית" — always shown in Hebrew
     $('langBtn').onclick = function () { DA.i18n.setLang(DA.i18n.lang === 'he' ? 'en' : 'he'); };
@@ -90,6 +95,8 @@
     DA.drawer.init(ctx);
     DA.eyePanel.init(ctx);
     DA.copilot.init(ctx);
+    DA.icons.apply(document.body);
+    DA.speech.init(ctx);
     SCREENS.forEach(function (s) { DA.screens[s].init(ctx); });
     var p0 = ctx.profile(); DA.eyes.setUsualDistance(p0 && p0.settings.refDistanceCm);
     profiles.sync();

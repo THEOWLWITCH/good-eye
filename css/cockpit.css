@@ -159,9 +159,9 @@ button.pf:hover:not(:disabled) { border-color: var(--cyan); }
 }
 
 /* calibration screens: fixed height so the drawing area stays on screen next to a long side panel */
-.screen.cal-screen.active { display: flex; flex-direction: column; flex: none; height: calc(100vh - 56px); }
+.screen.cal-screen.active { display: flex; flex-direction: column; flex: none; height: calc(100dvh - var(--hdr, 56px)); }
 .screen.cal-screen.active .layout { min-height: 0; }
-#screen-read.active { flex: none; height: calc(100vh - 56px); }
+#screen-read.active { flex: none; height: calc(100dvh - var(--hdr, 56px)); }
 .pf.eye { flex-wrap: wrap; }
 .pf.eye .eye-switch { white-space: normal; }
 .pf .pf-text { min-width: 0; }

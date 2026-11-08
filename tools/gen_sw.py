@@ -2,7 +2,7 @@
 Run after changing files:  python tools/gen_sw.py"""
 import pathlib, hashlib, re
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-files = ['./', 'index.html', 'manifest.webmanifest', 'icon.svg', 'css/style.css', 'css/cockpit.css']
+files = ['./', 'index.html', 'manifest.webmanifest', 'icon.svg', 'css/style.css', 'css/cockpit.css', 'css/v2.css']
 files += sorted(p.relative_to(ROOT).as_posix() for p in (ROOT / 'js').rglob('*.js'))
 h = hashlib.sha256()
 for f in files[1:]:
