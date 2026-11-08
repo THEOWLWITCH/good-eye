@@ -81,6 +81,7 @@
       </div>
     </div>
     <p id="hubTip" class="hub-tip"></p>
+    <p class="glasses-note" data-glasses></p>
 
     <h2 class="cp-h">🧭 לאן טסים היום?</h2>
     <div class="destinations">
@@ -164,6 +165,7 @@
     <div class="layout">
       <aside class="panel" id="panel">
         <section>
+          <p class="glasses-note" data-glasses></p>
           <h3>ניסיון נוכחי</h3>
           <div id="trialInfo" class="muted"></div>
           <label>כותרת <input id="label" type="text" placeholder="למשל: רשת 7×7 בוקר"></label>
@@ -273,6 +275,7 @@
       <p class="lead">נראה לך אותיות, מספרים, ציורים ומילים. את/ה רק בוחר/ת מה ראית, או מה יותר ברור. אין תשובות לא נכונות!</p>
       <button id="quickGame" class="primary huge">▶️ בואו נשחק (כ־5 דקות)</button>
       <p><button id="learnEyes" class="eye-switch"></button></p>
+      <p class="glasses-note" data-glasses></p>
       <p id="learnHasCal" class="muted small">טיפ: אחרי כיול עיוות ברשת, המשחק יבדוק גם אם התיקון עוזר.</p>
       <details class="adult">
         <summary>אפשרויות למבוגר</summary>
@@ -388,6 +391,7 @@
     <div class="layout">
       <aside class="panel">
         <section>
+          <p class="glasses-note" data-glasses></p>
           <p id="tlHelp" class="hint"></p>
           <div data-tl="dots">
             <label>גודל המערך <select id="tlN"><option value="5">5×5</option><option value="7" selected>7×7</option></select></label>
@@ -422,6 +426,7 @@
   <section id="screen-lab" class="screen">
     <h1 class="big-title">🔬 מעבדת טשטוש, ניגודיות ותנועה</h1>
     <p class="muted">כלים מתקדמים להתאמה מדויקת, לעבודה עם מבוגר. התוצאות נשמרות אצל הקורא, וצורת הטשטוש ושיטת החידוד שנבחרו יכולות לחדד תמונות, צילומים ועמודי PDF בקריאה. אלה התאמות תצוגה, לא בדיקה של בריאות העין.</p>
+    <p class="glasses-note" data-glasses></p>
     <nav id="labTabs" class="lab-tabs"></nav>
     <div id="labBody" class="lab-body"></div>
   </section>
@@ -438,6 +443,7 @@
       </div>
       <label class="check"><input type="checkbox" id="rtCompare"> להשוות גם בלי ההגדרות האישיות (עוד כ־5 דקות)</label>
       <p><span id="rtCalNote" class="muted small"></span> <button id="rtCard" class="linkish">📏 כיול גודל מסך</button></p>
+      <p class="glasses-note" data-glasses></p>
       <button id="rtStart" class="primary huge">▶ להתחיל</button>
     </div>
     <div id="rtPlay" class="learn-play" style="display:none">
@@ -472,6 +478,7 @@
         <label>גודל הנקודה <select id="ftDotSize"><option value="0.35">קטנה</option><option value="0.5" selected>רגילה</option><option value="0.9">גדולה (לראייה חלשה)</option></select></label>
       </div>
       <p><span id="ftCalNote" class="muted small"></span> <button id="ftCard" class="linkish">📏 כיול גודל מסך</button></p>
+      <p class="glasses-note" data-glasses></p>
       <button id="ftStart" class="primary huge">▶ להתחיל</button>
     </div>
     <div id="ftStage" class="ft-stage" style="display:none">
@@ -591,6 +598,16 @@
         <label><input type="radio" name="pkind" value="child" checked> 🧒 ילד/ה</label>
         <label><input type="radio" name="pkind" value="adult"> 🧑 מבוגר/ת</label>
       </div>
+      <label>👓 משקפיים או עדשות בזמן קריאה
+        <select id="profileGlasses">
+          <option value="">לא יודעים / משתנה</option>
+          <option value="none">בלי משקפיים</option>
+          <option value="reading">משקפי קריאה או משקפי מסך</option>
+          <option value="distance">משקפי ראייה רגילים (גם לרחוק)</option>
+          <option value="multifocal">מולטיפוקל (משקפיים עם כמה מוקדים)</option>
+          <option value="contacts">עדשות מגע</option>
+        </select>
+      </label>
       <p class="muted small">בחרו דמות:</p>
       <div id="emojiPick" class="emoji-pick"></div>
       <div class="row"><button value="ok" class="primary">שמירה</button> 
@@ -654,7 +671,7 @@
   <script src="js/core/device.js"></script>
   <script src="js/instruments/grid.js"></script>
   <script src="js/vision/eyes.js"></script>
-  <script>window.DA.VERSION = '1.0.0';</script>
+  <script>window.DA.VERSION = '1.0.1';</script>
   <script src="js/ui/common.js"></script>
   <script src="js/ui/drawer.js"></script>
   <script src="js/ui/cockpit.js"></script>

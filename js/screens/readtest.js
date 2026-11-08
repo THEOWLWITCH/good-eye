@@ -63,7 +63,7 @@
     sess = {
       schema: 'da.session/1', id: 'R' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), kind: 'mnread',
       profileId: p.id, softwareVersion: DA.VERSION, startedAt: new Date().toISOString(),
-      lang: $('rtLang').value, distanceCm: +$('rtDist').value || 40,
+      lang: $('rtLang').value, distanceCm: +$('rtDist').value || 40, glasses: ctx.glasses(),
       pxPerMm: Math.round(DA.device.pxPerMm() * 1000) / 1000, screenCalibrated: DA.device.isCalibrated(),
       settings: DA.settings.normalize(p.settings), runs: []
     };

@@ -80,7 +80,7 @@
       sess = {
         schema: 'da.session/1', id: 'F' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), kind: 'fieldmap',
         profileId: p.id, softwareVersion: DA.VERSION, startedAt: new Date().toISOString(),
-        eye: $('ftEye').value, distanceCm: dist, dotDeg: dotDeg,
+        eye: $('ftEye').value, distanceCm: dist, dotDeg: dotDeg, glasses: ctx.glasses(),
         pxPerMm: Math.round(DA.device.pxPerMm() * 1000) / 1000, screenCalibrated: DA.device.isCalibrated(),
         points: pts.map(function (q) { return { xDeg: q.xDeg, yDeg: q.yDeg, ecc: q.ecc, seen: [] }; }),
         blanks: 0, falseAlarms: 0, lateOrEarly: 0, log: []

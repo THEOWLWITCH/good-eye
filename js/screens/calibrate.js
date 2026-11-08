@@ -204,7 +204,8 @@
       distanceCm: $('distanceCm').value ? Number($('distanceCm').value) : null,
       headPose: $('headPose').value,
       lighting: $('lighting').value,
-      fixation: $('fixationNote').value
+      fixation: $('fixationNote').value,
+      glasses: ctx.glasses()
     };
   }
   function writeViewing(v) {

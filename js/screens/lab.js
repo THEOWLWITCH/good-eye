@@ -72,7 +72,7 @@
       schema: 'da.trial/1', id: 'B' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), label: label || '',
       softwareVersion: DA.VERSION, instrument: instrument, createdAt: new Date().toISOString(), savedAt: new Date().toISOString(),
       profileId: p.id, display: { screenW: screen.width, screenH: screen.height, dpr: root.devicePixelRatio || 1 },
-      viewing: { distanceCm: DA.device.distanceCm(null) }, model: { ops: [] }, actions: []
+      viewing: { distanceCm: DA.device.distanceCm(null), glasses: ctx.glasses() }, model: { ops: [] }, actions: []
     }, data);
     ctx.store.saveTrial(t);
     DA.cloud.save('trials', t.id, t);

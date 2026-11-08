@@ -165,3 +165,7 @@ button.pf:hover:not(:disabled) { border-color: var(--cyan); }
 .pf.eye { flex-wrap: wrap; }
 .pf.eye .eye-switch { white-space: normal; }
 .pf .pf-text { min-width: 0; }
+
+/* glasses reminder */
+.glasses-note { background: rgba(56, 214, 255, .1); border: 1px solid rgba(56, 214, 255, .45); border-radius: 12px; padding: 8px 12px; font-size: 15px; color: var(--text); margin: 10px 0; }
+.cal-screen .glasses-note { font-size: 13px; }

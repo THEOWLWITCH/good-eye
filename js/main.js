@@ -55,6 +55,7 @@
     renderHeader();
     DA.drawer.close();
     DA.screens[name].enter();
+    glassesNotes();
     root.scrollTo(0, 0);
     var scr = $('screen-' + name); if (scr && document.activeElement && document.activeElement.tagName === 'BODY') scr.focus({ preventScroll: true });
   }
@@ -97,6 +98,28 @@
     var start = location.hash.slice(1) || (ctx.profile() ? 'hub' : 'home');
     show(start);
   }
+
+  /**
+   * Glasses reminder: calibration and reading must use the same glasses (or lenses) the reader
+   * normally reads with — otherwise the learned settings will not fit.
+   */
+  var GLASSES = { reading: T('משקפי קריאה'), distance: T('משקפי ראייה'), multifocal: T('מולטיפוקל'), contacts: T('עדשות מגע'), none: T('בלי משקפיים') };
+  function glassesText(p) {
+    var g = p && p.glasses;
+    if (g === 'none') return '';
+    var base = {
+      reading: T('👓 מרכיבים את משקפי הקריאה, כמו בקריאה רגילה.'),
+      distance: T('👓 מרכיבים את המשקפיים. אם יש משקפי קריאה או מסך, עדיף אותם.'),
+      multifocal: T('👓 מולטיפוקל: מסתכלים דרך החלק התחתון של העדשה (החלק של הקריאה), ומזיזים את הראש ולא רק את העיניים.'),
+      contacts: T('👓 מרכיבים את עדשות המגע, כמו בקריאה רגילה.')
+    }[g] || T('👓 מרכיבים משקפיים או עדשות? משתמשים בעין טובה איתם, כמו בקריאה רגילה.');
+    return base + ' ' + T('חשוב: אותם משקפיים גם בכיול ובמשחק וגם בקריאה.');
+  }
+  function glassesNotes() {
+    var t = glassesText(ctx.profile());
+    document.querySelectorAll('[data-glasses]').forEach(function (e) { e.textContent = t; e.style.display = t ? '' : 'none'; });
+  }
+  ctx.glasses = function () { var p = ctx.profile(); return p ? (p.glasses || 'unknown') : 'unknown'; };
 
   /** Screen-reader and keyboard support: labels for icon buttons, landmarks, skip link. */
   function accessibility() {

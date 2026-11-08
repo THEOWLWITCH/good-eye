@@ -285,7 +285,7 @@
       stimulus: mode === 'dots' ? { type: 'dot-array', n: opt.n } : mode === 'spacing' ? { type: 'spacing-row', orient: opt.orient, position: opt.pos, gap: opt.gap, dots: 6 }
         : { type: 'size-match', shape: opt.shape, layout: opt.layout, referenceSize: REF },
       display: { stimulusSizePx: S, screenW: screen.width, screenH: screen.height, dpr: root.devicePixelRatio || 1 },
-      viewing: { distanceCm: DA.device.distanceCm(null) },
+      viewing: { distanceCm: DA.device.distanceCm(null), glasses: ctx.glasses() },
       actions: trial.actions,
       result: mode === 'size' ? { measures: st.measures } : { offsets: st.map(function (d) { return [r6(d[0]), r6(d[1])]; }), summary: stats() },
       model: { type: 'sequential-local-displacement', kernel: 'wendland-c2', ops: o, quality: DEF.analyze(o, 31) },

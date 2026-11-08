@@ -181,7 +181,8 @@
       profileId: p.id, kind: 'learn', plan: plan, softwareVersion: DA.VERSION,
       startedAt: new Date().toISOString(), before: work, prefs: [], recognition: {}, log: [],
       display: { w: window.innerWidth, h: window.innerHeight, dpr: window.devicePixelRatio || 1 },
-      calibrationId: hasWarp ? work.calibrationId : null
+      calibrationId: hasWarp ? work.calibrationId : null,
+      glasses: ctx.glasses()
     };
     sess._stairs = stairs;
     total = queue.reduce(function (a, t) { return a + (t.warp ? 2 : t.maxTrials || (t.rest ? t.rest.length : 1)); }, 0) + stairs.length * plan.maxTrials;

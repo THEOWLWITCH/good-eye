@@ -51,6 +51,7 @@
   function newProfile(kind) {
     var dlg = $('profileDialog');
     $('profileName').value = '';
+    $('profileGlasses').value = '';
     setKind(kind);
     renderEmojiPick(DA.AVATARS[Math.floor(Math.random() * DA.AVATARS.length)]);
     $('profileDialogTitle').textContent = kind === 'adult' ? T('הרשמה של מבוגר/ת') : T('הרשמה של ילד/ה');
@@ -61,6 +62,7 @@
       var name = $('profileName').value.trim();
       if (!name) { DA.ui.toast(T('צריך לכתוב שם')); return; }
       var p = ctx.profiles.create(name, selectedEmoji, getKind());
+      p.glasses = $('profileGlasses').value; ctx.profiles.save(p);
       ctx.setProfile(p.id);
       ctx.go('hub');
       DA.ui.tell(T('שלום ') + p.name + T('! הקוד האישי שלך הוא ') + p.code + T('. בעזרתו אפשר למצוא את הפרופיל במהירות.'));
@@ -247,6 +249,7 @@
     var dlg = $('profileDialog');
     $('profileDialogTitle').textContent = T('עריכת פרופיל');
     $('profileName').value = p.name;
+    $('profileGlasses').value = p.glasses || '';
     setKind(p.kind);
     renderEmojiPick(p.emoji);
     $('profileDelete').style.display = '';
@@ -258,6 +261,7 @@
       p.name = $('profileName').value.trim() || p.name;
       p.emoji = selectedEmoji;
       p.kind = getKind();
+      p.glasses = $('profileGlasses').value;
       ctx.profiles.save(p);
     };
     dlg.showModal();
