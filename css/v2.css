@@ -259,3 +259,10 @@ button.huge { font-size: 22px; padding: 18px 40px; }
   #screen-learn .learn-top { flex-wrap: wrap; row-gap: 8px; }
   #screen-learn .learn-top .progress { order: 10; flex: 1 1 100%; min-width: 0; }
 }
+/* praise bubble: solid and high-contrast — it often appears over a white card */
+.learn-feedback {
+  background: linear-gradient(135deg, #1b2a5c, #2b1f5e) !important; color: #fff !important;
+  border: 2px solid #ffd45a !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+  box-shadow: 0 12px 40px rgba(0,0,0,.55), 0 0 0 6px rgba(255,212,90,.18) !important;
+  text-shadow: 0 2px 6px rgba(0,0,0,.4); white-space: nowrap;
+}
