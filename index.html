@@ -90,6 +90,8 @@
       <div class="row wrap">
         <button id="hubReadTest">⏱️ גודל קריאה נוח</button>
         <button id="hubFieldTest">🎯 מפת נוחות צפייה</button>
+        <button id="hubLab">🔬 מעבדת טשטוש וניגודיות (מתקדם)</button>
+        <button id="hubTools">🎯 כלי כיול נוספים</button>
         <button id="hubCard" class="linkish">📏 כיול גודל מסך</button>
       </div>
     </div>
@@ -400,6 +402,14 @@
     </div>
   </section>
 
+  <!-- ============ LAB (spec 5.1, 6.1–6.5, 7.2) ============ -->
+  <section id="screen-lab" class="screen">
+    <h1 class="big-title">🔬 מעבדת טשטוש, ניגודיות ותנועה</h1>
+    <p class="muted">כלים מתקדמים להתאמה מדויקת, לעבודה עם מבוגר. התוצאות נשמרות אצל הקורא, וצורת הטשטוש ושיטת החידוד שנבחרו יכולות לחדד תמונות, צילומים ועמודי PDF בקריאה. אלה התאמות תצוגה, לא בדיקה של בריאות העין.</p>
+    <nav id="labTabs" class="lab-tabs"></nav>
+    <div id="labBody" class="lab-body"></div>
+  </section>
+
   <!-- ============ READING-SPEED TEST ============ -->
   <section id="screen-readtest" class="screen">
     <div id="rtSetup" class="learn-setup">
@@ -610,6 +620,7 @@
   <script src="js/core/i18n-en.js"></script>
   <script src="js/core/i18n.js"></script>
   <script src="js/engine/deformation.js"></script>
+  <script src="js/engine/imageproc.js"></script>
   <script src="js/core/history.js"></script>
   <script src="js/core/storage.js"></script>
   <script src="js/core/cloud.js"></script>
@@ -624,7 +635,7 @@
   <script src="js/core/device.js"></script>
   <script src="js/instruments/grid.js"></script>
   <script src="js/vision/eyes.js"></script>
-  <script>window.DA.VERSION = '0.7.0';</script>
+  <script>window.DA.VERSION = '0.8.0';</script>
   <script src="js/ui/common.js"></script>
   <script src="js/ui/drawer.js"></script>
   <script src="js/ui/eyepanel.js"></script>
@@ -636,6 +647,7 @@
   <script src="js/screens/fieldtest.js"></script>
   <script src="js/screens/history.js"></script>
   <script src="js/screens/tools.js"></script>
+  <script src="js/screens/lab.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

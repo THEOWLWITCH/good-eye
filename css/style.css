@@ -381,3 +381,26 @@ body.ft-running .topbar, body.ft-running .eye-widget { visibility: hidden; }
 .sync-card { flex: 1 1 100%; }
 .sync-code { font-family: Consolas, monospace; font-size: 20px; letter-spacing: .08em; background: #f3f5f8; padding: 2px 8px; border-radius: 6px; }
 #syncCodeIn { width: 260px; letter-spacing: .06em; font-family: Consolas, monospace; font-size: 17px; }
+
+/* ---------- lab ---------- */
+#screen-lab.active { padding: 18px; max-width: 1100px; margin: 0 auto; width: 100%; }
+.lab-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 14px; }
+.lab-tabs button { border-radius: 999px; }
+.lab-tabs button.on { background: #1b6ef3; color: #fff; border-color: #1b6ef3; }
+.lab-body { background: #fff; border: 1px solid #e3e8ec; border-radius: 14px; padding: 14px 16px; }
+.lab-help { font-size: 16px; }
+.lab-pair { display: flex; gap: 18px; flex-wrap: wrap; justify-content: center; margin: 10px 0; }
+.lab-fig { margin: 0; text-align: center; }
+.lab-fig canvas { border: 1px solid #dfe5ec; border-radius: 8px; background: #fff; max-width: 92vw; }
+.lab-fig figcaption { font-size: 13px; color: #6d7a86; margin-top: 4px; }
+.lab-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 6px 18px; margin: 10px 0; }
+.lab-controls > .row { grid-column: 1 / -1; }
+.lab-slider { display: block; font-size: 14px; }
+.lab-slider output { float: inline-end; color: #1b6ef3; }
+.lab-slider input { width: 100%; }
+.lab-rating { display: flex; gap: 8px; align-items: center; font-size: 14px; }
+.lab-rating span { display: inline-flex; gap: 4px; }
+.lab-rating button { width: 34px; padding: 4px 0; }
+.lab-rating button.on { background: #1b6ef3; color: #fff; border-color: #1b6ef3; }
+.lab-list { margin: 8px 0; }
+.lab-body h3 { margin: 16px 0 6px; font-size: 16px; }

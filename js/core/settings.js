@@ -64,6 +64,10 @@
     warmth: 0,             // 0..1 — warmer light (less blue)
     cvd: 'none',           // colour-vision help for pictures: none | protan | deutan | tritan
     calm: false,           // calm mode: softer contrast, no dense stripes (pattern glare, migraine)
+    // personal blur shape and the sharpening method chosen in the lab (applied to pictures/pages)
+    psf: null,             // { radius, stretch, angle, smear, tail, tailLen, halo, haloR }
+    deblur: 'none',        // none | unsharp | directional | local | wiener | rl
+    deblurAmount: 1, deblurRadius: 1.5, deblurK: 0.01, deblurIter: 10,
     // eye tracking (standalone version only)
     eyesKeepAngle: false,  // keep letters the same size for the eye when the reader moves closer/farther
     refDistanceCm: null    // viewing distance at which fontSize was chosen/learned
@@ -85,6 +89,7 @@
     if (!FONTS.some(function (f) { return f.id === out.font; })) out.font = DEFAULTS.font;
     if (!THEMES.some(function (t) { return t.id === out.theme; })) out.theme = DEFAULTS.theme;
     if (['none', 'protan', 'deutan', 'tritan'].indexOf(out.cvd) < 0) out.cvd = 'none';
+    if (['none', 'unsharp', 'directional', 'local', 'wiener', 'rl'].indexOf(out.deblur) < 0) out.deblur = 'none';
     return out;
   }
 
@@ -102,7 +107,8 @@
       s.brightness < 0.95 ? T('מעומעם') : null,
       s.warmth > 0.05 ? T('אור חם') : null,
       s.cvd !== 'none' ? T('צבעים לעיוורון צבעים') : null,
-      s.calm ? T('מצב רגוע') : null
+      s.calm ? T('מצב רגוע') : null,
+      s.deblur !== 'none' ? T('חידוד תמונות אישי') : null
     ].filter(Boolean).join(' · ');
   }
 

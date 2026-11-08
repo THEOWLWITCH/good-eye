@@ -287,10 +287,12 @@
     showView();
     var extra = '';
     if (d.type === 'image') extra = T('<button id="toText" class="big">📝 להפוך לטקסט</button>');
+    if ((d.type === 'image' || d.type === 'pages') && ctx.profile().settings.deblur !== 'none') extra += '<label class="inline check"><input type="checkbox" id="sharpenToggle"' + (ctx.store.getPref('sharpenOff', false) ? '' : ' checked') + '> ' + T('✨ חידוד אישי') + '</label>';
     if (d.type === 'pages') extra = T('<label class="inline">תצוגה <select id="pagesAs"><option value="text">טקסט מסודר</option><option value="pages">עמודים כמו במקור</option></select></label>');
     $('readExtra').innerHTML = extra;
     if ($('toText')) DA.ai.canImages().then(function (ok) { $('toText').style.display = ok ? '' : 'none'; $('toText').onclick = photoToText; });
     if ($('pagesAs')) $('pagesAs').onchange = function () { render(); };
+    if ($('sharpenToggle')) $('sharpenToggle').onchange = function () { ctx.store.setPref('sharpenOff', !this.checked); render(); };
     $('rMode').disabled = d.type !== 'text' && !(d.type === 'pages');
     render();
     if (!silent) $('readScroll').scrollTop = 0;
@@ -309,10 +311,12 @@
     $('segNav').style.display = 'none';
     if (doc.type === 'image') {
       box.innerHTML = '<div class="img-wrap"><img class="lens-img" alt="" src="' + doc.url + '"></div>';
+      personalSharpen(box);
       return;
     }
     if (doc.type === 'pages' && text == null) {
       box.innerHTML = '<div class="img-wrap">' + doc.pages.map(function (u) { return '<img class="lens-img page" alt="" src="' + u + '">'; }).join('') + '</div>';
+      personalSharpen(box);
       return;
     }
     if (text == null) return;
@@ -328,6 +332,35 @@
       $('segPlay').style.display = mode === 'word' ? '' : 'none';
       showSeg();
     }
+  }
+
+  /**
+   * Personal sharpening of pictures, photos and PDF pages (method and blur shape chosen in the lab).
+   * Runs on a copy of the picture (max ~1000 px for speed); the original stays available.
+   */
+  function personalSharpen(box) {
+    var s = ctx.profile().settings;
+    if (!s.deblur || s.deblur === 'none' || ctx.store.getPref('sharpenOff', false)) return;
+    box.querySelectorAll('img.lens-img').forEach(function (img, n) {
+      var go = function () {
+        setTimeout(function () {
+          try {
+            var max = s.deblur === 'wiener' || s.deblur === 'rl' ? 900 : 1400;
+            var k = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
+            var w = Math.round(img.naturalWidth * k), h = Math.round(img.naturalHeight * k);
+            var c = document.createElement('canvas'); c.width = w; c.height = h;
+            var g = c.getContext('2d'); g.drawImage(img, 0, 0, w, h);
+            var out = DA.imageproc.processImageData(g.getImageData(0, 0, w, h), s.deblur, s.psf || { radius: 1.5 },
+              { amount: s.deblurAmount, radius: s.deblurRadius, K: s.deblurK, iterations: s.deblurIter });
+            g.putImageData(out, 0, 0);
+            img.setAttribute('data-orig', img.src);
+            img.onload = null;
+            img.src = c.toDataURL('image/png');
+          } catch (e) { console.warn('sharpen failed', e); }
+        }, 30 + n * 20);
+      };
+      if (img.complete && img.naturalWidth) go(); else img.onload = go;
+    });
   }
 
   function paragraphs(text) {

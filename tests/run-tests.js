@@ -165,5 +165,38 @@ test('comfort settings are kept within range', function () {
   ok(s.brightness === 0.4 && s.warmth === 1 && s.cvd === 'none' && s.calm === true);
 });
 
+console.log('Image processing (blur & deblur)');
+require(path.join(__dirname, '..', 'js/engine/imageproc.js'));
+var IP = DA.imageproc;
+function testImage(w, h) { // bars and a step edge
+  var Y = new Float32Array(w * h);
+  for (var y = 0; y < h; y++) for (var x = 0; x < w; x++) Y[y * w + x] = (x > w / 2 ? 0.9 : 0.1) * ((Math.floor(y / 6) % 2) ? 1 : 0.85);
+  return Y;
+}
+function err(a, b) { var s = 0; for (var i = 0; i < a.length; i++) s += (a[i] - b[i]) * (a[i] - b[i]); return Math.sqrt(s / a.length); }
+test('PSF kernels are normalized for every component', function () {
+  [{ radius: 1 }, { radius: 2, stretch: 2, angle: 30 }, { radius: 1, smear: 8, angle: 90 }, { radius: 1, tail: 0.8, tailLen: 10 }, { radius: 1, halo: 0.6, haloR: 7 }].forEach(function (p) {
+    var k = IP.psfKernel(p), s = 0; for (var i = 0; i < k.data.length; i++) s += k.data[i];
+    near(s, 1, 1e-5);
+  });
+});
+test('FFT round-trip returns the original', function () {
+  var N = 16, re = new Float64Array(N * N), im = new Float64Array(N * N), orig = [];
+  for (var i = 0; i < N * N; i++) { re[i] = Math.sin(i * 0.37); orig.push(re[i]); }
+  IP.fft2(re, im, N, false); IP.fft2(re, im, N, true);
+  for (i = 0; i < N * N; i++) near(re[i], orig[i], 1e-9);
+});
+test('Wiener and Richardson-Lucy bring a blurred image closer to the original', function () {
+  var w = 48, h = 48, Y = testImage(w, h), psf = { radius: 1.6 };
+  var B = IP.convolve(Y, w, h, IP.psfKernel(psf));
+  var eB = err(B, Y), eW = err(IP.wiener(B, w, h, IP.psfKernel(psf), { K: 0.002 }), Y), eR = err(IP.richardsonLucy(B, w, h, IP.psfKernel(psf), { iterations: 15 }), Y);
+  ok(eW < eB, 'wiener ' + eW.toFixed(4) + ' < blurred ' + eB.toFixed(4));
+  ok(eR < eB, 'RL ' + eR.toFixed(4) + ' < blurred ' + eB.toFixed(4));
+});
+test('unsharp mask increases measured sharpness', function () {
+  var w = 40, h = 40, Y = testImage(w, h), B = IP.convolve(Y, w, h, IP.psfKernel({ radius: 1.5 }));
+  ok(IP.measure(B, IP.unsharp(B, w, h, { amount: 1 }), w, h).sharpness > IP.measure(B, B, w, h).sharpness);
+});
+
 console.log('\n' + passed + ' passed, ' + failed + ' failed');
 process.exit(failed ? 1 : 0);

@@ -161,6 +161,8 @@
     $('hubReadTest').onclick = function () { ctx.go('readtest'); };
     $('hubFieldTest').onclick = function () { ctx.go('fieldtest'); };
     $('hubCard').onclick = function () { DA.device.calibrate(); };
+    $('hubLab').onclick = function () { ctx.go('lab'); };
+    $('hubTools').onclick = function () { ctx.go('tools'); };
     ctx.profiles.onChange(function () { if (ctx.current() === 'hub') renderHub(); });
   }
 
