@@ -27,17 +27,17 @@
   <!-- ============ HOME: welcome, who is reading, registration ============ -->
   <section id="screen-home" class="screen">
     <div class="welcome">
-      <h1 class="big-title">👁️ ברוכים הבאים לעין טובה</h1>
+      <h1 class="big-title"><span class="title-badge"><i data-icon="eye"></i></span> ברוכים הבאים לעין טובה</h1>
       <p class="lead">כל טייס נרשם פעם אחת, עובר בדיקות קצרות לפני ההמראה, ואז עין טובה מנווטת אותו אל היעד: לקרוא ולראות הכי ברור שאפשר.</p>
     </div>
     <div id="whoSection">
-      <h2>🧑‍✈️ מי הטייס היום? <span class="muted small">(לחצו על הכרטיס)</span></h2>
+      <h2>מי הטייס היום? <span class="muted small">(לחצו על הכרטיס)</span></h2>
       <div id="profileGrid" class="profile-grid"></div>
     </div>
     <h2 id="registerTitle">בואו נתחיל: מי הקורא הראשון?</h2>
     <div class="register">
-      <button id="newChildBtn" class="reg-card child"><span class="avatar">🧒</span><b>טייס/ת צעיר/ה</b><small>הרשמה של ילד/ה: משחק עם תמונות, מספרים ומילים</small></button>
-      <button id="newAdultBtn" class="reg-card adult"><span class="avatar">🧑</span><b>טייס/ת מבוגר/ת</b><small>הרשמה של מבוגר/ת: אותיות, מילים, משפטים וכיול עיוות</small></button>
+      <button id="newChildBtn" class="reg-card child"><span class="reg-icon"><i data-icon="rocket"></i></span><b>טייס/ת צעיר/ה</b><small>מגיל 7: משחק קצר עם תמונות, מספרים ומילים</small></button>
+      <button id="newAdultBtn" class="reg-card adult"><span class="reg-icon"><i data-icon="plane"></i></span><b>טייס/ת מבוגר/ת</b><small>הרשמה של מבוגר/ת: אותיות, מילים, משפטים וכיול עיוות</small></button>
     </div>
     <details class="engine-room home-room">
       <summary>🔧 חדר המכונות <span class="muted small">(סנכרון בין מכשירים, גיבוי)</span></summary>
@@ -102,7 +102,7 @@
     <section class="block">
       <h2 class="sec-title">לפני ההמראה</h2>
       <ol class="flightpath">
-        <li><button id="tileLearn" class="fp-step"><span class="fp-dot"><i data-icon="game"></i><span id="pfLearnCheck" class="fp-check"></span></span><span class="fp-text"><b>משחק ההתאמה</b><small>כ־5 דקות</small></span><span id="tileLearnBadge" class="badge">מתחילים כאן</span></button></li>
+        <li><button id="tileLearn" class="fp-step"><span class="fp-dot"><i data-icon="game"></i><span id="pfLearnCheck" class="fp-check"></span></span><span class="fp-text"><b>משחק ההתאמה</b><small id="tileLearnSub">פעם אחת בלבד · כ־3 דקות</small></span><span id="tileLearnBadge" class="badge">מתחילים כאן</span></button></li>
         <li><button id="tileCalibrate" class="fp-step"><span class="fp-dot"><i data-icon="grid"></i><span id="pfCalCheck" class="fp-check"></span></span><span class="fp-text"><b>כיול עיוות</b><small id="tileCalSub">למי שרואה קווים עקומים או גלים</small></span></button></li>
         <li><div class="fp-step eye"><span class="fp-dot"><i data-icon="scan"></i></span><span class="fp-text"><b>מעקב עיניים</b><small>לא חובה · <button id="hubEyesInfo" class="link">מה זה?</button></small></span><button id="hubEyesToggle" class="eye-switch" data-short></button></div></li>
       </ol>
@@ -291,15 +291,24 @@
           <button id="learnRestart" class="ghost">להתחיל מחדש</button>
         </div>
       </div>
+      <div id="learnPlayed" class="once-card done" style="display:none">
+        <span class="once-icon"><i data-icon="once"></i></span>
+        <div><b id="learnPlayedWhen"></b><br>אין צורך לשחק שוב: ההגדרות שמורות. משחקים שוב רק אם משהו השתנה, למשל משקפיים חדשים, או פעם בכמה חודשים.</div>
+        <button id="learnGoRead" class="primary">📖 לקרוא</button>
+      </div>
       <button id="quickGame" class="primary huge">▶️ בואו נשחק (כ־3 דקות)</button>
+      <p id="learnOnce" class="once-note"><i data-icon="once"></i> משחקים <b>פעם אחת בלבד</b>. ההגדרות נשמרות, ובפעמים הבאות נכנסים ישר לקריאה.</p>
       <p class="muted small no-say">אפשר לעצור ⏸ בכל רגע ולהמשיך אחר כך מאותו מקום.</p>
       <div class="scope-card">
         <h3>מה המשחק בודק, ומה לא</h3>
         <ul class="scope-list">
-          <li class="yes">באיזה גודל אותיות הכי נוח לך לקרוא</li>
-          <li class="yes">אילו צבעים וריווח הכי ברורים לך</li>
-          <li class="yes">אם כבר עשית כיול עיוות: האם התיקון באמת עוזר</li>
-          <li class="no">הוא לא בודק עיוות: קווים ישרים שנראים עקומים, גליים או עם חלק חסר. בשביל זה יש <b>כיול עיוות</b> נפרד.</li>
+          <li class="yes">אם קווים ישרים נראים לך עקומים או חסרים, בכל עין לחוד</li>
+          <li class="yes">באיזה גודל אותיות הכי נוח לך לקרוא, עם ההגדרות שלך ובלעדיהן</li>
+          <li class="yes">אם קשה לך לראות אותיות חיוורות</li>
+          <li class="yes">אם קשה להבדיל בין צבעים מסוימים</li>
+          <li class="yes">אילו צבעים, ריווח ובהירות הכי נוחים לך, ואם תיקון העיוות עוזר</li>
+          <li class="no">המשחק לא מתקן עיוות בעצמו: אם רואים קווים עקומים, ממשיכים ל<b>כיול עיוות</b>. הוא גם לא בודק שדה ראייה מלא, ראייה כפולה או מהירות קריאה (לאלה יש כלים נפרדים בתא הטייס).</li>
+          <li class="no">זה כלי עזר ולא בדיקה רפואית. התוצאות רק מציעות הגדרות נוחות.</li>
         </ul>
       </div>
       <p><button id="learnEyes" class="eye-switch"></button></p>
@@ -319,6 +328,10 @@
           <label class="chip"><input type="checkbox" value="bold"> 𝐁 עובי</label>
           <label class="chip"><input type="checkbox" value="sharpen"> ✨ חדות</label>
           <label class="chip"><input type="checkbox" value="warp" checked> 🎯 תיקון עיוות (עם/בלי)</label>
+          <label class="chip"><input type="checkbox" value="brightness" checked> 🔆 בהירות</label>
+          <label class="chip"><input type="checkbox" value="lines" checked> 📏 קווים (כל עין)</label>
+          <label class="chip"><input type="checkbox" value="contrast" checked> 🌫️ אותיות בערפל</label>
+          <label class="chip"><input type="checkbox" value="color" checked> 🎨 מציאת צבע שונה</label>
         </div>
         <label>ניסיונות לכל בדיקה <input id="trialsPer" type="number" min="4" max="20" value="8"></label>
         <button id="customGame" class="primary">▶️ להתחיל עם הבחירות האלה</button>
@@ -347,6 +360,7 @@
           </div>
         </div>
       </div>
+      <div id="learnStations" class="stations" aria-hidden="true"></div>
       <div id="learnPrompt" class="learn-prompt"></div>
       <div id="learnStage" class="learn-stage"><div class="lens-content" id="learnContent"></div></div>
       <div id="learnChoices" class="learn-choices"></div>
@@ -355,13 +369,14 @@
     <div id="learnEnd" class="learn-end" style="display:none">
       <h1 id="learnEndTitle" class="big-title">🏆 כל הכבוד, סיימת!</h1>
       <p id="learnEndSay" class="end-say"></p>
+      <p class="once-note"><i data-icon="once"></i> זהו, את המשחק לא צריך לשחק שוב. בפעם הבאה נכנסים ישר לקריאה, וההגדרות כבר יחכו.</p>
       <div class="row wrap center end-actions">
         <button id="learnApplyBest" class="primary big">⭐ לשמור כמצב הקבוע שלי</button>
         <button id="learnApply">👀 להשתמש בהן עכשיו, בלי לשנות את ⭐ המצב שלי</button>
         <button id="learnKeep">↩️ להשאיר את ההגדרות הקודמות</button>
       </div>
       <div id="learnNext" class="next-card">
-        <h3>ומה הלאה? שאלה אחת</h3>
+        <h3>ומה הלאה?</h3>
         <p id="learnNextQ">קווים ישרים, כמו משקוף, שורות במחברת או קצה של שולחן, נראים לך לפעמים עקומים, גליים או עם חלק חסר?</p>
         <div class="row wrap center">
           <button id="learnNextYes" class="primary">כן, לפעמים ← לכיול עיוות (כ־10 דקות)</button>
@@ -758,7 +773,7 @@
   <script src="js/core/device.js"></script>
   <script src="js/instruments/grid.js"></script>
   <script src="js/vision/eyes.js"></script>
-  <script>window.DA.VERSION = '1.2.0';</script>
+  <script>window.DA.VERSION = '1.3.0';</script>
   <script src="js/ui/icons.js"></script>
   <script src="js/ui/common.js"></script>
   <script src="js/ui/drawer.js"></script>

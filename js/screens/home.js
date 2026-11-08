@@ -29,7 +29,7 @@
     ctx.profiles.onChange(function () { if (ctx.current() === 'home') renderHome(); });
   }
 
-  function kindLabel(p) { return p.kind === 'adult' ? T('🧑 מבוגר/ת') : T('🧒 ילד/ה'); }
+  function kindLabel(p) { return p.kind === 'adult' ? T('מבוגר/ת') : T('טייס/ת צעיר/ה'); }
 
   function renderHome() {
     var list = ctx.profiles.list();
@@ -38,7 +38,7 @@
     list.forEach(function (p) {
       var card = document.createElement('div');
       card.className = 'profile-card';
-      card.innerHTML = '<button class="pc-open"><span class="avatar">' + esc(p.emoji) + '</span><span class="pname">' + esc(p.name) +
+      card.innerHTML = '<button class="pc-open">' + DA.ui.avatar(p, 'lg') + '<span class="pname">' + esc(p.name) +
         '</span><span class="pkind">' + kindLabel(p) + T('</span></button><button class="pc-del" title="מחיקה">✕</button>');
       card.querySelector('.pc-open').onclick = function () { ctx.setProfile(p.id); ctx.go('hub'); };
       card.querySelector('.pc-del').onclick = function () { deleteProfile(p); };
@@ -172,7 +172,7 @@
   function renderHub() {
     var p = ctx.profile();
     if (!p) { ctx.go('home'); return; }
-    $('hubAvatar').textContent = p.emoji;
+    $('hubAvatar').innerHTML = DA.ui.avatar(p, 'lg');
     $('hubHello').textContent = p.name;
     $('hubKind').textContent = kindLabel(p);
     $('hubCode').textContent = p.code;
@@ -184,7 +184,7 @@
     var hasCal = !!ctx.opsFor(p.settings);
     // guide the first steps
     var tip;
-    if (!sessions.length) tip = T('✈️ לפני הטיסה הראשונה עושים את <b>בדיקה 1: משחק ההתאמה</b> (כ־5 דקות). הוא מכוון את המכשירים בשבילך.');
+    if (!sessions.length) tip = T('✈️ לפני הטיסה הראשונה עושים את <b>בדיקה 1: משחק ההתאמה</b> (פעם אחת בלבד, כ־3 דקות). הוא מכוון את המכשירים בשבילך.');
     else if (p.kind === 'adult' && !hasCal) tip = T('רואים קווים עקומים או גלים? אפשר לעשות את <b>בדיקה 2: כיול עיוות</b>. אם לא, אפשר להמריא ישר אל <b>לקרוא</b>.');
     else tip = T('🛫 הכול מוכן להמראה! בוחרים יעד: <b>לקרוא</b> או <b>לראות</b>.');
     $('hubTip').innerHTML = tip;
@@ -192,6 +192,10 @@
     $('tileLearn').classList.toggle('first', !sessions.length);
     var played = sessions.some(function (x) { return !x.kind || x.kind === 'learn'; });
     $('pfLearnCheck').textContent = played ? '✓' : '';
+    var lastPlay = sessions.filter(function (x) { return !x.kind || x.kind === 'learn'; })[0];
+    $('tileLearnSub').textContent = lastPlay
+      ? T('✓ בוצע') + ' ' + new Date(lastPlay.startedAt).toLocaleDateString(DA.i18n.locale) + ' · ' + T('לא צריך לחזור')
+      : T('פעם אחת בלבד · כ־3 דקות');
     $('pfCalCheck').textContent = hasCal ? '✓' : '';
     DA.cockpit.render($('gauges'), DA.settings.normalize(p.settings), hasCal);
     $('tileLearnBadge').style.display = sessions.length ? 'none' : '';

@@ -70,5 +70,17 @@
     root.claude.use('downloads').then(function (d) { downloads = d; }).catch(function () {});
   }
 
-  DA.ui = { ask: ask, tell: tell, prompt: prompt, toast: toast, download: download, esc: esc, stamp: stamp, $: $ };
+  /** A grown-up avatar: the name's initial on a personal gradient, with the chosen symbol as a small badge. */
+  var AV = [['#5ad8ff', '#4be3a4'], ['#c9b8ff', '#ff7ab6'], ['#ffd45a', '#ff9f43'], ['#4be3a4', '#2fb7ff'], ['#ff7ab6', '#ffb36b'], ['#8fa8ff', '#5ad8ff'], ['#ff8f70', '#ffd45a'], ['#7ef0c6', '#c9b8ff']];
+  function avatar(p, cls) {
+    if (!p) return '';
+    var key = String(p.id || p.name || ''), h = 0;
+    for (var i = 0; i < key.length; i++) h = (h * 31 + key.charCodeAt(i)) >>> 0;
+    var c = AV[h % AV.length], name = String(p.name || '').trim();
+    var init = name ? Array.from(name)[0].toUpperCase() : '?';
+    return '<span class="mono-av ' + (cls || '') + '" style="--a:' + c[0] + ';--b:' + c[1] + '"><span class="mono-init">' + esc(init) + '</span>' +
+      (p.emoji ? '<span class="mono-badge" aria-hidden="true">' + esc(p.emoji) + '</span>' : '') + '</span>';
+  }
+
+  DA.ui = { avatar: avatar, ask: ask, tell: tell, prompt: prompt, toast: toast, download: download, esc: esc, stamp: stamp, $: $ };
 })(typeof window !== 'undefined' ? window : globalThis);

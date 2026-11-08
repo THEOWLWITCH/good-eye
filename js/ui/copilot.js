@@ -40,7 +40,7 @@
     var p = ctx.profile(), name = p ? p.name : '';
     switch (key) {
       case 'home-empty': return { text: T('שלום! אני ינשוף, הנווט שלך. בוא נרשום את הטייס הראשון.'), target: 'newChildBtn',
-        buttons: [{ label: T('🧒 ילד/ה'), go: function () { $('newChildBtn').click(); } }, { label: T('🧑 מבוגר/ת'), go: function () { $('newAdultBtn').click(); } }] };
+        buttons: [{ label: T('טייס/ת צעיר/ה'), go: function () { $('newChildBtn').click(); } }, { label: T('מבוגר/ת'), go: function () { $('newAdultBtn').click(); } }] };
       case 'home': return { text: T('מי טס היום? לוחצים על הכרטיס שלך.'), target: 'profileGrid' };
       case 'hub-first': return { text: T('היי ') + name + T('! לפני ההמראה נשחק משחק קצר, כדי שאדע מה הכי ברור לך.'), target: 'tileLearn',
         buttons: [{ label: T('▶ בוא נשחק'), main: true, go: function () { ctx.go('learn'); setTimeout(function () { $('quickGame').click(); }, 250); } }] };

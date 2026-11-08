@@ -66,7 +66,7 @@
   function renderHeader() {
     var p = ctx.profile();
     $('whoChip').style.display = p ? '' : 'none';
-    if (p) { $('whoEmoji').textContent = p.emoji; $('whoName').textContent = p.name; }
+    if (p) { $('whoEmoji').innerHTML = DA.ui.avatar(p, 'xs'); $('whoName').textContent = p.name; }
     $('navHome').style.display = cur === 'hub' || cur === 'home' ? 'none' : '';
   }
 

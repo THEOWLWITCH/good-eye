@@ -6,6 +6,15 @@
   'use strict';
   var DA = (root.DA = root.DA || {});
   var P = {
+    rocket: '<path d="M12 2.5c3.2 2.2 5 5.6 5 9.5l-2 4H9l-2-4c0-3.9 1.8-7.3 5-9.5z"/><circle cx="12" cy="9.5" r="1.8"/><path d="M9 16l-2.5 2.5V21L9.5 19M15 16l2.5 2.5V21l-3-2M12 18v3.5"/>',
+    trophy: '<path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4v1.5A3.5 3.5 0 0 0 7.5 11M17 6h3v1.5a3.5 3.5 0 0 1-3.5 3.5M12 14v3.5M8.5 21h7M9.5 17.5h5"/>',
+    child: '<circle cx="12" cy="7" r="3.6"/><path d="M6.5 21v-3.5a5.5 5.5 0 0 1 11 0V21"/><path d="M9.6 7.3h.01M14.4 7.3h.01M10.5 9.2c.9.6 2.1.6 3 0"/>',
+    adult: '<circle cx="12" cy="6.5" r="3.2"/><path d="M5 21v-4a7 7 0 0 1 14 0v4"/><path d="M9.5 13.8 12 17l2.5-3.2"/>',
+    search: '<circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/>',
+    fog: '<path d="M4 9h11M7 13h13M3 17h10M17 17h4M6 5h8"/>',
+    lines: '<rect x="3" y="3" width="18" height="18" rx="2.5"/><path d="M3 9.5h18M3 14.5h18M9.5 3v18M14.5 3v18"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/>',
+    drop: '<path d="M12 3.5c3 3.6 6 7 6 10.3a6 6 0 0 1-12 0C6 10.5 9 7.1 12 3.5z"/><path d="M9.2 14.5a3 3 0 0 0 2.8 2.6"/>',
+    once: '<circle cx="12" cy="12" r="9"/><path d="M8 12.5 11 15.5 16.5 9.5"/>',
     book: '<path d="M2 5.5C4.5 4 8 4 12 6c4-2 7.5-2 10-.5V19c-2.5-1.5-6-1.5-10 .5C8 17.5 4.5 17.5 2 19z"/><path d="M12 6v13.5"/>',
     eye: '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
     camera: '<path d="M3 8a2 2 0 0 1 2-2h2.2l1.6-2h6.4l1.6 2H19a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="3.6"/>',
