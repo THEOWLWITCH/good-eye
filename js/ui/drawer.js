@@ -4,13 +4,13 @@
  */
 (function (root) {
   'use strict';
-  function PACE_OPTS() { return [['slow', T('🐢 לאט ובנחת')], ['normal', T('🚶 רגיל')], ['fast', T('🙂 קצת יותר זריז')], ['manual', T('✋ בקצב שלי (כפתור הבא)')]]; }
+  function PACE_OPTS() { return [['slow', T('לאט ובנחת')], ['normal', T('רגיל')], ['fast', T('קצת יותר זריז')], ['manual', T('בקצב שלי (כפתור הבא)')]]; }
   var DA = root.DA;
   var $ = DA.ui.$, esc = DA.ui.esc;
   var ctx, previewLens, work;
 
   var GROUPS = [
-    { title: T('🦉 הנווט והקראת הנחיות'), items: [
+    { title: T('הנווט והקראת הנחיות'), items: [
       { k: 'copilot', label: T('להציג את הנווט, שמסביר כל צעד'), type: 'check' },
       { k: 'gamePace', label: T('קצב טיסת הניסוי'), type: 'select', options: function () { return PACE_OPTS(); } },
       { k: 'gameVoice', label: T('קול בטיסת הניסוי: שאלות, עידוד ומה קורה בסוף'), type: 'check' },
@@ -54,7 +54,7 @@
       { k: 'speechHighlight', label: T('להדגיש כל מילה בזמן ההקראה'), type: 'check' },
       { k: 'speechRate', label: T('מהירות הקראה'), type: 'range', min: 0.5, max: 1.5, step: 0.05, fmt: f2 }
     ] },
-    { title: T('👁️ מעקב עיניים (באתר העצמאי, לא חובה)'), items: [
+    { title: T('מעקב עיניים (באתר העצמאי, לא חובה)'), items: [
       { k: 'eyesKeepAngle', label: T('לשמור על גודל אותיות קבוע לעין, גם כשמתקרבים או מתרחקים'), type: 'check' }
     ] }
   ];
@@ -79,10 +79,10 @@
     $('drawerClose').onclick = close;
     $('drawerBest').onclick = function () {
       ctx.profiles.setBest(ctx.profile(), work);
-      DA.ui.toast(T('⭐ נשמר כ"המצב שלי" — אפשר לחזור אליו בלחיצה'));
+      DA.ui.toast(T('נשמר כ"המצב שלי" — אפשר לחזור אליו בלחיצה'));
     };
     $('drawerPin').onclick = function () {
-      DA.ui.prompt(T('שם למצב הזה:'), '').then(function (n) { if (n) { ctx.profiles.pin(ctx.profile(), n, work); DA.ui.toast(T('📌 נשמר: ') + n); } });
+      DA.ui.prompt(T('שם למצב הזה:'), '').then(function (n) { if (n) { ctx.profiles.pin(ctx.profile(), n, work); DA.ui.toast(T('נשמר: ') + n); } });
     };
     $('drawerReset').onclick = function () {
       DA.ui.ask(T('להחזיר את כל ההגדרות לברירת המחדל? (הכיול הפעיל נשאר)'), T('איפוס')).then(function (y) {

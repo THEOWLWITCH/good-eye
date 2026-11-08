@@ -197,7 +197,7 @@
     st.swapped = !st.swapped; st.w = 0.75 + Math.random() * 0.5; st.h = 0.75 + Math.random() * 0.5;
     history.commit(st);
     changed();
-    DA.ui.toast(T('📏 המדידה נשמרה. עכשיו הצדדים התחלפו, מודדים שוב.'));
+    DA.ui.toast(T('המדידה נשמרה. עכשיו הצדדים התחלפו, מודדים שוב.'));
   }
 
   // ---------------- stats ----------------

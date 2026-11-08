@@ -16,8 +16,8 @@
   var ctx, tab = 'psf', cleanup = null;
 
   var TABS = [
-    ['psf', T('🔵 צורת הטשטוש')], ['deblur', T('✨ חידוד')], ['stripes', T('▦ פסים')], ['localblur', T('🖌️ טשטוש מקומי')],
-    ['contrast', T('◐ בהירות מקומית')], ['depth', T('🕳️ שקוע/בולט')], ['motion', T('➰ תנועה')]
+    ['psf', T('צורת הטשטוש')], ['deblur', T('חידוד')], ['stripes', T('▦ פסים')], ['localblur', T('טשטוש מקומי')],
+    ['contrast', T('◐ בהירות מקומית')], ['depth', T('שקוע/בולט')], ['motion', T('תנועה')]
   ];
 
   function init(c) {
@@ -134,7 +134,7 @@
     controls.appendChild(opts);
     var rate = rating(T('כמה הדמיון דומה למה שאני רואה?'));
     controls.appendChild(rate);
-    var actions = el('<div class="row wrap"><button type="button" class="primary">' + T('💾 לשמור צורת טשטוש') + '</button></div>');
+    var actions = el('<div class="row wrap"><button type="button" class="primary">' + T('לשמור צורת טשטוש') + '</button></div>');
     actions.querySelector('button').onclick = function () {
       DA.ui.prompt(T('שם לצורת הטשטוש (למשל "עין ימין, ערב"):'), '').then(function (name) {
         if (name == null) return;
@@ -218,7 +218,7 @@
     var stats = el('<p class="hint"></p>'); c.appendChild(stats);
     var rS = rating(T('חדות')), rH = rating(T('הילות (פחות = טוב)')), rN = rating(T('רעש (פחות = טוב)')), rC = rating(T('נוחות'));
     [rS, rH, rN, rC].forEach(function (x) { c.appendChild(x); });
-    var acts = el('<div class="row wrap"><button type="button" class="primary">' + T('💾 לשמור דירוג') + '</button><button type="button">' + T('✓ להפעיל את השיטה הזו בתמונות') + '</button></div>');
+    var acts = el('<div class="row wrap"><button type="button" class="primary">' + T('לשמור דירוג') + '</button><button type="button">' + T('✓ להפעיל את השיטה הזו בתמונות') + '</button></div>');
     acts.children[0].onclick = function () {
       saveRecord('deblur', { method: method, params: Object.assign({}, prm), psf: psf, stimulus: stim, ratings: { sharpness: rS.value(), halos: rH.value(), noise: rN.value(), comfort: rC.value() }, metrics: lastMetrics,
         result: { summary: METHOD_LABEL[method] + ' · ' + T('נוחות ') + rC.value() + '/5' } });
@@ -226,7 +226,7 @@
     };
     acts.children[1].onclick = function () {
       ctx.updateSettings({ deblur: method, deblurAmount: prm.amount, deblurRadius: prm.radius, deblurK: prm.K, deblurIter: prm.iterations, psf: psf });
-      DA.ui.toast(T('✨ השיטה תופעל על תמונות, צילומים ועמודי PDF בקריאה'));
+      DA.ui.toast(T('השיטה תופעל על תמונות, צילומים ועמודי PDF בקריאה'));
     };
     c.appendChild(acts);
     body.appendChild(c);
@@ -278,7 +278,7 @@
     if (ctx.profile().settings.calm) body.appendChild(el('<p class="bad small">' + T('מצב רגוע פועל: אם פסים מפריעים או גורמים לאי־נוחות, מדלגים על הכלי הזה.') + '</p>'));
     var c = canvas(300, 300), info = el('<p class="hint"></p>');
     var ctr = el('<div class="row wrap"><label>' + T('ניגודיות') + ' <select><option value="1">100%</option><option value="0.3">30%</option><option value="0.1">10%</option></select></label><button type="button" class="primary">' + T('▶ להתחיל') + '</button></div>');
-    var ans = el('<div class="row wrap center" style="display:none"><button type="button" class="big">' + T('👀 רואה פסים') + '</button><button type="button" class="big">' + T('⬜ נראה אפור אחיד') + '</button></div>');
+    var ans = el('<div class="row wrap center" style="display:none"><button type="button" class="big">' + T('רואה פסים') + '</button><button type="button" class="big">' + T('נראה אפור אחיד') + '</button></div>');
     body.appendChild(ctr); body.appendChild(wrapCap(c, '')); body.appendChild(ans); body.appendChild(info);
     var res = el('<div class="lab-list"></div>'); body.appendChild(res);
     var order, oi, fi, contrast, results, merged;
@@ -333,14 +333,14 @@
     var ctl = el('<div class="lab-controls"></div>');
     var r1 = el('<div class="row wrap"><label>' + T('צורה') + ' <select data-k="shape"><option value="rect">' + T('מלבן') + '</option><option value="line">' + T('קו') + '</option><option value="letter">' + T('אות') + '</option><option value="circle">' + T('עיגול') + '</option></select></label>' +
       '<label>' + T('המסכה צמודה ל') + ' <select data-k="coords"><option value="shape">' + T('צורה') + '</option><option value="screen">' + T('מסך') + '</option></select></label>' +
-      '<button type="button" data-k="clear">' + T('🧽 למחוק סימון') + '</button><button type="button" data-k="move">' + T('↔️ להזיז את הצורה') + '</button></div>');
+      '<button type="button" data-k="clear">' + T('למחוק סימון') + '</button><button type="button" data-k="move">' + T('להזיז את הצורה') + '</button></div>');
     ctl.appendChild(r1);
     ctl.appendChild(slider(T('גודל מברשת'), 6, 50, 1, brush, String, function (v) { brush = v; }));
     ctl.appendChild(slider(T('כיוון המריחה'), 0, 180, 1, angle, deg, function (v) { angle = v; draw(); }));
     ctl.appendChild(slider(T('עוצמת הטשטוש'), 0, 12, 0.5, strength, f1, function (v) { strength = v; draw(); }));
     var q = el('<div class="row wrap" style="display:none"><span>' + T('אחרי ההזזה, הטשטוש:') + '</span><button type="button">' + T('זז עם הצורה') + '</button><button type="button">' + T('נשאר במקום על המסך') + '</button></div>');
     ctl.appendChild(q);
-    var save = el('<div class="row wrap"><button type="button" class="primary">' + T('💾 לשמור') + '</button></div>');
+    var save = el('<div class="row wrap"><button type="button" class="primary">' + T('לשמור') + '</button></div>');
     ctl.appendChild(save);
     body.appendChild(ctl);
     var moveAnswer = null;
@@ -358,7 +358,7 @@
     };
     var painting = false;
     function paint(e) {
-      var r = c.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+      var r = c.getBoundingClientRect(), k = c.width / r.width, x = (e.clientX - r.left) * k, y = (e.clientY - r.top) * k;   // the canvas may be scaled down on phones
       if (coords === 'shape') { x -= off[0]; y -= off[1]; }
       var mx = Math.floor(x / N * MASK), my = Math.floor(y / N * MASK), br = Math.max(1, Math.round(brush / N * MASK));
       for (var j = -br; j <= br; j++) for (var i = -br; i <= br; i++) if (i * i + j * j <= br * br) { var X = mx + i, Y = my + j; if (X >= 0 && Y >= 0 && X < MASK && Y < MASK) mask[Y * MASK + X] = 1; }
@@ -412,7 +412,7 @@
     var sc = slider(T('ניגודיות האזור'), 0.4, 1.8, 0.05, 1, f1, function (v) { regions[sel].c = v; draw(); });
     ctl.appendChild(sb); ctl.appendChild(sc);
     var rate = rating(T('נוחות')); ctl.appendChild(rate);
-    var sv = el('<div class="row wrap"><button type="button" class="primary">' + T('💾 לשמור') + '</button></div>');
+    var sv = el('<div class="row wrap"><button type="button" class="primary">' + T('לשמור') + '</button></div>');
     sv.querySelector('button').onclick = function () {
       saveRecord('local-contrast', { regions: regions, background: bgc, invert: invert, comfort: rate.value(),
         result: { summary: T('רקע ') + bgc + (invert ? T(' · הפוך') : '') + T(' · נוחות ') + rate.value() + '/5' } });
@@ -420,7 +420,7 @@
     };
     ctl.appendChild(sv); body.appendChild(ctl);
     c.addEventListener('click', function (e) {
-      var rr = c.getBoundingClientRect(), x = Math.floor((e.clientX - rr.left) / N * 3), y = Math.floor((e.clientY - rr.top) / N * 3);
+      var rr = c.getBoundingClientRect(), x = Math.floor((e.clientX - rr.left) / rr.width * 3), y = Math.floor((e.clientY - rr.top) / rr.height * 3);
       sel = Math.max(0, Math.min(8, y * 3 + x)); sb.set(regions[sel].b); sc.set(regions[sel].c); draw();
     });
     function draw() {
@@ -458,7 +458,7 @@
     var before = rating(T('עוצמת התחושה לפני')), after = rating(T('עוצמת התחושה אחרי'));
     var adj = slider(T('שינוי'), -1, 1, 0.02, 0, f1, function (v) { if (sel < 0) return; setVal(v); draw(); });
     ctl.appendChild(before); ctl.appendChild(adj); ctl.appendChild(after);
-    var sv = el('<div class="row wrap"><button type="button" class="primary">' + T('💾 לשמור את הנקודה הזו') + '</button></div>');
+    var sv = el('<div class="row wrap"><button type="button" class="primary">' + T('לשמור את הנקודה הזו') + '</button></div>');
     sv.querySelector('button').onclick = function () {
       if (sel < 0) { DA.ui.toast(T('קודם בוחרים נקודה')); return; }
       var d = dots[sel];
@@ -470,7 +470,7 @@
     function valOf() { var d = dots[sel]; return param === 'size' ? d.size - 1 : param === 'bright' ? d.bright : param === 'sharp' ? d.sharp : d.dx / 20; }
     function setVal(v) { var d = dots[sel]; if (param === 'size') d.size = 1 + v; else if (param === 'bright') d.bright = v; else if (param === 'sharp') d.sharp = v; else d.dx = v * 20; }
     c.addEventListener('click', function (e) {
-      var rr = c.getBoundingClientRect(), x = e.clientX - rr.left, y = e.clientY - rr.top, best = -1, bd = 26;
+      var rr = c.getBoundingClientRect(), kk = c.width / rr.width, x = (e.clientX - rr.left) * kk, y = (e.clientY - rr.top) * kk, best = -1, bd = 26;
       dots.forEach(function (d, i) { var dd = Math.hypot(d.x + d.dx - x, d.y - y); if (dd < bd) { bd = dd; best = i; } });
       if (best >= 0) { sel = best; adj.set(valOf()); draw(); }
     });
@@ -503,14 +503,14 @@
     ctl.appendChild(r);
     ctl.appendChild(slider(T('מהירות'), 0.05, 1, 0.05, speed, function (v) { return Math.round(v * 100) + '%'; }, function (v) { speed = v; }));
     var ev = el('<div class="row wrap"></div>');
-    [['jump', T('⚡ קפיצה')], ['smear', T('〰️ מריחה')], ['double', T('👯 כפילות')], ['lag', T('🐢 עיכוב')], ['vanish', T('🫥 נעלמה')]].forEach(function (k) {
+    [['jump', T('קפיצה')], ['smear', T('מריחה')], ['double', T('כפילות')], ['lag', T('עיכוב')], ['vanish', T('נעלמה')]].forEach(function (k) {
       var b = el('<button type="button" class="big">' + esc(k[1]) + '</button>');
       b.onclick = function () { var p = pos(); events.push({ type: k[0], path: path, speed: speed, t: Math.round(t * 1000) / 1000, x: Math.round(p[0]) / N, y: Math.round(p[1]) / N, at: new Date().toISOString() }); info.textContent = T('דיווחים: ') + events.length; };
       ev.appendChild(b);
     });
     ctl.appendChild(ev);
     var info = el('<p class="hint">' + T('דיווחים: 0') + '</p>'); ctl.appendChild(info);
-    var sv = el('<div class="row wrap"><button type="button" class="primary">' + T('💾 לשמור את הדיווחים') + '</button></div>');
+    var sv = el('<div class="row wrap"><button type="button" class="primary">' + T('לשמור את הדיווחים') + '</button></div>');
     sv.querySelector('button').onclick = function () {
       if (!events.length) { DA.ui.toast(T('אין עדיין דיווחים')); return; }
       saveRecord('motion', { events: events, result: { summary: events.length + T(' דיווחים') } });

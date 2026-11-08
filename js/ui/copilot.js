@@ -45,17 +45,17 @@
       case 'hub-first': return { text: T('היי ') + name + T('! לפני ההמראה עושים טיסת ניסוי קצרה, כדי שאדע מה הכי ברור לך.'), target: 'tileLearn',
         buttons: [{ label: T('▶ לטיסת הניסוי'), main: true, go: function () { ctx.go('learn'); setTimeout(function () { $('quickGame').click(); }, 250); } }] };
       case 'hub-cal': return { text: T('רואים קווים עקומים או גלים? אפשר לכייל. אם לא, ממריאים ישר!'), target: 'tileCalibrate',
-        buttons: [{ label: T('🎯 לכייל'), go: function () { ctx.go('calibrate'); } }, { label: T('📖 לקרוא'), main: true, go: function () { ctx.store.setPref('copilot.skipCal.' + p.id, true); $('tileRead').click(); } }] };
+        buttons: [{ label: T('לכייל'), go: function () { ctx.go('calibrate'); } }, { label: T('לקרוא'), main: true, go: function () { ctx.store.setPref('copilot.skipCal.' + p.id, true); $('tileRead').click(); } }] };
       case 'hub-ready': return { text: T('הכול מוכן להמראה! לאן טסים: לקרוא או לראות?'), target: 'tileRead',
-        buttons: [{ label: T('📖 לקרוא'), main: true, go: function () { $('tileRead').click(); } }, { label: T('👀 לראות'), go: function () { $('tileSee').click(); } }] };
+        buttons: [{ label: T('לקרוא'), main: true, go: function () { $('tileRead').click(); } }, { label: T('לראות'), go: function () { $('tileSee').click(); } }] };
       case 'learn-setup': return { text: T('אראה לך מספרים, ציורים ומילים. רק בוחרים מה ראית. אין טעויות!'), target: 'quickGame',
         buttons: [{ label: T('▶ מתחילים'), main: true, go: function () { $('quickGame').click(); } }] };
       case 'learn-end': return { text: T('כל הכבוד, טייס! לשמור את זה כמצב שלך?'), target: 'learnApplyBest',
-        buttons: [{ label: T('⭐ לשמור'), main: true, go: function () { $('learnApplyBest').click(); } }] };
+        buttons: [{ label: T('לשמור'), main: true, go: function () { $('learnApplyBest').click(); } }] };
       case 'read-sources': return { text: T('מה נקרא? אפשר להדביק טקסט, לבחור קובץ, או לנסות דוגמה.'), target: 'srcSample',
-        buttons: [{ label: T('📄 דוגמה'), main: true, go: function () { $('srcSample').click(); } }, { label: T('📂 קובץ'), go: function () { $('srcFileBtn').click(); } }] };
+        buttons: [{ label: T('דוגמה'), main: true, go: function () { $('srcSample').click(); } }, { label: T('קובץ'), go: function () { $('srcFileBtn').click(); } }] };
       case 'read-see': return { text: T('מצלמים דף או תמונה, ואני אראה אותם ברור יותר.'), target: 'srcPhotoBtn',
-        buttons: [{ label: T('📷 לצלם'), main: true, go: function () { $('srcPhotoBtn').click(); } }, { label: T('📂 תמונה מהמכשיר'), go: function () { $('srcFileBtn').click(); } }] };
+        buttons: [{ label: T('לצלם'), main: true, go: function () { $('srcPhotoBtn').click(); } }, { label: T('תמונה מהמכשיר'), go: function () { $('srcFileBtn').click(); } }] };
       case 'read-view': return { text: T('קטן מדי? לוחצים A+. רוצים לשמוע? לוחצים 🔊. הכוכב ⭐ מחזיר למצב שלך.'), target: 'rBigger' };
       case 'calibrate': return { text: T('מביטים ברשת. קו נראה עקום? תופסים אותו וגוררים עד שהוא ישר. בסוף לוחצים שמירה.'), target: 'canvas' };
       case 'tools': return { text: T('בוחרים כלי למעלה, ומזיזים את הנקודות או הצורות עד שהן נראות נכון. בסוף: שמירה.'), target: 'tlMode' };
@@ -111,7 +111,7 @@
       bb.appendChild(el);
     });
     var ok = document.createElement('button');
-    ok.textContent = T('👍 הבנתי');
+    ok.textContent = T('הבנתי');
     ok.onclick = function () { minimized = true; render(); };
     bb.appendChild(ok);
     if (m.target) setTarget($(m.target));

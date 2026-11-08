@@ -11,12 +11,13 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/cockpit.css">
   <link rel="stylesheet" href="css/v2.css">
+  <link rel="stylesheet" href="css/v3.css">
 </head>
 <body>
   <header class="topbar">
-    <button id="navHome" class="nav-home" title="חזרה">🏠</button>
+    <button id="navHome" class="nav-home" title="חזרה"><i data-icon="home"></i></button>
     <div class="brand-wrap">
-      <div class="brand">👁️ <span>עין טובה</span> <small id="version"></small></div>
+      <div class="brand"><i data-icon="logo"></i><span>עין טובה</span> <small id="version"></small></div>
       <div class="brand-sub" role="note">כלי עזר ללמידה ולחיי היומיום. לא מכשיר רפואי, ואין להסתמך על התוצאות לקביעה רפואית כלשהי.</div>
     </div>
     <span id="cloudDot" class="cloud-dot" title=""></span>
@@ -40,10 +41,10 @@
       <button id="newAdultBtn" class="reg-card adult"><span class="reg-icon"><i data-icon="plane"></i></span><b>טייס/ת מבוגר/ת</b><small>הרשמה של מבוגר/ת: אותיות, מילים, משפטים וכיול עיוות</small></button>
     </div>
     <details class="engine-room home-room">
-      <summary>🔧 חדר המכונות <span class="muted small">(סנכרון בין מכשירים, גיבוי)</span></summary>
+      <summary><i data-icon="gear"></i> חדר המכונות <span class="muted small">(סנכרון בין מכשירים, גיבוי)</span></summary>
       <div class="engine-grid">
       <div class="card sync-card" id="syncCard" style="display:none">
-        <h3>🔄 סנכרון בין מכשירים</h3>
+        <h3><i data-icon="sync"></i> סנכרון בין מכשירים</h3>
         <p class="muted small">כל הקוראים וההגדרות יופיעו בכל המכשירים של המשפחה. הנתונים מוצפנים בתוך המכשיר לפני שהם נשלחים, כך שגם לשרת אין גישה אליהם. מי שיש לו את קוד המשפחה יכול לראות את הנתונים, אז שומרים אותו רק במשפחה.</p>
         <div id="syncOff">
           <button id="syncCreate" class="primary">להפעיל ולקבל קוד משפחה</button>
@@ -53,14 +54,14 @@
           </form>
         </div>
         <div id="syncOn" style="display:none">
-          <p>קוד המשפחה: <b id="syncCodeShow" dir="ltr" class="sync-code"></b> <button id="syncCopy" class="small">📋 העתקה</button></p>
-          <div class="row wrap"><button id="syncNowBtn">🔄 לסנכרן עכשיו</button><button id="syncLeave" class="danger small">ניתוק המכשיר הזה</button></div>
+          <p>קוד המשפחה: <b id="syncCodeShow" dir="ltr" class="sync-code"></b> <button id="syncCopy" class="small">העתקה</button></p>
+          <div class="row wrap"><button id="syncNowBtn"><i data-icon="sync"></i> לסנכרן עכשיו</button><button id="syncLeave" class="danger small">ניתוק המכשיר הזה</button></div>
           <p id="syncStatus" class="muted small"></p>
         </div>
       </div>
       <div class="backup">
-        <button id="backupBtn" title="שמירת כל הנתונים במכשיר הזה לקובץ">💾 גיבוי</button>
-        <button id="restoreBtn" title="טעינת נתונים מקובץ גיבוי">📥 שחזור מגיבוי</button>
+        <button id="backupBtn" title="שמירת כל הנתונים במכשיר הזה לקובץ"><i data-icon="save"></i> גיבוי</button>
+        <button id="restoreBtn" title="טעינת נתונים מקובץ גיבוי"><i data-icon="restore"></i> שחזור מגיבוי</button>
         <input id="restoreFile" type="file" accept=".json,application/json" hidden>
       </div>
       </div>
@@ -125,13 +126,13 @@
     <section class="block">
       <h2 class="sec-title">כל הכלים</h2>
       <div class="tool-grid2">
-        <button id="settingsBtn" class="tool2"><i data-icon="sliders"></i><b>כיוונון עדין</b></button>
-        <button id="hubReadTest" class="tool2"><i data-icon="timer"></i><b>גודל קריאה נוח</b></button>
-        <button id="hubFieldTest" class="tool2"><i data-icon="map"></i><b>מפת נוחות</b></button>
-        <button id="hubTools" class="tool2"><i data-icon="target"></i><b>כלי כיול</b></button>
-        <button id="hubLab" class="tool2"><i data-icon="flask"></i><b>מעבדה</b></button>
-        <button id="hubCard" class="tool2"><i data-icon="ruler"></i><b>גודל המסך</b></button>
-        <button id="hubHistShow" class="tool2"><i data-icon="chart"></i><b>היסטוריה</b></button>
+        <button id="settingsBtn" class="tool2"><span class="ap"><i data-icon="sliders"></i></span><b>כיוונון עדין</b></button>
+        <button id="hubReadTest" class="tool2"><span class="ap"><i data-icon="timer"></i></span><b>גודל קריאה נוח</b></button>
+        <button id="hubFieldTest" class="tool2"><span class="ap"><i data-icon="map"></i></span><b>מפת נוחות</b></button>
+        <button id="hubTools" class="tool2"><span class="ap"><i data-icon="target"></i></span><b>כלי כיול</b></button>
+        <button id="hubLab" class="tool2"><span class="ap"><i data-icon="flask"></i></span><b>מעבדה</b></button>
+        <button id="hubCard" class="tool2"><span class="ap"><i data-icon="ruler"></i></span><b>גודל המסך</b></button>
+        <button id="hubHistShow" class="tool2"><span class="ap"><i data-icon="chart"></i></span><b>היסטוריה</b></button>
       </div>
     </section>
 
@@ -166,8 +167,8 @@
         <button id="undo" title="ביטול (Ctrl+Z)">↶ ביטול</button>
         <button id="redo" title="חזרה (Ctrl+Y)">↷ חזרה</button>
         <button id="reset" title="איפוס כל התיקונים">⟲ איפוס</button>
-        <button id="save" class="primary" title="שמירת הניסיון (Ctrl+S)">💾 שמירה</button>
-        <button id="fullscreen" title="מסך מלא (F)">⛶ מסך מלא</button>
+        <button id="save" class="primary" title="שמירת הניסיון (Ctrl+S)"><i data-icon="save"></i> שמירה</button>
+        <button id="fullscreen" title="מסך מלא (F)">מסך מלא</button>
         <button id="calEyes" class="eye-switch" data-short></button>
       </div>
     </header>
@@ -220,7 +221,7 @@
         <section>
           <h3>גרירה</h3>
         <div id="nudgePad" class="nudge-pad">
-          <div class="hint">🎮 <b>בלי גרירה:</b> לוחצים על נקודה בקו העקום, ואז מזיזים בחצים.</div>
+          <div class="hint"><b>בלי גרירה:</b> לוחצים על נקודה בקו העקום, ואז מזיזים בחצים.</div>
           <div class="pad">
             <span></span><button id="nudgeUp" title="למעלה">▲</button><span></span>
             <button id="nudgeLeft" title="שמאלה">◀</button><button id="nudgeClear" title="ביטול הבחירה">✕</button><button id="nudgeRight" title="ימינה">▶</button>
@@ -287,16 +288,16 @@
       <div id="learnResume" class="resume-card" style="display:none">
         <b>⏸ יש טיסת ניסוי שעצרת באמצע (<span id="learnResumePct"></span>)</b>
         <div class="row wrap center">
-          <button id="learnContinue" class="primary big">▶️ להמשיך מאיפה שעצרנו</button>
+          <button id="learnContinue" class="primary big">להמשיך מאיפה שעצרנו</button>
           <button id="learnRestart" class="ghost">להתחיל מחדש</button>
         </div>
       </div>
       <div id="learnPlayed" class="once-card done" style="display:none">
         <span class="once-icon"><i data-icon="once"></i></span>
         <div><b id="learnPlayedWhen"></b><br>אין צורך לטוס אותה שוב: ההגדרות שמורות. טסים שוב רק אם משהו השתנה, למשל משקפיים חדשים, או פעם בכמה חודשים.</div>
-        <button id="learnGoRead" class="primary">📖 לקרוא</button>
+        <button id="learnGoRead" class="primary"><i data-icon="book"></i> לקרוא</button>
       </div>
-      <button id="quickGame" class="primary huge">▶️ ממריאים (כ־3 דקות)</button>
+      <button id="quickGame" class="primary huge">ממריאים (כ־3 דקות)</button>
       <p id="learnOnce" class="once-note"><i data-icon="once"></i> טיסת הניסוי נעשית <b>פעם אחת בלבד</b>. ההגדרות נשמרות, ובפעמים הבאות נכנסים ישר לקריאה.</p>
       <p class="muted small no-say">אפשר לעצור ⏸ בכל רגע ולהמשיך אחר כך מאותו מקום.</p>
       <div class="scope-card">
@@ -323,18 +324,18 @@
         <div id="prefChecks" class="chips">
           <label class="chip"><input type="checkbox" value="theme" checked> 🎨 צבעים</label>
           <label class="chip"><input type="checkbox" value="font" checked> 🔤 גופן</label>
-          <label class="chip"><input type="checkbox" value="letterSpacing" checked> ↔️ ריווח אותיות</label>
+          <label class="chip"><input type="checkbox" value="letterSpacing" checked> ריווח אותיות</label>
           <label class="chip"><input type="checkbox" value="lineHeight"> ↕️ ריווח שורות</label>
           <label class="chip"><input type="checkbox" value="bold"> 𝐁 עובי</label>
           <label class="chip"><input type="checkbox" value="sharpen"> ✨ חדות</label>
-          <label class="chip"><input type="checkbox" value="warp" checked> 🎯 תיקון עיוות (עם/בלי)</label>
+          <label class="chip"><input type="checkbox" value="warp" checked> תיקון עיוות (עם/בלי)</label>
           <label class="chip"><input type="checkbox" value="brightness" checked> 🔆 בהירות</label>
           <label class="chip"><input type="checkbox" value="lines" checked> 📏 קווים (כל עין)</label>
           <label class="chip"><input type="checkbox" value="contrast" checked> 🌫️ אותיות בערפל</label>
           <label class="chip"><input type="checkbox" value="color" checked> 🎨 מציאת צבע שונה</label>
         </div>
         <label>ניסיונות לכל בדיקה <input id="trialsPer" type="number" min="4" max="20" value="8"></label>
-        <button id="customGame" class="primary">▶️ להתחיל עם הבחירות האלה</button>
+        <button id="customGame" class="primary">להתחיל עם הבחירות האלה</button>
       </details>
     </div>
     <div id="learnPlay" class="learn-play" style="display:none">
@@ -342,7 +343,7 @@
         <button id="learnPause" class="small pause-btn" title="הפסקה">⏸ הפסקה</button>
         <button id="learnVoice" class="small voice-btn"></button>
         <label class="pace-ctl" title="קצב הטיסה"><span aria-hidden="true">⏱</span><select id="learnPace" aria-label="קצב הטיסה">
-          <option value="slow">🐢 לאט ובנחת</option><option value="normal">🚶 רגיל</option><option value="fast">🙂 קצת יותר זריז</option><option value="manual">✋ בקצב שלי</option>
+          <option value="slow">לאט ובנחת</option><option value="normal">רגיל</option><option value="fast">קצת יותר זריז</option><option value="manual">בקצב שלי</option>
         </select></label>
         <div id="learnProgressBar" class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-label="התקדמות בטיסה"><div id="learnProgress"></div></div>
         <span id="learnCount" class="learn-count"></span>
@@ -351,12 +352,12 @@
       </div>
       <div id="learnPaused" class="paused-card" style="display:none">
         <div class="paused-box">
-          <div class="paused-icon">⏸</div>
+          <div class="paused-icon"><span class="ap"><i data-icon="timer"></i></span></div>
           <h2>טיסת הניסוי בהפסקה</h2>
           <p>עברנו <b id="learnPausedPct"></b> מהדרך. אפשר להמשיך עכשיו, או לחזור בפעם אחרת. המקום נשמר.</p>
           <div class="row wrap center">
-            <button id="learnResumeBtn" class="primary big">▶️ להמשיך</button>
-            <button id="learnPauseLater" class="ghost">🏠 להמשיך אחר כך</button>
+            <button id="learnResumeBtn" class="primary big">להמשיך</button>
+            <button id="learnPauseLater" class="ghost">להמשיך אחר כך</button>
           </div>
         </div>
       </div>
@@ -367,20 +368,20 @@
       <div id="learnFeedback" class="learn-feedback"></div>
     </div>
     <div id="learnEnd" class="learn-end" style="display:none">
-      <h1 id="learnEndTitle" class="big-title">🏆 כל הכבוד, סיימת!</h1>
+      <h1 id="learnEndTitle" class="big-title">טיסת הניסוי הושלמה!</h1>
       <p id="learnEndSay" class="end-say"></p>
       <p class="once-note"><i data-icon="once"></i> זהו, את טיסת הניסוי לא צריך לעשות שוב. בפעם הבאה נכנסים ישר לקריאה, וההגדרות כבר יחכו.</p>
       <div class="row wrap center end-actions">
-        <button id="learnApplyBest" class="primary big">⭐ לשמור כמצב הקבוע שלי</button>
-        <button id="learnApply">👀 להשתמש בהן עכשיו, בלי לשנות את ⭐ המצב שלי</button>
-        <button id="learnKeep">↩️ להשאיר את ההגדרות הקודמות</button>
+        <button id="learnApplyBest" class="primary big"><i data-icon="star"></i> לשמור כמצב הקבוע שלי</button>
+        <button id="learnApply">להשתמש בהן עכשיו, בלי לשנות את "המצב שלי"</button>
+        <button id="learnKeep">להשאיר את ההגדרות הקודמות</button>
       </div>
       <div id="learnNext" class="next-card">
         <h3>ומה הלאה?</h3>
         <p id="learnNextQ">קווים ישרים, כמו משקוף, שורות במחברת או קצה של שולחן, נראים לך לפעמים עקומים, גליים או עם חלק חסר?</p>
         <div class="row wrap center">
           <button id="learnNextYes" class="primary">כן, לפעמים ← לכיול עיוות (כ־10 דקות)</button>
-          <button id="learnNextNo">לא ← אפשר לצאת לקרוא 📖</button>
+          <button id="learnNextNo">לא ← אפשר לצאת לקרוא</button>
         </div>
         <p id="learnNextPro" class="pro-note" style="display:none"></p>
         <p id="learnNextHasCal" class="muted small" style="display:none">✓ יש לך כבר כיול עיוות, וטיסת הניסוי בדקה אם הוא עוזר. אפשר לחדש אותו מתא הטייס.</p>
@@ -420,21 +421,21 @@
       <h2>מה נקרא היום?</h2>
       <div class="src-grid">
         <div class="src-card wide">
-          <b>✍️ להדביק או לכתוב טקסט</b>
+          <b><i data-icon="edit"></i> להדביק או לכתוב טקסט</b>
           <textarea id="srcPasteText" rows="5" dir="auto" placeholder="הדביקו כאן טקסט. נוסחאות אפשר לכתוב בין סימני $"></textarea>
           <div class="row"><button id="srcPasteGo" class="primary">לקרוא ▶</button><button id="srcSample">דוגמה</button></div>
         </div>
-        <button id="srcFileBtn" class="src-card"><span class="ti">📄</span><b>קובץ</b><small>טקסט, Word, PDF או תמונה</small></button>
-        <button id="srcPhotoBtn" class="src-card"><span class="ti">📷</span><b>צילום</b><small>לצלם דף בטלפון</small></button>
-        <button id="srcCamBtn" class="src-card"><span class="ti">🎥</span><b>מצלמה חיה</b><small id="srcCamNote">עובדת מחוץ ל־claude.ai</small></button>
-        <button id="srcGenBtn" class="src-card"><span class="ti">✨</span><b>טקסט חדש</b><small>לפי רמה ונושא</small><small id="srcGenNote" class="muted">זמין בגרסה שב־claude.ai</small></button>
+        <button id="srcFileBtn" class="src-card"><span class="ti ap"><i data-icon="folder"></i></span><b>קובץ</b><small>טקסט, Word, PDF או תמונה</small></button>
+        <button id="srcPhotoBtn" class="src-card"><span class="ti ap"><i data-icon="camera"></i></span><b>צילום</b><small>לצלם דף בטלפון</small></button>
+        <button id="srcCamBtn" class="src-card"><span class="ti ap"><i data-icon="scan"></i></span><b>מצלמה חיה</b><small id="srcCamNote">עובדת מחוץ ל־claude.ai</small></button>
+        <button id="srcGenBtn" class="src-card"><span class="ti ap"><i data-icon="sparkle"></i></span><b>טקסט חדש</b><small>לפי רמה ונושא</small><small id="srcGenNote" class="muted">זמין בגרסה שב־claude.ai</small></button>
         <span id="srcGenCard" hidden></span>
       </div>
       <input id="srcFile" type="file" accept=".txt,.md,.docx,.pdf,image/*,text/plain" hidden>
       <input id="srcPhoto" type="file" accept="image/*" capture="environment" hidden>
     </div>
     <div id="readView" class="read-view" style="display:none">
-      <div id="aiBar" class="ai-bar" style="display:none">⏳ Claude כותב… <button id="aiStop" class="small">עצירה</button></div>
+      <div id="aiBar" class="ai-bar" style="display:none">Claude כותב… <button id="aiStop" class="small">עצירה</button></div>
       <div id="readLens" class="read-lens">
         <div id="readScroll" class="lens-scroll"><div class="lens-content" id="readContent"></div></div>
       </div>
@@ -444,7 +445,7 @@
         <button id="segPlay" class="rb play" title="התקדמות אוטומטית">▶</button>
         <button id="segNext" class="rb" title="הבא">←</button>
         <span id="segCount" class="seg-count"></span>
-        <label class="seg-every">⏱ <select id="segEvery" title="כל כמה שניות להתקדם">
+        <label class="seg-every"><select id="segEvery" title="כל כמה שניות להתקדם">
           <option value="auto">קצב לפי האורך</option>
           <option value="1">כל שנייה</option><option value="2">כל 2 שניות</option><option value="3">כל 3 שניות</option>
           <option value="5">כל 5 שניות</option><option value="8">כל 8 שניות</option><option value="12">כל 12 שניות</option>
@@ -456,7 +457,7 @@
   <!-- ============ MORE CALIBRATION TOOLS (spec 4.2, 4.4, 4.5) ============ -->
   <section id="screen-tools" class="screen cal-screen">
     <header class="cal-bar">
-      <div class="cal-title">🎯 כלי כיול נוספים</div>
+      <div class="cal-title"><i data-icon="target"></i> כלי כיול נוספים</div>
       <label class="instrument">כלי:
         <select id="tlMode">
           <option value="dots">4.2 מערך נקודות</option>
@@ -469,7 +470,7 @@
         <button id="tlUndo">↶ ביטול</button>
         <button id="tlRedo">↷ חזרה</button>
         <button id="tlReset">⟲ איפוס</button>
-        <button id="tlSave" class="primary">💾 שמירה</button>
+        <button id="tlSave" class="primary"><i data-icon="save"></i> שמירה</button>
       </div>
     </header>
     <div class="layout">
@@ -490,7 +491,7 @@
           <div data-tl="size">
             <label>צורה <select id="tlShape"><option value="circle">עיגול</option><option value="square">ריבוע</option></select></label>
             <label>סידור <select id="tlLayout"><option value="lr">ימין ושמאל</option><option value="tb">למעלה ולמטה</option></select></label>
-            <div class="row wrap"><button id="tlSwap">⇄ להחליף צדדים</button><button id="tlMeasure" class="primary">📏 לשמור מדידה</button></div>
+            <div class="row wrap"><button id="tlSwap">⇄ להחליף צדדים</button><button id="tlMeasure" class="primary"><i data-icon="ruler"></i> לשמור מדידה</button></div>
           </div>
         </section>
         <section>
@@ -509,7 +510,7 @@
 
   <!-- ============ LAB (spec 5.1, 6.1–6.5, 7.2) ============ -->
   <section id="screen-lab" class="screen">
-    <h1 class="big-title">🔬 מעבדת טשטוש, ניגודיות ותנועה</h1>
+    <h1 class="big-title"><span class="title-badge"><i data-icon="flask"></i></span> מעבדת טשטוש, ניגודיות ותנועה</h1>
     <p class="muted">כלים להתאמה מדויקת. אפשר לנסות לבד או עם מישהו שעוזר. התוצאות נשמרות אצל הקורא, וצורת הטשטוש ושיטת החידוד שנבחרו יכולות לחדד תמונות, צילומים ועמודי PDF בקריאה. אלה התאמות תצוגה, לא בדיקה של בריאות העין.</p>
     <p class="glasses-note" data-glasses></p>
     <p class="device-note" data-small-screen></p>
@@ -520,7 +521,7 @@
   <!-- ============ READING-SPEED TEST ============ -->
   <section id="screen-readtest" class="screen">
     <div id="rtSetup" class="learn-setup">
-      <h1 class="big-title">⏱️ גודל קריאה נוח</h1>
+      <h1 class="big-title"><span class="title-badge"><i data-icon="timer"></i></span> גודל קריאה נוח</h1>
       <p class="lead">משפטים קצרים מופיעים בגדלים שהולכים וקטנים. קוראים כל משפט בקול, מהר ככל שנוח, ולוחצים "סיימתי". מי שמקשיב מסמן כמה מילים נקראו לא נכון.</p>
       <p class="muted">מתאים למי שכבר קורא משפטים (בערך מכיתה ב׳). לוקח כ־5 דקות. כך מוצאים את גודל האותיות הכי קטן שעדיין קוראים בו מהר ובנוחות.</p>
       <div class="setup-grid">
@@ -528,7 +529,7 @@
         <label>מרחק מהמסך (ס״מ) <input id="rtDist" type="number" min="15" max="150"></label>
       </div>
       <label class="check"><input type="checkbox" id="rtCompare"> להשוות גם בלי ההגדרות האישיות (עוד כ־5 דקות)</label>
-      <p><span id="rtCalNote" class="muted small"></span> <button id="rtCard" class="linkish">📏 כיול גודל מסך</button></p>
+      <p><span id="rtCalNote" class="muted small"></span> <button id="rtCard" class="linkish"><i data-icon="ruler"></i> כיול גודל מסך</button></p>
       <p class="glasses-note" data-glasses></p>
       <p class="device-note" data-small-screen></p>
       <button id="rtStart" class="primary huge">▶ להתחיל</button>
@@ -544,11 +545,11 @@
       <div id="rtButtons" class="learn-choices"></div>
     </div>
     <div id="rtEnd" class="learn-end" style="display:none">
-      <h1 class="big-title">🏁 סיימנו!</h1>
+      <h1 class="big-title"><span class="title-badge"><i data-icon="trophy"></i></span> סיימנו!</h1>
       <div id="rtSummary"></div>
       <div class="row wrap center">
         <button id="rtApply" class="primary big"></button>
-        <button id="rtKeep">↩️ להשאיר את הגודל הקודם</button>
+        <button id="rtKeep">להשאיר את הגודל הקודם</button>
       </div>
     </div>
   </section>
@@ -556,7 +557,7 @@
   <!-- ============ VISUAL-FIELD MAP ============ -->
   <section id="screen-fieldtest" class="screen">
     <div id="ftSetup" class="learn-setup">
-      <h1 class="big-title">🎯 מפת נוחות צפייה</h1>
+      <h1 class="big-title"><span class="title-badge"><i data-icon="map"></i></span> מפת נוחות צפייה</h1>
       <p class="lead">מביטים כל הזמן בצלב האדום שבמרכז. נקודות קטנות יהבהבו מסביב. כל פעם שרואים נקודה, לוחצים על המסך או על מקש הרווח. לא מזיזים את המבט אל הנקודה!</p>
       <p class="muted">כך רואים אם יש אזורים במסך שבהם קשה יותר לראות את הנקודות, ומתאימים לפי זה את מיקום הטקסט. לוקח כ־3 דקות.</p>
       <div class="setup-grid">
@@ -564,7 +565,7 @@
         <label>מרחק מהמסך (ס״מ) <input id="ftDist" type="number" min="15" max="150"></label>
         <label>גודל הנקודה <select id="ftDotSize"><option value="0.35">קטנה</option><option value="0.5" selected>רגילה</option><option value="0.9">גדולה (לראייה חלשה)</option></select></label>
       </div>
-      <p><span id="ftCalNote" class="muted small"></span> <button id="ftCard" class="linkish">📏 כיול גודל מסך</button></p>
+      <p><span id="ftCalNote" class="muted small"></span> <button id="ftCard" class="linkish"><i data-icon="ruler"></i> כיול גודל מסך</button></p>
       <p class="glasses-note" data-glasses></p>
       <p class="device-note" data-small-screen></p>
       <button id="ftStart" class="primary huge">▶ להתחיל</button>
@@ -581,20 +582,20 @@
       </div>
     </div>
     <div id="ftEnd" class="learn-end" style="display:none">
-      <h1 class="big-title">🗺️ מפת נוחות הצפייה</h1>
+      <h1 class="big-title"><span class="title-badge"><i data-icon="map"></i></span> מפת נוחות הצפייה</h1>
       <div id="ftSummary"></div>
       <div class="row wrap center">
         <button id="ftApply" class="primary big">✓ להפעיל את ההמלצות בקריאה</button>
-        <button id="ftKeep">↩️ להשאיר כמו שהיה</button>
+        <button id="ftKeep">להשאיר כמו שהיה</button>
       </div>
     </div>
   </section>
 
   <!-- ============ HISTORY (optional) ============ -->
   <section id="screen-history" class="screen">
-    <h1 class="big-title">📈 ההיסטוריה שלי</h1>
+    <h1 class="big-title"><span class="title-badge"><i data-icon="chart"></i></span> ההיסטוריה שלי</h1>
     <p class="muted">הנתונים נשמרים רק במכשירים שלכם (ובסנכרון המוצפן, אם הופעל). הגרפים לא מפרשים ולא מאבחנים, הם רק מראים איך ההתאמות השתנו.</p>
-    <div class="row wrap"><button id="histToggle" class="eye-switch"></button><button id="histClear" class="danger">🗑️ למחוק את ההיסטוריה</button></div>
+    <div class="row wrap"><button id="histToggle" class="eye-switch"></button><button id="histClear" class="danger"><i data-icon="trash"></i> למחוק את ההיסטוריה</button></div>
     <div id="histBody"></div>
   </section>
 
@@ -602,7 +603,7 @@
   <div id="drawerScrim" class="drawer-scrim"></div>
   <aside id="drawer" class="drawer">
     <div class="drawer-head">
-      <h2>⚙️ ההגדרות של הקורא</h2>
+      <h2><i data-icon="sliders"></i> ההגדרות של הקורא</h2>
       <button id="drawerClose">✕</button>
     </div>
     <div id="drawerPreview" class="drawer-preview"><div class="lens-content">
@@ -611,39 +612,39 @@
       <div class="ab-pics"><span>🐢</span><span>⭐</span></div>
     </div></div>
     <div class="row wrap">
-      <button id="drawerBest" class="primary">⭐ לקבוע כמצב שלי</button>
-      <button id="drawerPin">📌 לשמור מצב בשם</button>
+      <button id="drawerBest" class="primary"><i data-icon="star"></i> לקבוע כמצב שלי</button>
+      <button id="drawerPin"><i data-icon="pin"></i> לשמור מצב בשם</button>
       <button id="drawerReset">↺ ברירת מחדל</button>
     </div>
     <div id="drawerBody"></div>
-    <button id="drawerEyes">👁️ מעקב עיניים: הפעלה והסבר</button>
+    <button id="drawerEyes"><i data-icon="scan"></i> מעקב עיניים: הפעלה והסבר</button>
   </aside>
 
   <!-- ============ EYE TRACKING (opt-in) ============ -->
   <button id="eyeWidget" class="eye-widget" style="display:none" title="מעקב עיניים"></button>
   <div id="eyePanel" class="eye-panel">
-    <div class="drawer-head"><b>👁️ מעקב עיניים</b><button id="eyePanelClose" class="small">✕</button></div>
+    <div class="drawer-head"><b><i data-icon="scan"></i> מעקב עיניים</b><button id="eyePanelClose" class="small">✕</button></div>
     <div id="eyeStats" class="eye-stats"></div>
     <label class="check"><input type="checkbox" id="eyePreviewToggle"> להראות את המצלמה (רק כאן, לא נשמר)</label>
     <div id="eyePreview"></div>
-    <div class="row wrap"><button id="eyeCenter">🎯 לקבוע מרכז</button><button id="eyeCalib40">📏 כיול מרחק (40 ס״מ)</button></div>
+    <div class="row wrap"><button id="eyeCenter"><i data-icon="target"></i> לקבוע מרכז</button><button id="eyeCalib40"><i data-icon="ruler"></i> כיול מרחק (40 ס״מ)</button></div>
     <div class="row wrap"><button id="eyeInfoBtn" class="linkish">מה זה, ומתי זה לא עובד?</button><button id="eyeOff" class="danger">כיבוי</button></div>
   </div>
 
   <!-- ============ NAVIGATOR (guide) ============ -->
   <div id="copilot" class="copilot" role="dialog" aria-live="polite" aria-label="הנווט">
-    <div class="cp-owl" aria-hidden="true">🦉</div>
+    <div class="cp-owl ap" aria-hidden="true"><i data-icon="owl"></i></div>
     <div class="cp-body">
       <div class="cp-name">ינשוף, הנווט</div>
       <p id="copilotText" class="cp-text"></p>
       <div id="copilotButtons" class="cp-buttons"></div>
     </div>
     <div class="cp-tools">
-      <button id="copilotSpeak" class="small" title="להקריא">🔊</button>
+      <button id="copilotSpeak" class="small" title="להקריא"><i data-icon="sound"></i></button>
       <button id="copilotClose" class="small" title="להסתיר">✕</button>
     </div>
   </div>
-  <button id="copilotMini" class="copilot-mini" title="הנווט" style="display:none">🦉</button>
+  <button id="copilotMini" class="copilot-mini" title="הנווט" style="display:none"><span class="ap"><i data-icon="owl"></i></span></button>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <a href="#main-content" class="skip-link" id="skipLink">דילוג לתוכן</a>
@@ -685,9 +686,9 @@
 
   <dialog id="cardDialog" class="wide">
     <form method="dialog">
-      <h3>📏 כיול גודל המסך</h3>
+      <h3><i data-icon="ruler"></i> כיול גודל המסך</h3>
       <p>הניחו כרטיס אשראי (או כל כרטיס בגודל כזה, כמו תעודת זהות) על המסך, והגדילו או הקטינו את המלבן עד שהוא בדיוק בגודל הכרטיס.</p>
-      <div class="card-wrap"><div id="cardBox" class="card-box">💳</div></div>
+      <div class="card-wrap"><div id="cardBox" class="card-box"><span class="card-chip"></span><span class="card-stripe"></span></div></div>
       <div class="row center"><button type="button" id="cardMinus">−</button><input id="cardSlider" type="range"><button type="button" id="cardPlus">+</button></div>
       <div class="row"><button value="ok" class="primary">שמירה</button> <button value="cancel">ביטול</button></div>
     </form>
@@ -698,10 +699,10 @@
       <h3 id="profileDialogTitle">קורא/ת חדש/ה</h3>
       <label>שם <input id="profileName" type="text" maxlength="24" autocomplete="off"></label>
       <div class="kind-pick">
-        <label><input type="radio" name="pkind" value="child" checked> 🧒 ילד/ה</label>
-        <label><input type="radio" name="pkind" value="adult"> 🧑 מבוגר/ת</label>
+        <label><input type="radio" name="pkind" value="child" checked> טייס/ת צעיר/ה</label>
+        <label><input type="radio" name="pkind" value="adult"> מבוגר/ת</label>
       </div>
-      <label>👓 משקפיים או עדשות בזמן קריאה
+      <label><i data-icon="glasses"></i> משקפיים או עדשות בזמן קריאה
         <select id="profileGlasses">
           <option value="">לא יודעים / משתנה</option>
           <option value="none">בלי משקפיים</option>
@@ -714,7 +715,7 @@
       <p class="muted small">בחרו דמות:</p>
       <div id="emojiPick" class="emoji-pick"></div>
       <div class="row"><button value="ok" class="primary">שמירה</button> 
-        <button value="delete" id="profileDelete" class="danger" style="display:none">🗑️ מחיקת הקורא</button>
+        <button value="delete" id="profileDelete" class="danger" style="display:none"><i data-icon="trash"></i> מחיקת הקורא</button>
         <button value="cancel">ביטול</button>
       </div>
     </form>
@@ -730,7 +731,7 @@
 
   <dialog id="genDialog">
     <form method="dialog">
-      <h3>✨ טקסט חדש לקריאה</h3>
+      <h3><i data-icon="sparkle"></i> טקסט חדש לקריאה</h3>
       <label>רמה
         <select id="genLevel">
           <option value="g1">כיתה א׳</option><option value="g2" selected>כיתה ב׳</option><option value="g3">כיתה ג׳</option>
@@ -750,7 +751,7 @@
         <label>אורך <select id="genLength"><option value="short">קצר</option><option value="medium">בינוני</option><option value="long">ארוך</option></select></label>
       </div>
       <label class="check"><input id="genNikud" type="checkbox"> עם ניקוד</label>
-      <div class="row"><button value="ok" class="primary">✨ לכתוב</button> <button value="cancel">ביטול</button></div>
+      <div class="row"><button value="ok" class="primary"><i data-icon="sparkle"></i> לכתוב</button> <button value="cancel">ביטול</button></div>
     </form>
   </dialog>
 
@@ -774,7 +775,7 @@
   <script src="js/core/device.js"></script>
   <script src="js/instruments/grid.js"></script>
   <script src="js/vision/eyes.js"></script>
-  <script>window.DA.VERSION = '1.4.1';</script>
+  <script>window.DA.VERSION = '1.5.0';</script>
   <script src="js/ui/icons.js"></script>
   <script src="js/ui/common.js"></script>
   <script src="js/ui/drawer.js"></script>

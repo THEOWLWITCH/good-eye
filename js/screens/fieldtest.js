@@ -264,7 +264,7 @@
   function summaryHtml(s, full) {
     var r = s.result || analyze(s);
     var eye = { right: T('עין ימין'), left: T('עין שמאל'), both: T('שתי העיניים') }[s.eye] || '';
-    var out = '<p class="muted">🎯 ' + T('מפת נוחות צפייה') + ' · ' + eye + ' · ' + new Date(s.startedAt).toLocaleString(DA.i18n.locale) + (s.early ? T(' · הופסק באמצע') : '') + '</p>' +
+    var out = '<p class="muted">' + T('מפת נוחות צפייה') + ' · ' + eye + ' · ' + new Date(s.startedAt).toLocaleString(DA.i18n.locale) + (s.early ? T(' · הופסק באמצע') : '') + '</p>' +
       '<p><b>' + PATTERN[r.pattern] + '</b></p>';
     if (full) {
       out += '<div class="ft-result">' + mapSvg(s) + '<div class="ft-legend">' +

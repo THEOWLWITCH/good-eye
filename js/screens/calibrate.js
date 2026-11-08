@@ -103,8 +103,8 @@
     var txt = T('שינוי שטח מקומי: בין ×') + q.minDet.toFixed(2) + T(' ל-×') + q.maxDet.toFixed(2) +
       T(' · תזוזה מרבית: ') + Math.round(q.maxDisplacement * grid.S) + T(' פיקסלים');
     if (grid.settings.figure && grid.settings.figure !== 'grid') txt = shapeStats() + ' · ' + txt;
-    if (q.fold) { el.textContent = T('⚠ קיפול ברשת! ') + txt + T(' — מומלץ לבטל את הפעולה האחרונה'); el.className = 'bad'; }
-    else if (q.extreme) { el.textContent = T('⚠ עיוות מקומי חזק (מומלץ רדיוס גדול יותר) · ') + txt; el.className = 'warn'; }
+    if (q.fold) { el.textContent = T('קיפול ברשת! ') + txt + T(' — מומלץ לבטל את הפעולה האחרונה'); el.className = 'bad'; }
+    else if (q.extreme) { el.textContent = T('עיוות מקומי חזק (מומלץ רדיוס גדול יותר) · ') + txt; el.className = 'warn'; }
     else { el.textContent = T('✓ רציף, ללא קיפולים · ') + txt; el.className = 'ok'; }
   }
 

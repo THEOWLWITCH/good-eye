@@ -63,7 +63,7 @@
       dlg.onclose = function () {
         if (dlg.returnValue !== 'ok') { resolve(false); return; }
         save(+slider.value / CARD_MM);
-        DA.ui.toast(T('📏 גודל המסך נשמר במכשיר הזה'));
+        DA.ui.toast(T('גודל המסך נשמר במכשיר הזה'));
         resolve(true);
       };
       dlg.showModal();

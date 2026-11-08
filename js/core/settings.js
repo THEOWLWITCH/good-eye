@@ -19,7 +19,7 @@
   var FONTS_CSS = 'https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&family=Assistant:wght@400;600;800' +
     '&family=Varela+Round&family=Comic+Neue:wght@400;700&family=Atkinson+Hyperlegible:wght@400;700' +
     '&family=Lexend:wght@400;600&family=Heebo:wght@400;500;600;700;800;900&family=Frank+Ruhl+Libre:wght@400;700' +
-    '&family=Noto+Serif:wght@400;700&display=swap';
+    '&family=Noto+Serif:wght@400;700&family=IBM+Plex+Sans+Hebrew:wght@300;400;500;600;700&display=swap';
 
   // Colour themes: polarity + tint. fg/bg used for text; "reversed" also inverts images on request.
   var THEMES = [

@@ -102,8 +102,8 @@
     $('rtContent').innerHTML = '<p class="rt-sentence" dir="' + (sess.lang === 'he' ? 'rtl' : 'ltr') + '" style="font-size:' + Math.round(run.size * 10) / 10 + 'px">' + esc(sent) + '</p>';
     $('rtPrompt').textContent = T('קוראים בקול… ובסוף לוחצים "סיימתי".');
     buttons([
-      { html: T('✅ סיימתי'), cls: 'pick', fn: done },
-      { html: T('🚫 לא מצליח/ה לקרוא'), cls: 'same', fn: cannot }
+      { html: T('סיימתי'), cls: 'pick', fn: done },
+      { html: T('לא מצליח/ה לקרוא'), cls: 'same', fn: cannot }
     ]);
     t0 = performance.now();
   }
@@ -268,7 +268,7 @@
         : gain < -8 ? '<span class="bad">' + T('בלי ההגדרות הקריאה הייתה מהירה יותר. כדאי לבדוק את ההגדרות.') + '</span>'
         : T('מהירות דומה עם ההגדרות ובלעדיהן.')) + '</p>';
     }
-    return '<p class="muted">⏱️ ' + T('גודל קריאה נוח') + ' · ' + new Date(s.startedAt).toLocaleString(DA.i18n.locale) + ' · ' + s.distanceCm + T(' ס״מ') +
+    return '<p class="muted">' + T('גודל קריאה נוח') + ' · ' + new Date(s.startedAt).toLocaleString(DA.i18n.locale) + ' · ' + s.distanceCm + T(' ס״מ') +
       (s.early ? T(' · הופסק באמצע') : '') + '</p>' +
       '<table class="sum"><tr><th></th><th>' + T('מהירות מרבית (מילים לדקה)') + '</th><th>' + T('הגודל הקטן שעדיין נקרא בנוחות') + '</th><th>' + T('הגודל הקטן ביותר שנקרא') + '</th></tr>' + rows + '</table>' +
       verdict + (full ? chart(s) : '') +

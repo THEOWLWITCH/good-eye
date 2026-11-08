@@ -14,7 +14,7 @@ var FILES = [
 var LIB_HOSTS = ['cdnjs.cloudflare.com', 'cdn.jsdelivr.net', 'fonts.googleapis.com', 'fonts.gstatic.com', 'storage.googleapis.com'];
 
 self.addEventListener('install', function (e) {
-  e.waitUntil(caches.open(APP_CACHE).then(function (c) { return c.addAll(FILES); }).then(function () { return self.skipWaiting(); }));
+  e.waitUntil(caches.open(APP_CACHE).then(function (c) { return c.addAll(FILES.map(function (f) { return new Request(f, { cache: 'reload' }); })); }).then(function () { return self.skipWaiting(); }));
 });
 
 self.addEventListener('activate', function (e) {
@@ -30,7 +30,9 @@ self.addEventListener('fetch', function (e) {
   if (url.pathname.indexOf('/api/') === 0) return;               // sync: always live
   if (url.origin === self.location.origin) {
     // network first, fall back to the cached copy when offline
-    e.respondWith(fetch(req).then(function (res) {
+    // always revalidate with the server, never a stale HTTP-cache copy, so every update arrives
+    var fresh = req.mode === 'navigate' ? fetch(req.url, { cache: 'no-cache', credentials: 'same-origin' }) : fetch(new Request(req, { cache: 'no-cache' }));
+    e.respondWith(fresh.then(function (res) {
       if (res.ok) { var copy = res.clone(); caches.open(APP_CACHE).then(function (c) { c.put(req, copy); }); }
       return res;
     }).catch(function () {

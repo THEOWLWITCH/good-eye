@@ -49,7 +49,7 @@
   function renderPace() { var sel = $('learnPace'); if (sel) sel.value = pace(); }
   function renderVoiceBtn() {
     var b = $('learnVoice'); if (!b) return;
-    b.textContent = voiceOn() ? '🔊' : '🔇';
+    b.innerHTML = DA.icons.svg(voiceOn() ? 'sound' : 'mute');
     b.title = voiceOn() ? T('להשתיק את קול הטיסה') : T('להפעיל את קול הטיסה');
     b.setAttribute('aria-pressed', voiceOn() ? 'true' : 'false');
   }
@@ -215,7 +215,7 @@
     $('learnPlayed').style.display = prev ? '' : 'none';
     $('learnOnce').style.display = prev ? 'none' : '';
     $('quickGame').classList.toggle('huge', !prev);
-    $('quickGame').textContent = prev ? T('▶️ לטוס שוב בכל זאת') : T('▶️ ממריאים (כ־3 דקות)');
+    $('quickGame').textContent = prev ? T('לטוס שוב בכל זאת') : T('ממריאים (כ־3 דקות)');
     if (prev) $('learnPlayedWhen').textContent = T('✓ טיסת הניסוי כבר נעשתה ב־') + new Date(prev.startedAt).toLocaleDateString(DA.i18n.locale);
     document.querySelectorAll('#catChecks input').forEach(function (i) {
       var def = defaultCats(p.kind === 'adult');
@@ -461,10 +461,10 @@
       ? T('מכסים את העין <b>השמאלית</b> ביד, ומסתכלים בעין ימין על הנקודה האדומה. איך נראים הקווים?')
       : T('עכשיו מכסים את העין <b>הימנית</b>, ומסתכלים בעין שמאל על הנקודה האדומה. איך נראים הקווים?');
     choices([
-      { html: T('✅ כולם ישרים'), cls: 'answer wide', fn: function () { answerLines('straight'); } },
-      { html: T('〰️ חלק עקומים או גליים'), cls: 'answer wide', fn: function () { answerLines('wavy'); } },
-      { html: T('⬜ חסר חלק או יש כתם'), cls: 'answer wide', fn: function () { answerLines('missing'); } },
-      { html: T('🤷 לא בטוח'), cls: 'answer wide same', fn: function () { answerLines('unsure'); } }
+      { html: T('כולם ישרים'), cls: 'answer wide', fn: function () { answerLines('straight'); } },
+      { html: T('חלק עקומים או גליים'), cls: 'answer wide', fn: function () { answerLines('wavy'); } },
+      { html: T('חסר חלק או יש כתם'), cls: 'answer wide', fn: function () { answerLines('missing'); } },
+      { html: T('לא בטוח'), cls: 'answer wide same', fn: function () { answerLines('unsure'); } }
     ]);
     stepStart = performance.now();
   }
@@ -507,8 +507,8 @@
     for (var i = 0; i < 4; i++) html += '<button class="odd-dot" data-i="' + i + '" style="background:' + (i === odd ? other : base) + '" aria-label="' + T('עיגול') + ' ' + (i + 1) + '"></button>';
     $('learnContent').innerHTML = html + '</div>';
     $('learnContent').querySelectorAll('.odd-dot').forEach(function (b) { b.onclick = function () { answerColor(+b.getAttribute('data-i')); }; });
-    $('learnPrompt').textContent = T('איזה עיגול בצבע אחר? גע בו 👆');
-    choices([{ html: T('🤷 לא רואה הבדל'), cls: 'same', fn: function () { answerColor(-1); } }]);
+    $('learnPrompt').textContent = T('איזה עיגול בצבע אחר? גע בו');
+    choices([{ html: T('לא רואה הבדל'), cls: 'same', fn: function () { answerColor(-1); } }]);
     stepStart = performance.now();
   }
   function answerColor(i) {
@@ -574,8 +574,8 @@
       lens.apply(DA.settings.normalize(Object.assign(s, { fontSize: Math.min(work.fontSize, 34), shiftX: 0, shiftY: 0, ruler: 'off' })), null);
       el.onclick = function () { choosePref(v); };
     });
-    $('learnPrompt').textContent = T('איזה צד יותר ברור ונעים לקריאה? גע בו 👆');
-    choices([{ html: T('🤷 אותו דבר'), cls: 'same', fn: function () { choosePref('same'); } }]);
+    $('learnPrompt').textContent = T('איזה צד יותר ברור ונעים לקריאה? גע בו');
+    choices([{ html: T('אותו דבר'), cls: 'same', fn: function () { choosePref('same'); } }]);
   }
 
   function choosePref(v) {
@@ -597,9 +597,9 @@
       '<div class="ab-pics">' + DA.stimuli.lineSvg('house', 90) + DA.stimuli.lineSvg('star', 90) + '</div></div>';
     $('learnPrompt').innerHTML = (t.n === 0 ? T('<span class="muted">תיקון העיוות מכויל לעין אחת: כסו את העין השנייה והביטו במרכז. </span><br>') : '') + T('זו תמונה <b id="warpNum">1</b> מתוך 2. לחצו 🔁 כדי לראות את השנייה, ואז בחרו את הברורה יותר.');
     choices([
-      { html: T('🔁 להחליף'), cls: 'flip', fn: flipWarp },
-      { html: T('👍 זו יותר ברורה'), cls: 'pick', fn: function () { chooseWarp(false); }, disabled: true },
-      { html: T('🤷 אותו דבר'), cls: 'same', fn: function () { chooseWarp(true); }, disabled: true }
+      { html: T('להחליף'), cls: 'flip', fn: flipWarp },
+      { html: T('זו יותר ברורה'), cls: 'pick', fn: function () { chooseWarp(false); }, disabled: true },
+      { html: T('אותו דבר'), cls: 'same', fn: function () { chooseWarp(true); }, disabled: true }
     ]);
     showWarpVersion(0);
   }
@@ -783,7 +783,7 @@
     var showCal = wavy || missing || (!straight && !hasCal);
     $('learnNextYes').style.display = showCal ? '' : 'none';
     $('learnNextYes').textContent = wavy || missing ? (hasCal ? T('לחדש את כיול העיוות') : T('לכיול עיוות (כ־10 דקות)')) : T('כן, לפעמים ← לכיול עיוות (כ־10 דקות)');
-    $('learnNextNo').textContent = straight || wavy || missing ? T('לצאת לקרוא 📖') : T('לא ← אפשר לצאת לקרוא 📖');
+    $('learnNextNo').textContent = straight || wavy || missing ? T('לצאת לקרוא') : T('לא ← אפשר לצאת לקרוא');
     $('learnNextYes').onclick = function () { ctx.updateSettings(last.after); ctx.go('calibrate'); };
     $('learnNextNo').onclick = function () { ctx.updateSettings(last.after); ctx.store.setPref('read.intent', 'read'); ctx.go('read'); };
     $('learnEndSay').textContent = endMsg;
@@ -791,7 +791,7 @@
     $('learnApplyBest').onclick = function () {
       ctx.updateSettings(sess.after);
       ctx.profiles.setBest(ctx.profile(), sess.after);
-      DA.ui.toast(T('⭐ נשמר כמצב שלך')); ctx.go('hub');
+      DA.ui.toast(T('נשמר כמצב שלך')); ctx.go('hub');
     };
     $('learnApply').onclick = function () { ctx.updateSettings(sess.after); DA.ui.toast(T('ההגדרות החדשות פועלות. ⭐ המצב שלי נשאר כמו שהיה.')); ctx.go('hub'); };
     $('learnKeep').onclick = function () { ctx.go('hub'); };
@@ -801,7 +801,7 @@
   }
 
   var CAT_LABEL = {};
-  DA.stimuli.CATEGORIES.forEach(function (c) { CAT_LABEL[c.id] = c.icon + ' ' + c.label; });
+  DA.stimuli.CATEGORIES.forEach(function (c) { CAT_LABEL[c.id] = c.label; });
 
   /** Friendly summary of a session (also shown on the hub). */
   function summaryHtml(s) {
@@ -813,13 +813,13 @@
     }).join('');
     var LINES = { straight: T('ישרים'), wavy: T('עקומים או גליים'), missing: T('חסר חלק'), unsure: T('לא בטוח') };
     var extra = '';
-    if (s.lines) extra += T('<p>📏 קווים: ') + T('עין ימין') + ' – ' + (LINES[s.lines.right] || '—') + ' · ' + T('עין שמאל') + ' – ' + (LINES[s.lines.left] || '—') + '</p>';
-    if (s.contrast) extra += T('<p>🌫️ אותיות בערפל: ') + (s.contrast.needsMore ? T('קשה יותר לראות אותיות חיוורות, ולכן הפעלנו אותיות עבות.') : T('ראית היטב גם אותיות חיוורות.')) + '</p>';
-    if (s.colorHint !== undefined) extra += T('<p>🎨 צבעים: ') + (s.colorHint === 'rg' ? T('היה קשה להבדיל בין אדום לירוק, ולכן הפעלנו מסנן צבעים שעוזר להבדיל ביניהם.') : s.colorHint === 'by' ? T('היה קשה להבדיל בין כחול לירוק, ולכן הפעלנו מסנן צבעים מתאים.') : T('מצאת את כל הצבעים השונים.')) + '</p>';
+    if (s.lines) extra += T('<p>קווים: ') + T('עין ימין') + ' – ' + (LINES[s.lines.right] || '—') + ' · ' + T('עין שמאל') + ' – ' + (LINES[s.lines.left] || '—') + '</p>';
+    if (s.contrast) extra += T('<p>אותיות בערפל: ') + (s.contrast.needsMore ? T('קשה יותר לראות אותיות חיוורות, ולכן הפעלנו אותיות עבות.') : T('ראית היטב גם אותיות חיוורות.')) + '</p>';
+    if (s.colorHint !== undefined) extra += T('<p>צבעים: ') + (s.colorHint === 'rg' ? T('היה קשה להבדיל בין אדום לירוק, ולכן הפעלנו מסנן צבעים שעוזר להבדיל ביניהם.') : s.colorHint === 'by' ? T('היה קשה להבדיל בין כחול לירוק, ולכן הפעלנו מסנן צבעים מתאים.') : T('מצאת את כל הצבעים השונים.')) + '</p>';
     var warp = s.warpVerdict ? T('<p>תיקון העיוות: ') + ({ helps: T('נבחר כברור יותר ✓'), 'does-not-help': T('לא עזר בבדיקה הזו'), unclear: T('לא חד־משמעי') })[s.warpVerdict] + '</p>' : '';
     return '<p class="muted">' + new Date(s.startedAt).toLocaleString(DA.i18n.locale) + (s.early ? T(' · הופסק באמצע') : '') + '</p>' +
       (rows ? T('<table class="sum"><tr><th>מה ראינו</th><th>הגודל הקטן ביותר שזוהה — עם ההגדרות שלי</th><th>בלי</th><th>שיפור</th></tr>') + rows + '</table>' : '') +
-      extra + warp + (s.viewing && s.viewing.distanceCmMedian ? T('<p>👁️ מרחק צפייה ממוצע: ') + s.viewing.distanceCmMedian + T(' ס״מ') +
+      extra + warp + (s.viewing && s.viewing.distanceCmMedian ? T('<p>מרחק צפייה ממוצע: ') + s.viewing.distanceCmMedian + T(' ס״מ') +
         (s.viewing.gazeCenteredPct != null ? T(' · מבט במרכז ') + s.viewing.gazeCenteredPct + T('% מהזמן') : '') + '</p>' : '') + (s.attention != null && s.attention < 70 ? T('<p class="bad">בבדיקות הקלות היו טעויות — ייתכן שהייתה עייפות. כדאי לחזור על טיסת הניסוי ביום אחר.</p>') : '') +
       T('<p><b>ההגדרות שנלמדו:</b> ') + esc(DA.settings.describe(s.after || s.before)) + '</p>';
   }

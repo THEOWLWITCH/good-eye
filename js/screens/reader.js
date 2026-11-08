@@ -24,7 +24,7 @@
     $('rGlasses').onchange = function () { ctx.updateSettings({ warpStrength: +this.value }); };
     $('rStar').onclick = function () {
       var p = ctx.profile();
-      if (p.best) { ctx.updateSettings(p.best.settings); DA.ui.toast(T('⭐ המצב שלי')); }
+      if (p.best) { ctx.updateSettings(p.best.settings); DA.ui.toast(T('המצב שלי')); }
       else DA.ui.toast(T('עוד אין "מצב שלי". אפשר לקבוע אחרי טיסת הניסוי או בהגדרות.'));
     };
     $('rTheme').onclick = cycleTheme;
@@ -90,7 +90,7 @@
         DA.voice.start(DA.i18n.content, voiceCommand, function (onNow, err) {
           $('rVoice').classList.toggle('listening', onNow);
           if (err) DA.ui.tell(T('אין גישה למיקרופון. צריך לאשר אותו בדפדפן.'));
-          else if (onNow) DA.ui.toast(T('🎤 מקשיב: "גדול יותר", "קטן יותר", "תקריא", "עצור", "הבא", "הקודם", "צבעים", "סרגל"'));
+          else if (onNow) DA.ui.toast(T('מקשיב: "גדול יותר", "קטן יותר", "תקריא", "עצור", "הבא", "הקודם", "צבעים", "סרגל"'));
         });
       };
     }
@@ -167,7 +167,7 @@
     var pop = document.createElement('div');
     pop.id = 'dictPop'; pop.className = 'dict-pop';
     pop.innerHTML = (emo ? '<div class="emo">' + emo + '</div>' : '') + '<div class="w" dir="auto">' + esc(word) + '</div>' +
-      '<div class="row center"><button type="button" class="big" data-a="say">🔊</button><button type="button" data-a="ai" style="display:none">' + T('🪄 מה זה?') + '</button></div><p class="muted small" data-a="exp"></p>';
+      '<div class="row center"><button type="button" class="big" data-a="say">🔊</button><button type="button" data-a="ai" style="display:none">' + T('מה זה?') + '</button></div><p class="muted small" data-a="exp"></p>';
     document.body.appendChild(pop);
     var r = w.getBoundingClientRect();
     pop.style.top = Math.max(8, Math.min(innerHeight - pop.offsetHeight - 8, r.bottom + 8)) + 'px';
@@ -177,7 +177,7 @@
       var b = pop.querySelector('[data-a=ai]'); if (!ok || !b) return;
       b.style.display = '';
       b.onclick = function () {
-        var exp = pop.querySelector('[data-a=exp]'); exp.textContent = T('⏳ חושב…');
+        var exp = pop.querySelector('[data-a=exp]'); exp.textContent = T('חושב…');
         DA.ai.explainWord(word, docText() || '', ctx.profile().kind).then(function (r) { exp.textContent = r.text; }, function (e) { exp.textContent = DA.ai.errorText(e); });
       };
     });
@@ -288,7 +288,7 @@
 
   function busy(text) {
     showView();
-    $('readContent').innerHTML = '<p class="busy">⏳ ' + esc(text) + '</p>';
+    $('readContent').innerHTML = '<p class="busy">' + esc(text) + '</p>';
   }
 
   // ---------------- camera (live) ----------------
@@ -300,13 +300,13 @@
       showView();
       $('readContent').innerHTML = '<div class="cam-wrap"><video id="camVideo" autoplay playsinline muted></video></div>';
       $('camVideo').srcObject = s;
-      $('readExtra').innerHTML = T('<button id="camFreeze" class="big">📸 להקפיא</button>');
+      $('readExtra').innerHTML = T('<button id="camFreeze" class="big">להקפיא</button>');
       $('camFreeze').onclick = freezeFrame;
       setMode('page');
     }).catch(camFallback);
   }
   function camFallback() {
-    DA.ui.tell(T('המצלמה החיה לא זמינה כאן (בתוך claude.ai היא חסומה). אפשר לצלם תמונה עם "📷 צילום" — היא תוצג עם כל התיקונים.'));
+    DA.ui.tell(T('המצלמה החיה לא זמינה כאן (בתוך claude.ai היא חסומה). אפשר לצלם תמונה עם "צילום" — היא תוצג עם כל התיקונים.'));
   }
   function freezeFrame() {
     var v = $('camVideo');
@@ -346,7 +346,7 @@
 
   function runAi(label, call, meta) {
     showView();
-    $('readContent').innerHTML = '<p class="busy">⏳ ' + esc(label) + '</p>';
+    $('readContent').innerHTML = '<p class="busy">' + esc(label) + '</p>';
     $('aiBar').style.display = '';
     aiCtl = new AbortController();
     call(function (u) { $('readContent').innerHTML = '<div class="read-text">' + paragraphs(u.text) + '</div>'; }, aiCtl.signal)
@@ -370,9 +370,9 @@
     if (d.type === 'text') ctx.store.setPref('lastDoc.' + ctx.profile().id, { type: 'text', text: d.text, title: d.title || '' });
     showView();
     var extra = '';
-    if (d.type === 'image') extra = T('<button id="toText" class="big">📝 להפוך לטקסט</button>');
-    if (d.type === 'text' || d.type === 'pages') extra += '<button id="simplifyBtn" style="display:none">' + T('🪄 לפשט') + '</button>';
-    if ((d.type === 'image' || d.type === 'pages') && ctx.profile().settings.deblur !== 'none') extra += '<label class="inline check"><input type="checkbox" id="sharpenToggle"' + (ctx.store.getPref('sharpenOff', false) ? '' : ' checked') + '> ' + T('✨ חידוד אישי') + '</label>';
+    if (d.type === 'image') extra = T('<button id="toText" class="big">להפוך לטקסט</button>');
+    if (d.type === 'text' || d.type === 'pages') extra += '<button id="simplifyBtn" style="display:none">' + T('לפשט') + '</button>';
+    if ((d.type === 'image' || d.type === 'pages') && ctx.profile().settings.deblur !== 'none') extra += '<label class="inline check"><input type="checkbox" id="sharpenToggle"' + (ctx.store.getPref('sharpenOff', false) ? '' : ' checked') + '> ' + T('חידוד אישי') + '</label>';
     if (d.type === 'pages') extra = T('<label class="inline">תצוגה <select id="pagesAs"><option value="text">טקסט מסודר</option><option value="pages">עמודים כמו במקור</option></select></label>');
     $('readExtra').innerHTML = extra;
     if ($('toText')) DA.ai.canImages().then(function (ok) { $('toText').style.display = ok ? '' : 'none'; $('toText').onclick = photoToText; });

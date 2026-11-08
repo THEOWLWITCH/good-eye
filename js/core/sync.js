@@ -148,7 +148,7 @@
     var c = code();
     if (!c || !available()) return Promise.resolve({ ok: false });
     if (!navigator.onLine) { status(T('אין אינטרנט כרגע. הסנכרון יקרה כשיחזור החיבור.'), true); return Promise.resolve({ ok: false }); }
-    if (!quiet) status(T('🔄 מסנכרן…'));
+    if (!quiet) status(T('מסנכרן…'));
     var k, changed = 0;
     busy = keys(c).then(function (kk) {
       k = kk;

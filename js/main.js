@@ -119,11 +119,11 @@
     var g = p && p.glasses;
     if (g === 'none') return '';
     var base = {
-      reading: T('👓 מרכיבים את משקפי הקריאה, כמו בקריאה רגילה.'),
-      distance: T('👓 מרכיבים את המשקפיים. אם יש משקפי קריאה או מסך, עדיף אותם.'),
-      multifocal: T('👓 מולטיפוקל: מסתכלים דרך החלק התחתון של העדשה (החלק של הקריאה), ומזיזים את הראש ולא רק את העיניים.'),
-      contacts: T('👓 מרכיבים את עדשות המגע, כמו בקריאה רגילה.')
-    }[g] || T('👓 מרכיבים משקפיים או עדשות? משתמשים בעין טובה איתם, כמו בקריאה רגילה.');
+      reading: T('מרכיבים את משקפי הקריאה, כמו בקריאה רגילה.'),
+      distance: T('מרכיבים את המשקפיים. אם יש משקפי קריאה או מסך, עדיף אותם.'),
+      multifocal: T('מולטיפוקל: מסתכלים דרך החלק התחתון של העדשה (החלק של הקריאה), ומזיזים את הראש ולא רק את העיניים.'),
+      contacts: T('מרכיבים את עדשות המגע, כמו בקריאה רגילה.')
+    }[g] || T('מרכיבים משקפיים או עדשות? משתמשים בעין טובה איתם, כמו בקריאה רגילה.');
     return base + ' ' + T('חשוב: אותם משקפיים גם בטיסות הניסוי וגם בקריאה.');
   }
   function glassesNotes() {
@@ -134,7 +134,7 @@
   function smallScreenNotes() {
     // a phone-sized device (or a very narrow window): the device's screen, not just this window
     var small = Math.min(root.screen.width, root.screen.height) < 600 || root.innerWidth < 520;
-    var t = small ? T('📱 המסך הזה קטן. לטיסות הניסוי ולמדידות עדיף מחשב או טאבלט. אפשר להמשיך, אבל התוצאות יתאימו רק למכשיר הזה.') : '';
+    var t = small ? T('המסך הזה קטן. לטיסות הניסוי ולמדידות עדיף מחשב או טאבלט. אפשר להמשיך, אבל התוצאות יתאימו רק למכשיר הזה.') : '';
     document.querySelectorAll('[data-small-screen]').forEach(function (e) { e.textContent = t; e.style.display = t ? '' : 'none'; });
   }
   root.addEventListener('resize', function () { smallScreenNotes(); });
@@ -156,7 +156,7 @@
     var hadController = !!navigator.serviceWorker.controller;
     navigator.serviceWorker.register('sw.js').then(function () {
       if (!hadController) {
-        try { if (!localStorage.getItem('da.v1.offlineToast')) { localStorage.setItem('da.v1.offlineToast', '1'); DA.ui.toast(T('📶 עין טובה מוכנה לעבודה גם בלי אינטרנט')); } } catch (e) { /* ignore */ }
+        try { if (!localStorage.getItem('da.v1.offlineToast')) { localStorage.setItem('da.v1.offlineToast', '1'); DA.ui.toast(T('עין טובה מוכנה לעבודה גם בלי אינטרנט')); } } catch (e) { /* ignore */ }
       }
     }).catch(function () {});
     navigator.serviceWorker.addEventListener('controllerchange', function () {

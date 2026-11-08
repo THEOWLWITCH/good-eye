@@ -184,9 +184,9 @@
     var hasCal = !!ctx.opsFor(p.settings);
     // guide the first steps
     var tip;
-    if (!sessions.length) tip = T('✈️ לפני ההמראה עושים <b>טיסת ניסוי ראשונה</b> (פעם אחת בלבד, כ־3 דקות). היא מכוונת את המכשירים בשבילך.');
+    if (!sessions.length) tip = T('לפני ההמראה עושים <b>טיסת ניסוי ראשונה</b> (פעם אחת בלבד, כ־3 דקות). היא מכוונת את המכשירים בשבילך.');
     else if (p.kind === 'adult' && !hasCal) tip = T('רואים קווים עקומים או גלים? אפשר לעשות את <b>טיסת הניסוי השנייה: כיול עיוות</b>. אם לא, אפשר להמריא ישר אל <b>לקרוא</b>.');
-    else tip = T('🛫 הכול מוכן להמראה! בוחרים יעד: <b>לקרוא</b> או <b>לראות</b>.');
+    else tip = T('הכול מוכן להמראה! בוחרים יעד: <b>לקרוא</b> או <b>לראות</b>.');
     $('hubTip').innerHTML = tip;
     DA.screens.history.hubCard();
     $('tileLearn').classList.toggle('first', !sessions.length);
@@ -206,7 +206,7 @@
     (p.pinned || []).forEach(function (st) {
       var row = document.createElement('div');
       row.className = 'pinned-item';
-      row.innerHTML = '<button class="apply">📌 ' + esc(st.name) + '</button><span class="muted">' + esc(DA.settings.describe(st.settings)) + '</span>';
+      row.innerHTML = '<button class="apply">' + esc(st.name) + '</button><span class="muted">' + esc(DA.settings.describe(st.settings)) + '</span>';
       var del = document.createElement('button'); del.className = 'danger small'; del.textContent = '✕'; del.title = T('מחיקה');
       del.onclick = function () {
         DA.ui.ask(T('למחוק את המצב "') + st.name + '"?', T('מחיקה')).then(function (y) {
@@ -236,7 +236,7 @@
     var p = ctx.profile();
     if (!p || !p.best) return;
     ctx.updateSettings(p.best.settings);
-    DA.ui.toast(T('⭐ חזרנו למצב שלך'));
+    DA.ui.toast(T('חזרנו למצב שלך'));
   }
 
   function pinCurrent() {
@@ -244,7 +244,7 @@
     DA.ui.prompt(T('שם למצב הזה (למשל "קריאה בערב"):'), '').then(function (name) {
       if (!name) return;
       ctx.profiles.pin(p, name, p.settings);
-      DA.ui.toast(T('📌 נשמר: ') + name);
+      DA.ui.toast(T('נשמר: ') + name);
     });
   }
 

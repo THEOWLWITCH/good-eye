@@ -27,10 +27,10 @@
   function render(el, s, hasCal) {
     var t = DA.settings.theme(s.theme);
     el.innerHTML =
-      ring('text', T('גודל אותיות'), (s.fontSize - 12) / 84, s.fontSize + 'px', '#5ad8ff') +
-      ring('spacing', T('ריווח'), s.letterSpacing / 0.4, Math.round(s.letterSpacing * 100) + '%', '#4be3a4') +
-      ring('grid', T('תיקון עיוות'), hasCal ? s.warpStrength / 1.5 : 0, hasCal ? Math.round(s.warpStrength * 100) + '%' : T('אין כיול'), '#ffc04d') +
-      ring('sun', T('בהירות'), (s.brightness - 0.4) / 0.6, Math.round(s.brightness * 100) + '%', '#ff7ab6') +
+      ring('text', T('גודל אותיות'), (s.fontSize - 12) / 84, s.fontSize + 'px', '#8fe9ff') +
+      ring('spacing', T('ריווח'), s.letterSpacing / 0.4, Math.round(s.letterSpacing * 100) + '%', '#b3a6ff') +
+      ring('grid', T('תיקון עיוות'), hasCal ? s.warpStrength / 1.5 : 0, hasCal ? Math.round(s.warpStrength * 100) + '%' : T('אין כיול'), '#ffd59a') +
+      ring('sun', T('בהירות'), (s.brightness - 0.4) / 0.6, Math.round(s.brightness * 100) + '%', '#ff9fc8') +
       colorChip(T('צבעים'), t);
     el.querySelectorAll('[data-gauge]').forEach(function (b) { b.onclick = function () { DA.drawer.open(); }; });
   }
