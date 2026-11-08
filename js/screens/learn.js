@@ -397,7 +397,7 @@
       ctx.profiles.setBest(ctx.profile(), sess.after);
       DA.ui.toast(T('⭐ נשמר כמצב שלך')); ctx.go('hub');
     };
-    $('learnApply').onclick = function () { ctx.updateSettings(sess.after); DA.ui.toast(T('ההגדרות עודכנו')); ctx.go('hub'); };
+    $('learnApply').onclick = function () { ctx.updateSettings(sess.after); DA.ui.toast(T('ההגדרות החדשות פועלות. ⭐ המצב שלי נשאר כמו שהיה.')); ctx.go('hub'); };
     $('learnKeep').onclick = function () { ctx.go('hub'); };
     var last = sess;
     sess = null;
