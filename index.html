@@ -405,6 +405,7 @@
       <button id="rStar" class="rb2" title="המצב שלי"><i data-icon="star"></i><span>המצב שלי</span></button>
       <button id="rOneEye" class="rb2 one-eye" style="display:none"><i data-icon="eye"></i><span id="rOneEyeLabel"></span></button>
       <label id="rGlassesWrap" class="rb2 glasses" title="עוצמת תיקון העיוות"><i data-icon="glasses"></i><input id="rGlasses" type="range" min="0" max="1" step="0.05"></label>
+      <label id="rFollowWrap" class="rb2 follow" title="איפה התיקון ממוקם" style="display:none"><i data-icon="target"></i><select id="rFollow"><option value="center">התיקון במרכז</option><option value="pointer">התיקון עוקב אחרי העכבר או האצבע</option><option value="camera">התיקון עוקב אחרי המבט (מצלמה)</option><option value="recal">כיול המבט מחדש</option></select></label>
       <span id="readExtra"></span>
       <details class="more" id="rMore">
         <summary class="rb2" title="עוד"><i data-icon="more"></i><span>עוד</span></summary>
@@ -854,6 +855,7 @@
   <script src="js/core/device.js"></script>
   <script src="js/instruments/grid.js"></script>
   <script src="js/vision/eyes.js"></script>
+  <script src="js/vision/gaze.js"></script>
   <script src="js/core/version.js"></script>
   <script src="js/ui/icons.js"></script>
   <script src="js/ui/common.js"></script>

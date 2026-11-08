@@ -27,6 +27,18 @@
       var t = store.getTrial(s.calibrationId);
       return t && t.model && t.model.ops && t.model.ops.length ? t.model.ops : null;
     },
+    /**
+     * Everything the lens needs to place a calibration correctly: ops, the size the grid had on
+     * screen (px), where the eye looked (0..1), and a scale for a different viewing distance.
+     */
+    warpFor: function (s) {
+      var ops = ctx.opsFor(s);
+      if (!ops) return null;
+      var t = store.getTrial(s.calibrationId) || {}, st = t.stimulus || {}, d = t.display || {};
+      var fix = st.fixationPoint && DA.GridInstrument && DA.GridInstrument.FIX[st.fixationPos] || [0.5, 0.5];
+      var calDist = t.viewing && +t.viewing.distanceCm, nowDist = DA.eyes.state.running && DA.eyes.state.distanceCm;
+      return { ops: ops, sizePx: d.stimulusSizePx || null, fix: fix, scale: calDist && nowDist ? calDist / nowDist : 1 };
+    },
     /** The eye a calibration was made for ('right' | 'left' | 'both' | null). */
     calEye: function (s) {
       if (!s || !s.calibrationId) return null;

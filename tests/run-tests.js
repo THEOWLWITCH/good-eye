@@ -160,6 +160,27 @@ test('daltonize keeps grays gray and makes red visible to a deutan viewer', func
   var D = dalt('deutan');
   ok(Math.abs(D[2][0]) > 0.1, 'red gains a blue component');
 });
+test('logMAR sizes: logmarToPx is the inverse of printSize, and a 0.1 step is ×1.26', function () {
+  if (!global.localStorage) global.localStorage = { getItem: function () { return null; }, setItem: function () {} };
+  if (!global.screen) global.screen = { width: 1920, height: 1080 };
+  global.window = global; require(path.join(__dirname, '..', 'js/core/device.js'));
+  var D = DA.device;
+  [0, 0.4, 1.0, 1.3].forEach(function (L) { near(D.printSize(D.logmarToPx(L, 40), 40).logMAR, L, 0.011, 'logMAR ' + L); });
+  near(D.logmarToPx(0.5, 40) / D.logmarToPx(0.4, 40), Math.pow(10, 0.1), 0.002, 'step');
+});
+test('gaze calibration fits a linear map and reports its error', function () {
+  global.window = global; require(path.join(__dirname, '..', 'js/vision/gaze.js'));
+  var G = DA.gazeMath, truth = { cx: [960, -1500, 12], cy: [540, 1100, -9] }, L = [], C = [];
+  [[.1, .1], [.5, .1], [.9, .1], [.1, .5], [.5, .5], [.9, .5], [.1, .9], [.5, .9], [.9, .9]].forEach(function (p, i) {
+    var f = { h: 0.35 + p[0] * 0.3, v: 0.3 + p[1] * 0.4, yaw: Math.sin(i * 1.7) * 3, pitch: Math.cos(i * 2.3) * 2 };
+    var q = G.predict(truth, f); L.push(Object.assign(f, { x: q.x, y: q.y }));
+  });
+  var m = G.fit(L);
+  ok(m && G.meanError(m, L) < 0.01, 'recovers an exact linear map: ' + (m && G.meanError(m, L)));
+  var f2 = { h: 0.5, v: 0.5, yaw: 1, pitch: 0 }, q2 = G.predict(truth, f2);
+  C.push(Object.assign(f2, { x: q2.x + 30, y: q2.y - 40 }));
+  near(G.meanError(m, C), 50, 0.05, 'error of a check point 50 px off');
+});
 test('Machado matrices: a deutan viewer confuses red/green, and the correction separates them', function () {
   var src = require('fs').readFileSync(path.join(__dirname, '..', 'js/render/lens.js'), 'utf8');
   var tables = src.slice(src.indexOf('var CVD_SIM'), src.indexOf('/** D = I'));

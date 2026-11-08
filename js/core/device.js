@@ -70,5 +70,12 @@
     });
   }
 
-  DA.device = { pxPerMm: pxPerMm, isCalibrated: isCalibrated, distanceCm: distanceCm, degToPx: degToPx, pxToDeg: pxToDeg, printSize: printSize, calibrate: calibrate, CARD_MM: CARD_MM };
+  /** Font size (CSS px) whose x-height has a given logMAR at a distance (inverse of printSize). */
+  function logmarToPx(L, distCm) {
+    var arcmin = 5 * Math.pow(10, L);
+    var xhMm = Math.tan(arcmin / 60 * Math.PI / 180) * distCm * 10;
+    return xhMm / 0.5 * pxPerMm();
+  }
+
+  DA.device = { logmarToPx: logmarToPx, pxPerMm: pxPerMm, isCalibrated: isCalibrated, distanceCm: distanceCm, degToPx: degToPx, pxToDeg: pxToDeg, printSize: printSize, calibrate: calibrate, CARD_MM: CARD_MM };
 })(typeof window !== 'undefined' ? window : globalThis);

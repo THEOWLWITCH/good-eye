@@ -596,7 +596,7 @@
     var swap = Math.random() < 0.5;
     step = { type: 'pref', tuner: tuner, c: c, swap: swap };
     stepStart = performance.now();
-    stageLens.apply(work, ctx.opsFor(work));
+    stageLens.apply(work, ctx.warpFor(work));
     var txt = DA.stimuli.sampleText(DA.i18n.content);
     var content = '<p class="ab-text">' + esc(txt) + '</p><div class="ab-pics">' + DA.stimuli.lineSvg('house', 56) + '<span>🐢</span><span>7</span></div>';
     var left = swap ? 'b' : 'a', right = swap ? 'a' : 'b';
@@ -643,7 +643,7 @@
     step.showing = i; step.seen[i] = true;
     var on = step.order[i] === 1;
     var s = Object.assign({}, work, { warpStrength: on ? (work.warpStrength || 1) : 0 });
-    stageLens.apply(s, ctx.opsFor(work));
+    stageLens.apply(s, ctx.warpFor(work));
     var n = $('warpNum'); if (n) n.textContent = String(i + 1);
     if (step.seen[0] && step.seen[1]) $('learnChoices').querySelectorAll('button').forEach(function (b) { b.disabled = false; });
   }
@@ -665,7 +665,7 @@
   // ----- recognition -----
   function showRecognize(st, isCatch) {
     var cond = st.condition === 'corrected' ? work : plainSettings;
-    stageLens.apply(cond, st.condition === 'corrected' ? ctx.opsFor(work) : null);
+    stageLens.apply(cond, st.condition === 'corrected' ? ctx.warpFor(work) : null);
     var trial = makeFresh(st.category, step && step.trial ? step.trial.answer : null);
     if (work.cvi) {
       // simple & focused: only two answers, the target and one other

@@ -1,6 +1,8 @@
 /*
  * עין טובה — Reading-speed test (MNREAD-style).
- * Sentences appear at sizes that shrink by 0.1 log units (×0.794) each step. The reader reads each
+ * Sentences appear at sizes that shrink by 0.1 log units (×0.794) each step. With a calibrated
+ * screen the sizes sit on the logMAR grid for the stated distance (as on an MNREAD chart), and
+ * the results are also given, approximately, in logMAR and M units. The reader reads each
  * one aloud and taps "done"; an adult taps how many words were wrong or missed. From reading speed
  * versus print size we get:
  *   - maximum reading speed (MRS): the plateau of the curve;
@@ -15,7 +17,7 @@
   DA.screens = DA.screens || {};
   var $ = DA.ui.$, esc = DA.ui.esc;
   var ctx, lens, run, runs, queue, state, t0, sess, usedSentences;
-  var START = 64, STEP = Math.pow(10, -0.1), MIN = 6;
+  var STEP = Math.pow(10, -0.1), MIN = 6, MAX_PX = 200, LOGMAR_TOP = 1.3;
   var PLAIN = { font: 'arial', theme: 'white', letterSpacing: 0, wordSpacing: 0.05, lineHeight: 1.4, warpStrength: 0, sharpen: 0, bold: false,
     ruler: 'off', shiftX: 0, shiftY: 0, lineMarker: false, brightness: 1, warmth: 0, calm: false, cvd: 'none' };
 
@@ -69,6 +71,8 @@
     };
     queue = conds.slice();
     runs = [];
+    var first = startSize(sess.distanceCm);
+    sess.startPx = first.px; sess.startLogMAR = first.logMAR;
     $('rtSetup').style.display = 'none';
     $('rtPlay').style.display = '';
     nextRun();
@@ -78,8 +82,8 @@
     if (!queue.length) { finish(false); return; }
     var cond = queue.shift(), p = ctx.profile();
     var s = cond === 'with' ? DA.settings.normalize(p.settings) : DA.settings.normalize(Object.assign({}, p.settings, PLAIN));
-    lens.apply(s, cond === 'with' ? ctx.opsFor(s) : null);
-    run = { condition: cond, trials: [], size: START, sentences: DA.sentences.pool(sess.lang, usedSentences) };
+    lens.apply(s, cond === 'with' ? ctx.warpFor(s) : null);
+    run = { condition: cond, trials: [], size: sess.startPx, logMAR: sess.startLogMAR, sentences: DA.sentences.pool(sess.lang, usedSentences) };
     runs.push(run);
     $('rtCond').textContent = cond === 'with' ? T('עם ההגדרות האישיות') : T('בלי ההגדרות (להשוואה)');
     ready();
@@ -129,6 +133,7 @@
     record(run.ms, Math.min(n, w), false);
     if (n >= w - 1 || run.size * STEP < MIN) { endRun(); return; }
     run.size = run.size * STEP;
+    if (run.logMAR != null) run.logMAR = Math.round((run.logMAR - 0.1) * 10) / 10;
     ready();
   }
 
@@ -136,7 +141,7 @@
     var w = DA.sentences.words(run.current), ch = run.current.length;
     var min = ms / 60000, correctFrac = Math.max(0, w - errs) / w;
     run.trials.push({
-      size: Math.round(run.size * 10) / 10, sentence: run.current, words: w, chars: ch, ms: Math.round(ms), errors: errs, gaveUp: gaveUp,
+      size: Math.round(run.size * 10) / 10, logMAR: run.logMAR, sentence: run.current, words: w, chars: ch, ms: Math.round(ms), errors: errs, gaveUp: gaveUp,
       wpm: gaveUp ? 0 : Math.round(w * correctFrac / min * 10) / 10,
       cpm: gaveUp ? 0 : Math.round(ch * correctFrac / min),
       eyes: DA.eyes.snapshot()
@@ -145,12 +150,31 @@
 
   function endRun() { nextRun(); }
 
+  /**
+   * The first (largest) size. With a calibrated screen: logMAR 1.3 (the top of an MNREAD chart)
+   * at the stated distance, or the largest 0.1 step below it that fits the stage. Otherwise a
+   * large size in px, so readers with severe low vision can still reach their plateau.
+   */
+  function startSize(distCm) {
+    var stage = $('rtStage').clientWidth || innerWidth;
+    var cap = Math.min(MAX_PX, Math.max(48, stage / 8));
+    if (DA.device.isCalibrated() && distCm) {
+      var L = LOGMAR_TOP;
+      while (L > -0.3 && DA.device.logmarToPx(L, distCm) > cap) L = Math.round((L - 0.1) * 10) / 10;
+      return { px: DA.device.logmarToPx(L, distCm), logMAR: L };
+    }
+    return { px: Math.min(cap, 100), logMAR: null };
+  }
+
   function progress() {
     var n = runs.reduce(function (a, r) { return a + r.trials.length; }, 0);
     var total = sessionTotal();
     $('rtProgress').style.width = Math.min(100, Math.round(n / total * 100)) + '%';
   }
-  function sessionTotal() { return (queue.length + runs.length) * 11; }
+  function sessionTotal() {
+    var steps = Math.max(6, Math.ceil(Math.log((sess.startPx || 64) / MIN) / Math.log(1 / STEP)));
+    return (queue.length + runs.length) * Math.min(steps, 16);
+  }
 
   function buttons(list) {
     var box = $('rtButtons');
@@ -184,9 +208,11 @@
       if (t[k].cpm >= 0.8 * best) { cps = t[k].size; dips = 0; }
       else if (++dips >= 2) break;
     }
+    var lm = function (size) { var x = t.filter(function (q) { return q.size === size; })[0]; return x && x.logMAR != null ? x.logMAR : null; };
     return {
       mrsWpm: Math.round(bestW), mrsCpm: Math.round(best), cps: cps,
       acuity: read[read.length - 1].size,
+      cpsLogMAR: lm(cps), acuityLogMAR: lm(read[read.length - 1].size),
       recommendedFont: Math.round(Math.min(96, Math.max(16, cps * 1.26)))
     };
   }
@@ -216,12 +242,16 @@
   }
 
   // ---------------- report ----------------
-  function sizeText(px, s) {
+  function sizeText(px, s, logMAR) {
     if (px == null) return '—';
     var out = Math.round(px) + 'px';
     if (s.screenCalibrated) {
-      var mm = px / DA.device.pxPerMm();
+      var mm = px / (s.pxPerMm || DA.device.pxPerMm());
       out += ' (≈' + mm.toFixed(1) + T(' מ״מ') + ')';
+      if (logMAR != null) {
+        var M = s.distanceCm / 100 * Math.pow(10, logMAR);
+        out += '<br><span class="muted small">≈ logMAR ' + logMAR.toFixed(1) + ' · ' + M.toFixed(1) + 'M</span>';
+      }
     }
     return out;
   }
@@ -258,7 +288,7 @@
   function summaryHtml(s, full) {
     var rows = s.runs.map(function (r) {
       var x = r.result || analyze(r.trials);
-      return '<tr><td>' + (r.condition === 'with' ? T('עם ההגדרות שלי') : T('בלי ההגדרות')) + '</td><td>' + x.mrsWpm + '</td><td>' + sizeText(x.cps, s) + '</td><td>' + sizeText(x.acuity, s) + '</td></tr>';
+      return '<tr><td>' + (r.condition === 'with' ? T('עם ההגדרות שלי') : T('בלי ההגדרות')) + '</td><td>' + x.mrsWpm + '</td><td>' + sizeText(x.cps, s, x.cpsLogMAR) + '</td><td>' + sizeText(x.acuity, s, x.acuityLogMAR) + '</td></tr>';
     }).join('');
     var w = s.runs.filter(function (r) { return r.condition === 'with'; })[0], wo = s.runs.filter(function (r) { return r.condition === 'without'; })[0];
     var verdict = '';
@@ -273,7 +303,8 @@
       '<table class="sum"><tr><th></th><th>' + T('מהירות מרבית (מילים לדקה)') + '</th><th>' + T('הגודל הקטן שעדיין נקרא בנוחות') + '</th><th>' + T('הגודל הקטן ביותר שנקרא') + '</th></tr>' + rows + '</table>' +
       verdict + (full ? chart(s) : '') +
       (full && w && w.result.recommendedFont ? '<p>' + T('המלצה: גודל אותיות של ') + '<b>' + w.result.recommendedFont + 'px</b>' + T(' (קצת מעל הגודל הקטן שעדיין נוח, כדי שהקריאה תהיה רגועה).') + '</p>' : '') +
-      (full && !s.screenCalibrated ? '<p class="muted small">' + T('הגדלים בפיקסלים. אחרי כיול גודל המסך יוצג גם הגודל במילימטרים.') + '</p>' : '');
+      (full && !s.screenCalibrated ? '<p class="muted small">' + T('הגדלים בפיקסלים. אחרי כיול גודל המסך יוצג גם הגודל במילימטרים וב־logMAR.') + '</p>' : '') +
+      (full && s.screenCalibrated && s.startLogMAR != null ? '<p class="muted small">' + T('logMAR ו־M מחושבים בקירוב מגובה האות x, מהמרחק שהוזן ומכיול המסך. אותיות עבריות מעט גבוהות יותר. זו לא בדיקת חדות ראייה, ואין להסתמך עליה לקביעה רפואית.') + '</p>' : '');
   }
 
   DA.screens.readtest = { init: init, enter: enter, leave: leave, summaryHtml: summaryHtml, analyze: analyze };

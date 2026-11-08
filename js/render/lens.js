@@ -15,7 +15,8 @@
   'use strict';
   var DA = (root.DA = root.DA || {});
   var SVGNS = 'http://www.w3.org/2000/svg';
-  var MAP_N = 112;
+  var MAP_N = 128;
+  var WARP_MARGIN = 0.25;   // the map extends a quarter of the calibration square beyond each side
   var counter = 0;
   var defs = null;
 
@@ -58,7 +59,11 @@
   /** Apply settings. `ops` = the calibration's deformation ops (or null). */
   Lens.prototype.apply = function (settings, ops) {
     var s = this.settings = DA.settings.normalize(settings);
-    this.ops = ops || null;
+    // `ops` is either a plain ops array (legacy) or { ops, sizePx, fix, scale } from ctx.warpFor()
+    var w = ops && !Array.isArray(ops) ? ops : null;
+    this.ops = w ? w.ops : (ops || null);
+    this.warpSize = w && w.sizePx ? w.sizePx * (w.scale || 1) : null;   // px of the calibration grid on this screen
+    this.warpFix = w && w.fix ? w.fix : [0.5, 0.5];                     // where the eye looked during calibration (0..1)
     var t = DA.settings.theme(s.theme), st = this.el.style;
     st.setProperty('--fg', t.fg);
     st.setProperty('--bg', t.bg);
@@ -105,6 +110,30 @@
     this.ruler.style.top = 'calc(' + (this.rulerY * 100) + '% - ' + h / 2 + 'px)';
   };
 
+  /**
+   * Where the eye is looking, in lens-local px (null: the middle of the lens). The correction is
+   * centred there, so the calibration's fixation point lands on the point being looked at.
+   * Moving the anchor only moves the map image: no recomputation.
+   */
+  Lens.prototype.setWarpAnchor = function (x, y) {
+    this.anchor = x == null ? null : [x, y];
+    if (!this._warpImg || !this._patch) return;
+    var o = this._patchOrigin();
+    this._warpImg.setAttribute('x', String(Math.round(o[0])));
+    this._warpImg.setAttribute('y', String(Math.round(o[1])));
+  };
+  /** Anchor from screen (client) coordinates. */
+  Lens.prototype.setWarpAnchorClient = function (cx, cy) {
+    if (cx == null) { this.setWarpAnchor(null); return; }
+    var r = this.el.getBoundingClientRect();
+    this.setWarpAnchor(cx - r.left, cy - r.top);
+  };
+  Lens.prototype._patchOrigin = function () {
+    var w = this.el.clientWidth, h = this.el.clientHeight, P = this._patch.size, m = WARP_MARGIN;
+    var a = this.anchor || [w / 2, h / 2];
+    return [a[0] - (this.warpFix[0] + m) * P, a[1] - (this.warpFix[1] + m) * P];
+  };
+
   // ---------- SVG filter: sharpen + warp ----------
   Lens.prototype._updateFilter = function () {
     var s = this.settings;
@@ -112,6 +141,7 @@
     var useWarp = this.ops && this.ops.length && s.warpStrength > 0 && w > 0 && h > 0;
     var useSharp = s.sharpen > 0.01;
     var comfort = comfortFilter(s);
+    this._warpImg = null; this._patch = null;
     if (!useWarp && !useSharp) { this.el.style.filter = comfort; return; }
 
     var d = ensureDefs();
@@ -142,15 +172,33 @@
       input = 'sharp';
     }
     if (useWarp) {
-      var m = this._warpMap(w, h);
+      // the patch: the calibration square (plus a margin) at its real size, placed around the anchor;
+      // outside it a neutral flood means "no displacement"
+      var P = this.warpSize || Math.min(w, h);
+      var m = this._warpMap(P);
+      this._patch = { size: P };
+      var full = P * (1 + 2 * WARP_MARGIN), o = this._patchOrigin();
+      var fl = document.createElementNS(SVGNS, 'feFlood');
+      fl.setAttribute('flood-color', 'rgb(128,128,128)');
+      fl.setAttribute('x', '0'); fl.setAttribute('y', '0');
+      fl.setAttribute('width', String(w)); fl.setAttribute('height', String(h));
+      fl.setAttribute('result', 'neutral');
+      f.appendChild(fl);
       var img = document.createElementNS(SVGNS, 'feImage');
       img.setAttribute('href', m.url);
       img.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', m.url);
-      img.setAttribute('x', '0'); img.setAttribute('y', '0');
-      img.setAttribute('width', String(w)); img.setAttribute('height', String(h));
+      img.setAttribute('x', String(Math.round(o[0]))); img.setAttribute('y', String(Math.round(o[1])));
+      img.setAttribute('width', String(Math.round(full))); img.setAttribute('height', String(Math.round(full)));
       img.setAttribute('preserveAspectRatio', 'none');
-      img.setAttribute('result', 'map');
+      img.setAttribute('result', 'patch');
       f.appendChild(img);
+      this._warpImg = img;
+      var comp = document.createElementNS(SVGNS, 'feComposite');
+      comp.setAttribute('in', 'patch'); comp.setAttribute('in2', 'neutral'); comp.setAttribute('operator', 'over');
+      comp.setAttribute('x', '0'); comp.setAttribute('y', '0');
+      comp.setAttribute('width', String(w)); comp.setAttribute('height', String(h));
+      comp.setAttribute('result', 'map');
+      f.appendChild(comp);
       var dm = document.createElementNS(SVGNS, 'feDisplacementMap');
       dm.setAttribute('in', input);
       dm.setAttribute('in2', 'map');
@@ -162,19 +210,21 @@
     this.el.style.filter = 'url(#' + this.id + ')' + (comfort ? ' ' + comfort : '');
   };
 
-  /** Displacement map (data URL) for a w×h viewport. Cached per ops/strength/size. */
-  Lens.prototype._warpMap = function (w, h) {
+  /**
+   * Displacement map (data URL) for the calibration square of P px plus a margin on each side
+   * (normalized −m … 1+m). Cached per ops/strength/size.
+   */
+  Lens.prototype._warpMap = function (P) {
     var k = this.settings.warpStrength;
-    var key = JSON.stringify(this.ops) + '|' + k + '|' + w + 'x' + h;
+    var key = JSON.stringify(this.ops) + '|' + k + '|' + Math.round(P);
     if (key === this._mapKey) return this._map;
     var ops = this.ops.map(function (o) { return { ax: o.ax, ay: o.ay, dx: o.dx * k, dy: o.dy * k, r: o.r }; });
-    var Q = Math.min(w, h), ox = (w - Q) / 2, oy = (h - Q) / 2;
+    var Q = P, mg = WARP_MARGIN, span = 1 + 2 * mg;
     var nx = MAP_N, ny = MAP_N;
     var dxs = new Float32Array(nx * ny), dys = new Float32Array(nx * ny), maxAbs = 0.5;
     for (var j = 0; j < ny; j++) {
       for (var i = 0; i < nx; i++) {
-        var px = (i + 0.5) / nx * w, py = (j + 0.5) / ny * h;
-        var u = (px - ox) / Q, v = (py - oy) / Q;
+        var u = -mg + (i + 0.5) / nx * span, v = -mg + (j + 0.5) / ny * span;
         var inv = DA.deformation.invert(ops, u, v, 20);
         var ddx = (inv[0] - u) * Q, ddy = (inv[1] - v) * Q;
         dxs[j * nx + i] = ddx; dys[j * nx + i] = ddy;

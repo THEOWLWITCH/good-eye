@@ -20,6 +20,14 @@
     // kid toolbar
     $('rSmaller').onclick = function () { bump('fontSize', 1 / 1.15); };
     $('rBigger').onclick = function () { bump('fontSize', 1.15); };
+    $('rFollow').onchange = function () { setFollow(this.value); };
+    // the correction follows the mouse or finger: centred on the word under it
+    $('readLens').addEventListener('pointermove', function (e) {
+      if (!followOn || follow !== 'pointer' || mode === 'word') return;
+      var x = e.clientX, y = e.clientY;
+      if (followRaf) return;
+      followRaf = requestAnimationFrame(function () { followRaf = null; anchorNear(x, y); });
+    });
     $('rOneEye').onclick = function () {
       var p = ctx.profile(), k = 'read.oneEye.' + p.id, on = !ctx.store.getPref(k, false);
       ctx.store.setPref(k, on);
@@ -197,13 +205,80 @@
     runAi(T('כותב גרסה פשוטה יותר…'), function (onText, signal) { return DA.ai.simplify(text, kind, onText, signal); }, null);
   }
 
+  // ---------- where the distortion correction is centred ----------
+  // The correction was calibrated around the point the eye looked at. It is right only where the
+  // reader is looking: in "word by word" that is the fixed mark; otherwise the middle, the word
+  // under the mouse or finger (and the word read aloud), or the camera's estimate of the gaze.
+  var follow = 'center', followOn = false, followRaf = null, gazeOn = false;
+  function followSetup(on) {
+    var p = ctx.profile();
+    followOn = !!on;
+    follow = p ? ctx.store.getPref('read.follow.' + p.id, 'center') : 'center';
+    if (follow === 'camera' && !DA.gaze.ready()) follow = 'center';
+    $('rFollowWrap').style.display = on ? '' : 'none';
+    $('rFollow').value = follow;
+    $('rFollow').querySelector('[value=recal]').hidden = !DA.gaze.ready();
+    if (!on || (follow === 'center' && mode !== 'word')) lens.setWarpAnchor(null);
+    gazeOn = on && follow === 'camera';
+  }
+  function setFollow(v) {
+    var p = ctx.profile();
+    if (v === 'camera' && DA.gaze.ready()) { ctx.store.setPref('read.follow.' + p.id, v); followSetup(true); return; }
+    if (v === 'camera' || v === 'recal') {
+      $('rFollow').value = follow;
+      DA.ui.tell(T('המצלמה מעריכה לאן מסתכלים. קודם עושים כיול קצר: מסתכלים על 13 נקודות. בסוף נראה כמה הוא מדויק. זה עובד רק בחדר מואר, כשהפנים מול המצלמה.')).then(function () {
+        return DA.gaze.calibrate();
+      }).then(function (r) {
+        if (r.cancelled) return;
+        if (r.ok) {
+          ctx.store.setPref('read.follow.' + p.id, 'camera');
+          DA.ui.tell(T('המבט מוערך בדיוק של כ־') + r.errDeg + T(' מעלות. זה מספיק כדי למצוא את השורה ואת המילה בערך, לא נקודה מדויקת. לדיוק הכי טוב: מצב "מילה אחרי מילה".'));
+        } else {
+          ctx.store.setPref('read.follow.' + p.id, 'pointer');
+          DA.ui.tell((r.errDeg ? T('המבט מוערך כאן בדיוק של כ־') + r.errDeg + T(' מעלות, וזה לא מספיק כדי למקם את התיקון. ') : T('המצלמה לא זיהתה את העיניים מספיק טוב. ')) +
+            T('במקום זה התיקון יעקוב אחרי העכבר או האצבע: מצביעים על המילה שקוראים.'));
+        }
+        followSetup(followOn);
+      }, function () { DA.ui.tell(T('אין גישה למצלמה. אפשר לבחור שהתיקון יעקוב אחרי העכבר או האצבע.')); followSetup(followOn); });
+      return;
+    }
+    ctx.store.setPref('read.follow.' + p.id, v);
+    followSetup(followOn);
+  }
+  function anchorToWord(el) {
+    var r = el.getBoundingClientRect();
+    lens.setWarpAnchorClient(r.left + r.width / 2, r.top + r.height / 2);
+  }
+  /** Centre the correction on the word at (or nearest to) a screen point. */
+  function anchorNear(x, y) {
+    var el = document.elementFromPoint(x, y), w = el && el.closest ? el.closest('#readContent .w') : null;
+    if (!w) {
+      // nearest word on the nearest line (for the camera's coarse estimate)
+      var best = null, bd = Infinity;
+      $('readContent').querySelectorAll('.w').forEach(function (s) {
+        var r = s.getBoundingClientRect();
+        if (r.bottom < 0 || r.top > innerHeight) return;
+        var d = Math.abs(r.top + r.height / 2 - y) * 2 + Math.abs(r.left + r.width / 2 - x);   // lines matter more than columns
+        if (d < bd) { bd = d; best = s; }
+      });
+      w = best;
+    }
+    if (w) anchorToWord(w); else lens.setWarpAnchorClient(x, y);
+  }
+  DA.eyes.on(function () {
+    if (!gazeOn || mode === 'word' || ctx.current() !== 'read') return;
+    var g = DA.gaze.point();
+    if (g) anchorNear(g.x, g.y);
+  });
+
   /** Re-apply the reader's settings (called after any settings change). */
   function refresh(previewSettings) {
     var p = ctx.profile();
     if (!p) return;
     var s = effective(previewSettings || p.settings);
     var hasCal = !!ctx.opsFor(s), oneEye = hasCal && ctx.store.getPref('read.oneEye.' + p.id, false);
-    lens.apply(s, oneEye ? ctx.opsFor(s) : null);
+    lens.apply(s, oneEye ? ctx.warpFor(s) : null);
+    followSetup(oneEye);
     if (doc && lastSyl !== !!s.syllables) { lastSyl = !!s.syllables; render(); }
     var eye = ctx.calEye(s);
     $('rOneEye').style.display = hasCal ? '' : 'none';
@@ -548,6 +623,7 @@
     var minS = r.left + r.width * 0.03 - wb.left, maxS = r.right - r.width * 0.03 - wb.right;
     shift = Math.max(minS, Math.min(maxS, shift));
     w.style.transform = 'translateX(' + Math.round(shift) + 'px)';
+    if (followOn) lens.setWarpAnchorClient(r.left + r.width / 2, (wb.top + wb.bottom) / 2);
     // the ticks sit just above and below the word's box (which includes the vowel marks)
     var wr = w.getBoundingClientRect(), em = parseFloat(getComputedStyle(seg).fontSize) || 30;
     seg.querySelector('.fix-tick.top').style.top = Math.round(wr.top - r.top - em * 0.8) + 'px';
@@ -628,6 +704,7 @@
     if (!hit || hit.classList.contains('speaking')) return;
     $('readContent').querySelectorAll('.w.speaking').forEach(function (e) { e.classList.remove('speaking'); });
     hit.classList.add('speaking');
+    if (followOn && follow === 'pointer' && mode !== 'word') anchorToWord(hit);   // the eye follows the word read aloud
     var r = hit.getBoundingClientRect(), v = $('readScroll').getBoundingClientRect();
     if (r.top < v.top + 20 || r.bottom > v.bottom - 20) hit.scrollIntoView({ block: 'center', behavior: 'smooth' });
   }

@@ -244,6 +244,16 @@ html[lang="he"] .stn-step, html[lang="he"] .eyebrow, html[lang="he"] .sec-title 
 .credits .link, .a11y-link { background: none !important; border: 0 !important; padding: 0; color: var(--ice); text-decoration: underline; font: inherit; cursor: pointer; }
 #a11yDialog ul { padding-inline-start: 20px; line-height: 1.6; }
 
+/* ---------- warp anchor: control and camera gaze calibration ---------- */
+.rb2.follow select { max-width: 15em; }
+.gz-overlay { position: fixed; inset: 0; z-index: 90; background: #0a0f1e; color: #e8eefc; }
+.gz-text { position: absolute; top: 40%; left: 50%; transform: translateX(-50%); width: min(90vw, 560px); text-align: center; font-size: 20px; line-height: 1.5; opacity: .85; }
+.gz-dot { position: absolute; width: 28px; height: 28px; margin: -14px 0 0 -14px; border-radius: 50%; background: radial-gradient(circle, #fff 0 18%, #7fe0ff 19% 42%, rgba(127, 224, 255, .25) 43%); box-shadow: 0 0 24px rgba(127, 224, 255, .6); left: -100px; top: -100px; }
+.gz-dot.go { animation: gzIn .7s ease-out; }
+@keyframes gzIn { from { transform: scale(2.4); opacity: .3; } to { transform: scale(1); opacity: 1; } }
+.gz-stop { position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); }
+@media (prefers-reduced-motion: reduce) { .gz-dot.go { animation: none; } }
+
 /* ---------- About: a small header button and the dialog ---------- */
 .about-btn { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 4px 12px; border-radius: 999px; font-size: 14px; }
 .about-btn .ic { width: 18px; height: 18px; }
