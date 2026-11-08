@@ -124,7 +124,7 @@
       multifocal: T('👓 מולטיפוקל: מסתכלים דרך החלק התחתון של העדשה (החלק של הקריאה), ומזיזים את הראש ולא רק את העיניים.'),
       contacts: T('👓 מרכיבים את עדשות המגע, כמו בקריאה רגילה.')
     }[g] || T('👓 מרכיבים משקפיים או עדשות? משתמשים בעין טובה איתם, כמו בקריאה רגילה.');
-    return base + ' ' + T('חשוב: אותם משקפיים גם בכיול ובמשחק וגם בקריאה.');
+    return base + ' ' + T('חשוב: אותם משקפיים גם בטיסות הניסוי וגם בקריאה.');
   }
   function glassesNotes() {
     var t = glassesText(ctx.profile());
@@ -134,7 +134,7 @@
   function smallScreenNotes() {
     // a phone-sized device (or a very narrow window): the device's screen, not just this window
     var small = Math.min(root.screen.width, root.screen.height) < 600 || root.innerWidth < 520;
-    var t = small ? T('📱 המסך הזה קטן. לכיול, למשחק ולמדידות עדיף מחשב או טאבלט. אפשר להמשיך, אבל התוצאות יתאימו רק למכשיר הזה.') : '';
+    var t = small ? T('📱 המסך הזה קטן. לטיסות הניסוי ולמדידות עדיף מחשב או טאבלט. אפשר להמשיך, אבל התוצאות יתאימו רק למכשיר הזה.') : '';
     document.querySelectorAll('[data-small-screen]').forEach(function (e) { e.textContent = t; e.style.display = t ? '' : 'none'; });
   }
   root.addEventListener('resize', function () { smallScreenNotes(); });

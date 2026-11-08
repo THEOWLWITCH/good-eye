@@ -42,8 +42,8 @@
       case 'home-empty': return { text: T('שלום! אני ינשוף, הנווט שלך. בוא נרשום את הטייס הראשון.'), target: 'newChildBtn',
         buttons: [{ label: T('טייס/ת צעיר/ה'), go: function () { $('newChildBtn').click(); } }, { label: T('מבוגר/ת'), go: function () { $('newAdultBtn').click(); } }] };
       case 'home': return { text: T('מי טס היום? לוחצים על הכרטיס שלך.'), target: 'profileGrid' };
-      case 'hub-first': return { text: T('היי ') + name + T('! לפני ההמראה נשחק משחק קצר, כדי שאדע מה הכי ברור לך.'), target: 'tileLearn',
-        buttons: [{ label: T('▶ בוא נשחק'), main: true, go: function () { ctx.go('learn'); setTimeout(function () { $('quickGame').click(); }, 250); } }] };
+      case 'hub-first': return { text: T('היי ') + name + T('! לפני ההמראה עושים טיסת ניסוי קצרה, כדי שאדע מה הכי ברור לך.'), target: 'tileLearn',
+        buttons: [{ label: T('▶ לטיסת הניסוי'), main: true, go: function () { ctx.go('learn'); setTimeout(function () { $('quickGame').click(); }, 250); } }] };
       case 'hub-cal': return { text: T('רואים קווים עקומים או גלים? אפשר לכייל. אם לא, ממריאים ישר!'), target: 'tileCalibrate',
         buttons: [{ label: T('🎯 לכייל'), go: function () { ctx.go('calibrate'); } }, { label: T('📖 לקרוא'), main: true, go: function () { ctx.store.setPref('copilot.skipCal.' + p.id, true); $('tileRead').click(); } }] };
       case 'hub-ready': return { text: T('הכול מוכן להמראה! לאן טסים: לקרוא או לראות?'), target: 'tileRead',

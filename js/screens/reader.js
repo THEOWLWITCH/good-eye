@@ -25,7 +25,7 @@
     $('rStar').onclick = function () {
       var p = ctx.profile();
       if (p.best) { ctx.updateSettings(p.best.settings); DA.ui.toast(T('⭐ המצב שלי')); }
-      else DA.ui.toast(T('עוד אין "מצב שלי". אפשר לקבוע אחרי המשחק או בהגדרות.'));
+      else DA.ui.toast(T('עוד אין "מצב שלי". אפשר לקבוע אחרי טיסת הניסוי או בהגדרות.'));
     };
     $('rTheme').onclick = cycleTheme;
     $('rRuler').onclick = function () {

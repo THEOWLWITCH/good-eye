@@ -80,7 +80,7 @@
   }
 
   function deleteProfile(p) {
-    DA.ui.ask(T('למחוק את ') + p.name + T('? יימחקו גם ההגדרות, המשחקים והכיולים שלו/ה. אי אפשר לשחזר (אלא מגיבוי).'), T('מחיקה')).then(function (y) {
+    DA.ui.ask(T('למחוק את ') + p.name + T('? יימחקו גם ההגדרות, טיסות הניסוי והכיולים שלו/ה. אי אפשר לשחזר (אלא מגיבוי).'), T('מחיקה')).then(function (y) {
       if (!y) return;
       ctx.store.listTrials().forEach(function (s) {
         var t = ctx.store.getTrial(s.id);
@@ -178,14 +178,14 @@
     $('hubCode').textContent = p.code;
     $('hubCurrent').textContent = DA.settings.describe(p.settings);
     $('bestBtn').disabled = !p.best;
-    $('bestInfo').textContent = p.best ? DA.settings.describe(p.best.settings) : T('עדיין לא נקבע. אחרי המשחק או בהגדרות אפשר לקבוע "המצב שלי".');
+    $('bestInfo').textContent = p.best ? DA.settings.describe(p.best.settings) : T('עדיין לא נקבע. אחרי טיסת הניסוי או בהגדרות אפשר לקבוע "המצב שלי".');
 
     var sessions = ctx.profiles.sessionsFor(p.id);
     var hasCal = !!ctx.opsFor(p.settings);
     // guide the first steps
     var tip;
-    if (!sessions.length) tip = T('✈️ לפני הטיסה הראשונה עושים את <b>בדיקה 1: משחק ההתאמה</b> (פעם אחת בלבד, כ־3 דקות). הוא מכוון את המכשירים בשבילך.');
-    else if (p.kind === 'adult' && !hasCal) tip = T('רואים קווים עקומים או גלים? אפשר לעשות את <b>בדיקה 2: כיול עיוות</b>. אם לא, אפשר להמריא ישר אל <b>לקרוא</b>.');
+    if (!sessions.length) tip = T('✈️ לפני ההמראה עושים <b>טיסת ניסוי ראשונה</b> (פעם אחת בלבד, כ־3 דקות). היא מכוונת את המכשירים בשבילך.');
+    else if (p.kind === 'adult' && !hasCal) tip = T('רואים קווים עקומים או גלים? אפשר לעשות את <b>טיסת הניסוי השנייה: כיול עיוות</b>. אם לא, אפשר להמריא ישר אל <b>לקרוא</b>.');
     else tip = T('🛫 הכול מוכן להמראה! בוחרים יעד: <b>לקרוא</b> או <b>לראות</b>.');
     $('hubTip').innerHTML = tip;
     DA.screens.history.hubCard();
@@ -229,7 +229,7 @@
       var scr = k === 'mnread' ? DA.screens.readtest : k === 'fieldmap' ? DA.screens.fieldtest : DA.screens.learn;
       parts.push('<div class="learned-item">' + scr.summaryHtml(s) + '</div>');
     });
-    $('hubLearned').innerHTML = parts.length ? parts.join('') : T('<span class="muted">עוד לא שיחקנו. המשחק ילמד מה הכי ברור לך.</span>');
+    $('hubLearned').innerHTML = parts.length ? parts.join('') : T('<span class="muted">עוד לא עשינו טיסת ניסוי. היא תלמד מה הכי ברור לך.</span>');
   }
 
   function restoreBest() {
@@ -287,7 +287,7 @@
       (b.profiles || []).forEach(function (p) { if (p && p.id && p.schema) { ctx.profiles.save(p); np++; } });
       (b.sessions || []).forEach(function (s) { if (s && s.id) { ctx.profiles.saveSession(s); ns++; } });
       nt = ctx.store.importBundle(b.trials || []);
-      DA.ui.tell(T('שוחזרו ') + np + T(' קוראים, ') + ns + T(' משחקים ו־') + nt + T(' כיולים.'));
+      DA.ui.tell(T('שוחזרו ') + np + T(' קוראים, ') + ns + T(' טיסות ניסוי ו־') + nt + T(' כיולים.'));
       renderHome();
     }).catch(function (e) { DA.ui.tell(T('קובץ גיבוי לא תקין: ') + e.message); });
   }

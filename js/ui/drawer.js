@@ -12,9 +12,9 @@
   var GROUPS = [
     { title: T('🦉 הנווט והקראת הנחיות'), items: [
       { k: 'copilot', label: T('להציג את הנווט, שמסביר כל צעד'), type: 'check' },
-      { k: 'gamePace', label: T('קצב המשחק'), type: 'select', options: function () { return PACE_OPTS(); } },
-      { k: 'gameVoice', label: T('קול במשחק: שאלות, עידוד ומה קורה בסוף'), type: 'check' },
-      { k: 'copilotVoice', label: T('להקריא את כל ההנחיות אוטומטית (הנווט, המשחק, הכלים והשאלות)'), type: 'check' }
+      { k: 'gamePace', label: T('קצב טיסת הניסוי'), type: 'select', options: function () { return PACE_OPTS(); } },
+      { k: 'gameVoice', label: T('קול בטיסת הניסוי: שאלות, עידוד ומה קורה בסוף'), type: 'check' },
+      { k: 'copilotVoice', label: T('להקריא את כל ההנחיות אוטומטית (הנווט, טיסות הניסוי, הכלים והשאלות)'), type: 'check' }
     ] },
     { title: T('טקסט'), items: [
       { k: 'fontSize', label: T('גודל אותיות'), type: 'range', min: 12, max: 96, step: 1, fmt: function (v) { return v + 'px'; } },

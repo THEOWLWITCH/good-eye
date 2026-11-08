@@ -50,7 +50,7 @@
   function renderVoiceBtn() {
     var b = $('learnVoice'); if (!b) return;
     b.textContent = voiceOn() ? '🔊' : '🔇';
-    b.title = voiceOn() ? T('להשתיק את קול המשחק') : T('להפעיל את קול המשחק');
+    b.title = voiceOn() ? T('להשתיק את קול הטיסה') : T('להפעיל את קול הטיסה');
     b.setAttribute('aria-pressed', voiceOn() ? 'true' : 'false');
   }
 
@@ -215,8 +215,8 @@
     $('learnPlayed').style.display = prev ? '' : 'none';
     $('learnOnce').style.display = prev ? 'none' : '';
     $('quickGame').classList.toggle('huge', !prev);
-    $('quickGame').textContent = prev ? T('▶️ לשחק שוב בכל זאת') : T('▶️ בואו נשחק (כ־3 דקות)');
-    if (prev) $('learnPlayedWhen').textContent = T('✓ כבר שיחקת ב־') + new Date(prev.startedAt).toLocaleDateString(DA.i18n.locale);
+    $('quickGame').textContent = prev ? T('▶️ לטוס שוב בכל זאת') : T('▶️ ממריאים (כ־3 דקות)');
+    if (prev) $('learnPlayedWhen').textContent = T('✓ טיסת הניסוי כבר נעשתה ב־') + new Date(prev.startedAt).toLocaleDateString(DA.i18n.locale);
     document.querySelectorAll('#catChecks input').forEach(function (i) {
       var def = defaultCats(p.kind === 'adult');
       i.checked = def.indexOf(i.value) >= 0;
@@ -266,7 +266,7 @@
     if (root.speechSynthesis) root.speechSynthesis.cancel();
     $('learnPaused').style.display = '';
     $('learnPausedPct').textContent = Math.round(pct()) + '%';
-    setTimeout(function () { speak(T('המשחק בהפסקה. המקום נשמר. כשתרצו, לחצו להמשיך.')); }, 50);
+    setTimeout(function () { speak(T('טיסת הניסוי בהפסקה. המקום נשמר. כשתרצו, לחצו להמשיך.')); }, 50);
   }
   function resume() {
     paused = false;
@@ -434,11 +434,11 @@
     $('learnStage').classList.remove('cvi');
     $('learnStage').classList.add('intro');
     $('learnContent').innerHTML = '<div class="stn-intro"><div class="stn-icon">' + DA.icons.svg(inf.icon) + '</div>' +
-      '<div class="stn-step">' + T('תחנה') + ' ' + i + ' ' + T('מתוך') + ' ' + n + '</div><h2>' + esc(inf.title) + '</h2><p>' + esc(inf.text) + '</p></div>';
+      '<div class="stn-step">' + T('שלב') + ' ' + i + ' ' + T('מתוך') + ' ' + n + '</div><h2>' + esc(inf.title) + '</h2><p>' + esc(inf.text) + '</p></div>';
     $('learnPrompt').textContent = inf.title;
-    choices([{ html: T('יוצאים לדרך ▶'), cls: 'next-btn', fn: function () { sess._intro = sess._si; nextStep(); } }]);
+    choices([{ html: T('ממריאים ▶'), cls: 'next-btn', fn: function () { sess._intro = sess._si; nextStep(); } }]);
     var nb = $('learnChoices').querySelector('.next-btn'); if (nb) nb.focus();
-    speak(T('תחנה') + ' ' + i + '. ' + inf.title + '. ' + inf.text);
+    speak(T('שלב') + ' ' + i + '. ' + inf.title + '. ' + inf.text);
   }
 
   // ----- lines (each eye) -----
@@ -755,21 +755,18 @@
     var endMsg = early
       ? T('עצרנו כאן, וזה בסדר גמור. גם ממה שהספקנו למדנו משהו חשוב עליך. רוצים לשמור? לחצו על הכפתור הגדול עם הכוכב.')
       : T('מצאנו בשבילך את הדרך הכי נוחה לקרוא. לחצו על הכפתור הגדול עם הכוכב, ומעכשיו כל טקסט באפליקציה ייראה בדיוק ככה.');
-    var endTitle = early ? T('עצרנו לנוח') : T('כל הכבוד, סיימת!');
+    var endTitle = early ? T('נחתנו באמצע, וזה בסדר') : T('טיסת הניסוי הושלמה!');
     $('learnEndTitle').innerHTML = '<span class="end-badge">' + DA.icons.svg(early ? 'pin' : 'trophy') + '</span>' + esc(endTitle);
     var hasCal = !!ctx.opsFor(ctx.profile().settings);
     var la = sess.lines || {}, vals = Object.keys(la).map(function (k) { return la[k]; });
     var wavy = vals.indexOf('wavy') >= 0, missing = vals.indexOf('missing') >= 0;
     var straight = vals.length === 2 && vals.every(function (v) { return v === 'straight'; });
-    var q, nextSay, young = ctx.profile().kind !== 'adult', pro = '';
+    var q, nextSay, pro = '';
     if (wavy || missing) {
       q = (wavy ? T('ראית קווים עקומים או גליים') : T('ראית שחסר חלק מהרשת')) + T(' בעין אחת לפחות. ') +
         (hasCal ? T('כדאי לחדש את כיול העיוות, כדי שהתיקון יתאים בדיוק.') : T('כדאי לעשות כיול עיוות: הוא מיישר את מה שנראה עקום, ומתאים את הטקסט בדיוק לעין שלך.')) +
-        (missing ? T(' ובשביל חלק שחסר, יש גם את "מפת נוחות" בכל הכלים.') : '') +
-        (young ? ' ' + T('את הכיול עושים יחד עם מבוגר שיושב לידך ועוזר.') : '');
-      pro = young
-        ? T('וחשוב לספר על זה להורים, כדי שיבדקו את זה גם אצל רופא/ת עיניים או אופטומטריסט/ית.')
-        : T('כדאי לבדוק את זה גם אצל רופא/ת עיניים או אופטומטריסט/ית, במיוחד אם זה חדש או השתנה.');
+        (missing ? T(' ובשביל חלק שחסר, יש גם את "מפת נוחות" בכל הכלים.') : '');
+      pro = T('כדאי לבדוק את זה גם אצל רופא/ת עיניים או אופטומטריסט/ית, במיוחד אם זה חדש או השתנה.');
       nextSay = ' ' + q + ' ' + pro;
     } else if (straight) {
       q = T('הקווים נראו לך ישרים בשתי העיניים, אז אין צורך בכיול עיוות. אפשר לצאת לקרוא!');
@@ -785,12 +782,12 @@
     $('learnNextHasCal').style.display = 'none';
     var showCal = wavy || missing || (!straight && !hasCal);
     $('learnNextYes').style.display = showCal ? '' : 'none';
-    $('learnNextYes').textContent = wavy || missing ? (hasCal ? T('לחדש את כיול העיוות') : young ? T('לכיול עיוות, יחד עם מבוגר (כ־10 דקות)') : T('לכיול עיוות (כ־10 דקות)')) : T('כן, לפעמים ← לכיול עיוות (כ־10 דקות)');
+    $('learnNextYes').textContent = wavy || missing ? (hasCal ? T('לחדש את כיול העיוות') : T('לכיול עיוות (כ־10 דקות)')) : T('כן, לפעמים ← לכיול עיוות (כ־10 דקות)');
     $('learnNextNo').textContent = straight || wavy || missing ? T('לצאת לקרוא 📖') : T('לא ← אפשר לצאת לקרוא 📖');
     $('learnNextYes').onclick = function () { ctx.updateSettings(last.after); ctx.go('calibrate'); };
     $('learnNextNo').onclick = function () { ctx.updateSettings(last.after); ctx.store.setPref('read.intent', 'read'); ctx.go('read'); };
     $('learnEndSay').textContent = endMsg;
-    setTimeout(function () { speak(endTitle + ' ' + endMsg + ' ' + T('את המשחק לא צריך לשחק שוב. בפעם הבאה נכנסים ישר לקריאה.') + nextSay); }, 300);
+    setTimeout(function () { speak(endTitle + ' ' + endMsg + ' ' + T('את טיסת הניסוי לא צריך לעשות שוב. בפעם הבאה נכנסים ישר לקריאה.') + nextSay); }, 300);
     $('learnApplyBest').onclick = function () {
       ctx.updateSettings(sess.after);
       ctx.profiles.setBest(ctx.profile(), sess.after);
@@ -823,7 +820,7 @@
     return '<p class="muted">' + new Date(s.startedAt).toLocaleString(DA.i18n.locale) + (s.early ? T(' · הופסק באמצע') : '') + '</p>' +
       (rows ? T('<table class="sum"><tr><th>מה ראינו</th><th>הגודל הקטן ביותר שזוהה — עם ההגדרות שלי</th><th>בלי</th><th>שיפור</th></tr>') + rows + '</table>' : '') +
       extra + warp + (s.viewing && s.viewing.distanceCmMedian ? T('<p>👁️ מרחק צפייה ממוצע: ') + s.viewing.distanceCmMedian + T(' ס״מ') +
-        (s.viewing.gazeCenteredPct != null ? T(' · מבט במרכז ') + s.viewing.gazeCenteredPct + T('% מהזמן') : '') + '</p>' : '') + (s.attention != null && s.attention < 70 ? T('<p class="bad">בבדיקות הקלות היו טעויות — ייתכן שהייתה עייפות. כדאי לחזור על המשחק ביום אחר.</p>') : '') +
+        (s.viewing.gazeCenteredPct != null ? T(' · מבט במרכז ') + s.viewing.gazeCenteredPct + T('% מהזמן') : '') + '</p>' : '') + (s.attention != null && s.attention < 70 ? T('<p class="bad">בבדיקות הקלות היו טעויות — ייתכן שהייתה עייפות. כדאי לחזור על טיסת הניסוי ביום אחר.</p>') : '') +
       T('<p><b>ההגדרות שנלמדו:</b> ') + esc(DA.settings.describe(s.after || s.before)) + '</p>';
   }
 

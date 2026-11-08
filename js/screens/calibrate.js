@@ -359,7 +359,7 @@
     if (prof && t.actions.length) {
       prof.settings = DA.settings.normalize(Object.assign({}, prof.settings, { calibrationId: t.id }));
       ctx.profiles.save(prof);
-      DA.ui.toast(T('הכיול הזה ישמש עכשיו לתיקון בקריאה ובמשחק של ') + prof.name);
+      DA.ui.toast(T('הכיול הזה ישמש עכשיו לתיקון בקריאה ובטיסות של ') + prof.name);
     }
   });
 
@@ -557,12 +557,6 @@
   function enter() {
     visible = true;
     var prof = ctx.profile();
-    // young pilots calibrate together with an adult
-    var tog = document.getElementById('calTogether');
-    if (tog) {
-      tog.style.display = prof && prof.kind !== 'adult' ? '' : 'none';
-      document.getElementById('calTogetherOk').onclick = function () { tog.style.display = 'none'; setTimeout(function () { grid.resize(); }, 0); };
-    }
     var calm = !!(prof && prof.settings.calm);
     grid.setSettings({ soft: calm });
     if (calm && grid.settings.density > 7) grid.setSettings({ density: 7 });

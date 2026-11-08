@@ -64,7 +64,7 @@
     var ss = ctx.profiles.sessionsFor(p.id).slice().reverse(); // oldest first
     var box = $('histBody');
     if (!p.keepHistory) {
-      box.innerHTML = '<p class="muted">' + T('שמירת ההיסטוריה כבויה. אפשר להפעיל אותה, ואז כל משחק, מדידה וכיול יישמרו ויוצגו כאן לאורך זמן.') + '</p>';
+      box.innerHTML = '<p class="muted">' + T('שמירת ההיסטוריה כבויה. אפשר להפעיל אותה, ואז כל טיסת ניסוי, מדידה וכיול יישמרו ויוצגו כאן לאורך זמן.') + '</p>';
       return;
     }
     var parts = [];
@@ -80,14 +80,14 @@
     var cats = {};
     learn.forEach(function (s) { Object.keys(s.recognition || {}).forEach(function (k) { if (s.recognition[k].corrected) (cats[k] = cats[k] || []).push({ t: s.startedAt, v: s.recognition[k].corrected.threshold }); }); });
     var CAT = {}; DA.stimuli.CATEGORIES.forEach(function (c) { CAT[c.id] = c.icon + ' ' + c.label; });
-    Object.keys(cats).forEach(function (k) { parts.push(section('🎮 ' + T('הגודל הקטן שזוהה במשחק: ') + (CAT[k] || k), cats[k])); });
+    Object.keys(cats).forEach(function (k) { parts.push(section('🎮 ' + T('הגודל הקטן שזוהה בטיסת הניסוי: ') + (CAT[k] || k), cats[k])); });
     var fm = ss.filter(function (s) { return s.kind === 'fieldmap' && s.result; }).map(function (s) { return { t: s.startedAt, v: s.result.defects }; });
     if (fm.length) parts.push(section(T('🎯 מפת נוחות: נקודות שנראו פחות'), fm));
     var trials = ctx.store.allTrials().filter(function (t) { return t.profileId === p.id && t.model && t.model.quality; })
       .sort(function (a, b) { return a.savedAt < b.savedAt ? -1 : 1; })
       .map(function (t) { return { t: t.savedAt, v: Math.round(t.model.quality.maxDisplacement * ((t.display && t.display.stimulusSizePx) || 600)) }; });
     if (trials.length) parts.push(section(T('🎯 כיול עיוות: התזוזה הגדולה ביותר (פיקסלים)'), trials));
-    box.innerHTML = parts.length ? parts.join('') : '<p class="muted">' + T('עוד אין מספיק נתונים. אחרי כמה משחקים או מדידות יופיעו כאן גרפים.') + '</p>';
+    box.innerHTML = parts.length ? parts.join('') : '<p class="muted">' + T('עוד אין מספיק נתונים. אחרי כמה טיסות ניסוי או מדידות יופיעו כאן גרפים.') + '</p>';
   }
 
   function section(title, pts) {
