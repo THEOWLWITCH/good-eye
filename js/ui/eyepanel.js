@@ -172,10 +172,10 @@
       var sup = DA.eyes.supported();
       b.classList.toggle('on', !!s.running);
       b.classList.toggle('unsupported', !sup);
-      var short = b.getAttribute('data-short') != null;
+      var mode = b.getAttribute('data-short'), short = mode != null && mode !== 'label', mid = mode === 'label';
       b.textContent = !sup ? (short ? '👁️' : T('👁️ מעקב עיניים: זמין רק באתר העצמאי'))
-        : s.running ? (short ? T('👁️ פועל') : T('👁️ מעקב עיניים: פועל ✓ (לחצו לכיבוי)'))
-        : (short ? T('👁️ כבוי') : T('👁️ מעקב עיניים: כבוי (לחצו להפעלה)'));
+        : s.running ? (short ? T('👁️ פועל') : mid ? T('👁️ מעקב עיניים: פועל ✓') : T('👁️ מעקב עיניים: פועל ✓ (לחצו לכיבוי)'))
+        : (short ? T('👁️ כבוי') : mid ? T('👁️ מעקב עיניים: כבוי') : T('👁️ מעקב עיניים: כבוי (לחצו להפעלה)'));
       b.title = T('מעקב עיניים במצלמה: לא חובה, עוזר להתאמה מדויקת יותר');
     });
   }

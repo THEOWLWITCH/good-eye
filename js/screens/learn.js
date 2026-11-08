@@ -435,7 +435,7 @@
     $('learnStage').classList.add('intro');
     $('learnContent').innerHTML = '<div class="stn-intro"><div class="stn-icon">' + DA.icons.svg(inf.icon) + '</div>' +
       '<div class="stn-step">' + T('שלב') + ' ' + i + ' ' + T('מתוך') + ' ' + n + '</div><h2>' + esc(inf.title) + '</h2><p>' + esc(inf.text) + '</p></div>';
-    $('learnPrompt').textContent = inf.title;
+    $('learnPrompt').textContent = '';
     choices([{ html: T('ממריאים ▶'), cls: 'next-btn', fn: function () { sess._intro = sess._si; nextStep(); } }]);
     var nb = $('learnChoices').querySelector('.next-btn'); if (nb) nb.focus();
     speak(T('שלב') + ' ' + i + '. ' + inf.title + '. ' + inf.text);

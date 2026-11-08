@@ -346,3 +346,10 @@ button.huge { font-size: 22px; padding: 18px 40px; }
 .together-icon svg { width: 24px; height: 24px; }
 .pro-note { margin: 10px auto 0; max-width: 560px; font-size: 15px; line-height: 1.55; opacity: .9; padding-top: 10px; border-top: 1px solid rgba(255,255,255,.1); }
 @media (max-width: 560px) { .together-note { flex-wrap: wrap; } .together-note p { font-size: 14px; } }
+#learnStage.intro { width: min(94vw, 640px) !important; height: auto !important; min-height: 280px; aspect-ratio: auto !important; }
+#learnStage.intro > .lens-content { position: relative !important; inset: auto !important; padding: 8px 0 !important; }
+#learnStage.intro .stn-intro { max-width: 600px; font-size: 18px; }
+#learnStage.intro .stn-intro p { font-size: 18px !important; line-height: 1.55 !important; letter-spacing: normal !important; word-spacing: normal !important; }
+.read-bar.v2 { position: relative; z-index: 25; }   /* keep the "More" menu above the page */
+.learn-prompt:empty + .say-btn { display: none; }
+html[lang="en"] #drawerPreview p[dir="rtl"] { display: none; }   /* the preview speaks the interface language */

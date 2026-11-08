@@ -202,7 +202,7 @@
     body.appendChild(el('<p class="lab-help">' + T('משמאל המקור, מימין אחרי עיבוד. העיבוד "מחדד מראש" לפי צורת הטשטוש שלכם, כדי שאחרי הטשטוש בעין זה ייראה ברור יותר. משווים שיטות, מדרגים, ובוחרים מה להפעיל בתמונות.') + '</p>'));
     if (!ctx.profile().settings.psf) body.appendChild(el('<p class="muted small">' + T('טיפ: קודם שומרים צורת טשטוש בלשונית "צורת הטשטוש" ולוחצים "להשתמש". בינתיים משתמשים בטשטוש עגול רגיל.') + '</p>'));
     var row = el('<div class="lab-pair"></div>'), A = canvas(260, 260), B = canvas(260, 260);
-    row.appendChild(wrapCap(A, T('מקור'))); row.appendChild(wrapCap(B, T('אחרי עיבוד')));
+    row.appendChild(wrapCap(A, T('המקור'))); row.appendChild(wrapCap(B, T('אחרי עיבוד')));
     body.appendChild(row);
     var c = el('<div class="lab-controls"></div>');
     var sel = el('<div class="row wrap"><label>' + T('גירוי') + ' <select data-k="stim"><option value="edges">' + T('קצוות') + '</option><option value="lines">' + T('קווים דקים') + '</option><option value="corners">' + T('פינות') + '</option><option value="text">' + T('טקסט') + '</option></select></label>' +
