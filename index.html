@@ -120,14 +120,18 @@
   <!-- ============ CALIBRATE (grid) ============ -->
   <section id="screen-calibrate" class="screen cal-screen">
     <header class="cal-bar">
-      <div class="cal-title">🎯 כיול עיוות — רשת קווים <span class="muted">(לביצוע עם מבוגר)</span></div>
+      <div class="cal-title">🎯 כיול עיוות <span class="muted">(לביצוע עם מבוגר)</span></div>
       <label class="instrument">מכשיר כיול:
         <select id="instrument">
           <option value="flex-grid" selected>4.1 רשת קווים גמישה</option>
-          <option disabled>4.2 מערך נקודות (שלב 2)</option>
-          <option disabled>4.3 צורות וזוויות (שלב 2)</option>
-          <option disabled>4.4 מרווחים שווים (שלב 3)</option>
-          <option disabled>4.5 שוויון גודל (שלב 3)</option>
+          <option value="dots">4.2 מערך נקודות</option>
+          <option value="shape-circle">4.3 צורה: עיגול</option>
+          <option value="shape-rings">4.3 צורה: טבעות</option>
+          <option value="shape-square">4.3 צורה: ריבוע</option>
+          <option value="shape-rect">4.3 צורה: מלבן</option>
+          <option value="shape-triangle">4.3 צורה: משולש</option>
+          <option value="spacing">4.4 מרווחים שווים</option>
+          <option value="size">4.5 שוויון גודל</option>
         </select>
       </label>
       <div class="toolbar">
@@ -154,10 +158,10 @@
 
         <section>
           <h3>גירוי</h3>
-          <label>צפיפות רשת <output id="densityOut"></output>
+          <label class="grid-only">צפיפות רשת <output id="densityOut"></output>
             <input id="density" type="range" min="3" max="21" step="1">
           </label>
-          <label>תצוגה
+          <label class="grid-only">תצוגה
             <select id="mode">
               <option value="both">קווים אופקיים ואנכיים</option>
               <option value="h">קווים אופקיים בלבד</option>
@@ -165,7 +169,7 @@
               <option value="single">קו יחיד</option>
             </select>
           </label>
-          <div id="singleBox" class="row">
+          <div id="singleBox" class="row grid-only">
             <select id="singleOrient"><option value="h">אופקי</option><option value="v">אנכי</option></select>
             <label class="inline">מס׳ קו <input id="singleIndex" type="number" min="1" step="1"></label>
           </div>
@@ -173,7 +177,14 @@
             <input id="lineWidth" type="range" min="1" max="8" step="0.5">
           </label>
           <label class="check"><input id="dark" type="checkbox"> קווים לבנים על רקע שחור</label>
-          <label class="check"><input id="fixation" type="checkbox"> נקודת קיבוע במרכז</label>
+          <label class="check"><input id="fixation" type="checkbox"> נקודת מבט (מביטים בה בזמן הכיול)</label>
+          <label>מיקום נקודת המבט
+            <select id="fixationPos">
+              <option value="c">מרכז</option><option value="n">למעלה</option><option value="s">למטה</option>
+              <option value="e">ימינה</option><option value="w">שמאלה</option><option value="ne">למעלה־ימינה</option>
+              <option value="nw">למעלה־שמאלה</option><option value="se">למטה־ימינה</option><option value="sw">למטה־שמאלה</option>
+            </select>
+          </label>
         </section>
 
         <section>
@@ -216,6 +227,7 @@
           <label>השוואה לניסיון
             <select id="compare"><option value="">— ללא —</option></select>
           </label>
+          <div id="compareDiff" class="hint"></div>
           <div class="row wrap">
             <button id="exportJson">ייצוא JSON</button>
             <button id="exportCsv">ייצוא CSV</button>
@@ -333,6 +345,58 @@
         <button id="segPlay" class="rb">▶️</button>
         <button id="segNext" class="rb">←</button>
       </div>
+    </div>
+  </section>
+
+  <!-- ============ MORE CALIBRATION TOOLS (spec 4.2, 4.4, 4.5) ============ -->
+  <section id="screen-tools" class="screen cal-screen">
+    <header class="cal-bar">
+      <div class="cal-title">🎯 כלי כיול נוספים</div>
+      <label class="instrument">כלי:
+        <select id="tlMode">
+          <option value="dots">4.2 מערך נקודות</option>
+          <option value="spacing">4.4 מרווחים שווים</option>
+          <option value="size">4.5 שוויון גודל</option>
+        </select>
+      </label>
+      <div class="toolbar">
+        <button id="tlBack">← לרשת ולצורות</button>
+        <button id="tlUndo">↶ ביטול</button>
+        <button id="tlRedo">↷ חזרה</button>
+        <button id="tlReset">⟲ איפוס</button>
+        <button id="tlSave" class="primary">💾 שמירה</button>
+      </div>
+    </header>
+    <div class="layout">
+      <aside class="panel">
+        <section>
+          <p id="tlHelp" class="hint"></p>
+          <div data-tl="dots">
+            <label>גודל המערך <select id="tlN"><option value="5">5×5</option><option value="7" selected>7×7</option></select></label>
+            <label class="check"><input id="tlOrig" type="checkbox" checked> להראות איפה הנקודות היו (חלש)</label>
+          </div>
+          <div data-tl="spacing">
+            <label>כיוון <select id="tlOrient"><option value="h">שורה</option><option value="v">עמודה</option><option value="d">אלכסון</option></select></label>
+            <label>מיקום <select id="tlPos"><option value="top">למעלה</option><option value="mid" selected>באמצע</option><option value="bottom">למטה</option></select></label>
+            <label>מרווח התחלתי <select id="tlGap"><option value="s">קטן</option><option value="m" selected>בינוני</option><option value="l">גדול</option></select></label>
+          </div>
+          <div data-tl="size">
+            <label>צורה <select id="tlShape"><option value="circle">עיגול</option><option value="square">ריבוע</option></select></label>
+            <label>סידור <select id="tlLayout"><option value="lr">ימין ושמאל</option><option value="tb">למעלה ולמטה</option></select></label>
+            <div class="row wrap"><button id="tlSwap">⇄ להחליף צדדים</button><button id="tlMeasure" class="primary">📏 לשמור מדידה</button></div>
+          </div>
+        </section>
+        <section>
+          <h3>תוצאה</h3>
+          <p id="tlStats" class="hint"></p>
+          <p id="tlSaved" class="hint"></p>
+        </section>
+        <section>
+          <h3>שמירות קודמות</h3>
+          <div id="tlList" class="trial-list"></div>
+        </section>
+      </aside>
+      <main class="stage" id="tlStage"><canvas id="tlCanvas"></canvas></main>
     </div>
   </section>
 
@@ -560,7 +624,7 @@
   <script src="js/core/device.js"></script>
   <script src="js/instruments/grid.js"></script>
   <script src="js/vision/eyes.js"></script>
-  <script>window.DA.VERSION = '0.6.0';</script>
+  <script>window.DA.VERSION = '0.7.0';</script>
   <script src="js/ui/common.js"></script>
   <script src="js/ui/drawer.js"></script>
   <script src="js/ui/eyepanel.js"></script>
@@ -571,6 +635,7 @@
   <script src="js/screens/readtest.js"></script>
   <script src="js/screens/fieldtest.js"></script>
   <script src="js/screens/history.js"></script>
+  <script src="js/screens/tools.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

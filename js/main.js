@@ -7,8 +7,8 @@
   var $ = DA.ui.$;
   var store = new DA.storage.Store();
   var profiles = new DA.ProfileStore(store);
-  var SCREENS = ['home', 'hub', 'calibrate', 'learn', 'read', 'readtest', 'fieldtest', 'history'];
-  var NEEDS_PROFILE = { hub: 1, calibrate: 1, learn: 1, read: 1, readtest: 1, fieldtest: 1, history: 1 };
+  var SCREENS = ['home', 'hub', 'calibrate', 'learn', 'read', 'readtest', 'fieldtest', 'history', 'tools'];
+  var NEEDS_PROFILE = { hub: 1, calibrate: 1, learn: 1, read: 1, readtest: 1, fieldtest: 1, history: 1, tools: 1 };
   var cur = null;
 
   var ctx = {

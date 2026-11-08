@@ -26,7 +26,9 @@
     showControls: true,
     clamp: true,               // prevent folds by limiting drag length relative to radius
     dark: false,               // false: black lines on white; true: white lines on black
-    fixation: false
+    fixation: false,
+    fixationPos: 'c',          // c | n | s | e | w | ne | nw | se | sw  (spec 7.1: nine gaze points)
+    figure: 'grid'             // grid | circle | rings | square | rect | triangle  (spec 4.3)
   };
 
   function GridInstrument(canvas, opts) {
@@ -100,7 +102,9 @@
 
   /** Original (undeformed) lines, filtered by the display mode. */
   GridInstrument.prototype.originalLines = function (all) {
-    var s = this.settings, pos = linePositions(s.density), lines = [];
+    var s = this.settings;
+    if (s.figure && s.figure !== 'grid') return figureLines(s.figure);
+    var pos = linePositions(s.density), lines = [];
     var showH = all || s.mode === 'both' || s.mode === 'h';
     var showV = all || s.mode === 'both' || s.mode === 'v';
     for (var i = 0; i < pos.length; i++) {
@@ -110,6 +114,45 @@
     }
     return lines;
   };
+
+  /** Closed outlines for shape calibration (spec 4.3). Every point of the outline can be grabbed. */
+  function figureLines(fig) {
+    var N = 240, c = 0.5;
+    function poly(id, pts) {
+      // resample a closed polygon to N evenly spaced points
+      var segs = [], total = 0;
+      for (var i = 0; i < pts.length; i++) {
+        var a = pts[i], b = pts[(i + 1) % pts.length], l = Math.hypot(b[0] - a[0], b[1] - a[1]);
+        segs.push([a, b, l]); total += l;
+      }
+      var out = [], step = total / N, si = 0, acc = 0;
+      for (var k = 0; k <= N; k++) {
+        var d = Math.min(k * step, total - 1e-9);
+        while (si < segs.length - 1 && acc + segs[si][2] < d) { acc += segs[si][2]; si++; }
+        var sg = segs[si], u = (d - acc) / sg[2];
+        out.push([sg[0][0] + u * (sg[1][0] - sg[0][0]), sg[0][1] + u * (sg[1][1] - sg[0][1])]);
+      }
+      return { id: id, orient: 'shape', index: 0, points: out, closed: true };
+    }
+    function circle(id, r) {
+      var out = [];
+      for (var k = 0; k <= N; k++) { var t = k / N * 2 * Math.PI; out.push([c + r * Math.cos(t), c + r * Math.sin(t)]); }
+      return { id: id, orient: 'shape', index: 0, points: out, closed: true };
+    }
+    switch (fig) {
+      case 'circle': return [circle('circle', 0.32)];
+      case 'rings': return [circle('ring1', 0.1), circle('ring2', 0.2), circle('ring3', 0.3), circle('ring4', 0.4)];
+      case 'square': return [poly('square', [[0.2, 0.2], [0.8, 0.2], [0.8, 0.8], [0.2, 0.8]])];
+      case 'rect': return [poly('rect', [[0.12, 0.3], [0.88, 0.3], [0.88, 0.7], [0.12, 0.7]])];
+      case 'triangle': return [poly('triangle', [[0.5, 0.14], [0.86, 0.8], [0.14, 0.8]])];
+    }
+    return [];
+  }
+  GridInstrument.figureLines = figureLines;
+
+  /** Position of the fixation point for each of the nine gaze positions (spec 7.1). */
+  var FIX = { c: [0.5, 0.5], n: [0.5, 0.12], s: [0.5, 0.88], e: [0.88, 0.5], w: [0.12, 0.5], ne: [0.88, 0.12], nw: [0.12, 0.12], se: [0.88, 0.88], sw: [0.12, 0.88] };
+  GridInstrument.FIX = FIX;
 
   function makeLine(orient, index, c) {
     var pts = [];
@@ -299,8 +342,9 @@
     lines.forEach(function (L) { self._poly(DEF.applyToPolyline(ops, L.points)); });
 
     if (s.fixation) {
+      var fp = FIX[s.fixationPos] || FIX.c;
       ctx.fillStyle = '#e00000';
-      ctx.beginPath(); ctx.arc(S / 2, S / 2, 4, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(fp[0] * S, fp[1] * S, 5, 0, Math.PI * 2); ctx.fill();
     }
 
     if (s.showControls) {

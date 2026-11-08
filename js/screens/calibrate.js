@@ -102,9 +102,71 @@
     if (!ops().length) { el.textContent = T('אין תיקונים'); el.className = ''; return; }
     var txt = T('שינוי שטח מקומי: בין ×') + q.minDet.toFixed(2) + T(' ל-×') + q.maxDet.toFixed(2) +
       T(' · תזוזה מרבית: ') + Math.round(q.maxDisplacement * grid.S) + T(' פיקסלים');
+    if (grid.settings.figure && grid.settings.figure !== 'grid') txt = shapeStats() + ' · ' + txt;
     if (q.fold) { el.textContent = T('⚠ קיפול ברשת! ') + txt + T(' — מומלץ לבטל את הפעולה האחרונה'); el.className = 'bad'; }
     else if (q.extreme) { el.textContent = T('⚠ עיוות מקומי חזק (מומלץ רדיוס גדול יותר) · ') + txt; el.className = 'warn'; }
     else { el.textContent = T('✓ רציף, ללא קיפולים · ') + txt; el.className = 'ok'; }
+  }
+
+  /** Shape measurements (spec 4.3): centre shift, area, roundness / corner angles of the corrected outline. */
+  function shapeStats() {
+    var o = ops(), S = grid.S, out = [];
+    grid.originalLines(true).forEach(function (L) {
+      var P = DEF.applyToPolyline(o, L.points), n = P.length - 1;
+      var ca = centroidArea(L.points), cb = centroidArea(P);
+      var shift = Math.hypot(cb.x - ca.x, cb.y - ca.y) * S;
+      var line = T('מרכז זז ') + Math.round(shift) + T(' פיקסלים') + T(' · שטח ×') + (cb.a / ca.a).toFixed(2);
+      if (/circle|ring/.test(L.id)) {
+        var rs = P.slice(0, n).map(function (p) { return Math.hypot(p[0] - cb.x, p[1] - cb.y); });
+        line += T(' · יחס רדיוסים ') + (Math.max.apply(null, rs) / Math.min.apply(null, rs)).toFixed(2);
+      } else {
+        var corners = L.id === 'triangle' ? 3 : 4, angs = [];
+        var per = cornerIndices(L.points, corners);
+        per.forEach(function (i) {
+          var a = P[(i - 6 + n) % n], b = P[i], c = P[(i + 6) % n];
+          var v1 = [a[0] - b[0], a[1] - b[1]], v2 = [c[0] - b[0], c[1] - b[1]];
+          var ang = Math.acos(Math.max(-1, Math.min(1, (v1[0] * v2[0] + v1[1] * v2[1]) / (Math.hypot(v1[0], v1[1]) * Math.hypot(v2[0], v2[1])))));
+          angs.push(Math.round(ang * 180 / Math.PI));
+        });
+        line += T(' · זוויות ') + angs.join('°, ') + '°';
+      }
+      out.push(line);
+    });
+    return out.slice(0, 2).join(' | ');
+  }
+  function centroidArea(pts) {
+    var a = 0, cx = 0, cy = 0;
+    for (var i = 0; i < pts.length - 1; i++) {
+      var f = pts[i][0] * pts[i + 1][1] - pts[i + 1][0] * pts[i][1];
+      a += f; cx += (pts[i][0] + pts[i + 1][0]) * f; cy += (pts[i][1] + pts[i + 1][1]) * f;
+    }
+    a /= 2;
+    return { a: Math.abs(a) || 1e-9, x: cx / (6 * a), y: cy / (6 * a) };
+  }
+  function cornerIndices(pts, k) {
+    // the original polygon's corners are where the direction changes most
+    var n = pts.length - 1, turn = [];
+    for (var i = 0; i < n; i++) {
+      var a = pts[(i - 1 + n) % n], b = pts[i], c = pts[(i + 1) % n];
+      var d1 = Math.atan2(b[1] - a[1], b[0] - a[0]), d2 = Math.atan2(c[1] - b[1], c[0] - b[0]);
+      var t = Math.abs(((d2 - d1 + 3 * Math.PI) % (2 * Math.PI)) - Math.PI);
+      turn.push([t, i]);
+    }
+    turn.sort(function (x, y) { return y[0] - x[0]; });
+    var picked = [];
+    turn.forEach(function (t) { if (picked.length < k && picked.every(function (p) { return Math.abs(p - t[1]) > 10; })) picked.push(t[1]); });
+    return picked.sort(function (x, y) { return x - y; });
+  }
+
+  /** Repeatability (spec 8.2): mean difference in pixels between two calibrations' fields. */
+  function fieldDiff(opsA, opsB) {
+    var sum = 0, n = 0, S = grid.S;
+    for (var j = 0; j <= 20; j++) for (var i = 0; i <= 20; i++) {
+      var x = 0.08 + i * 0.042, y = 0.08 + j * 0.042;
+      var a = DEF.apply(opsA, x, y), b = DEF.apply(opsB, x, y);
+      sum += Math.hypot(a[0] - b[0], a[1] - b[1]) * S; n++;
+    }
+    return sum / n;
   }
 
   function updateButtons() {
@@ -118,7 +180,7 @@
     $('trialInfo').innerHTML =
       T('מזהה: <b>') + trial.id + '</b><br>' +
       T('פעולות: ') + history.present.length +
-      (trial.repeatOf ? T('<br>חזרה על: ') + trial.repeatOf : '') +
+      (trial.repeatOf ? T('<br>חזרה על: ') + trial.repeatOf + repeatDiff() : '') +
       '<br>' + (saved ? (dirty ? T('<span style="color:#b26a00">שינויים שלא נשמרו</span>') : T('שמור ✓')) : T('עדיין לא נשמר'));
     renderTrialList();
   }
@@ -164,6 +226,10 @@
     $('lineWidth').value = s.lineWidth; $('lineWidthOut').textContent = s.lineWidth + 'px';
     $('radius').value = s.radius; $('radiusOut').textContent = Math.round(s.radius * grid.S) + 'px';
     ['dark', 'fixation', 'clamp', 'showOriginal', 'showControls'].forEach(function (k) { $(k).checked = !!s[k]; });
+    $('fixationPos').value = s.fixationPos || 'c';
+    var fig = s.figure || 'grid';
+    $('instrument').value = fig === 'grid' ? 'flex-grid' : 'shape-' + fig;
+    document.querySelectorAll('.grid-only').forEach(function (e) { e.style.display = fig === 'grid' ? '' : 'none'; });
     $('stage').classList.toggle('dark', !!s.dark);
   }
 
@@ -184,6 +250,20 @@
   $('lineWidth').addEventListener('input', function () { setSetting({ lineWidth: +this.value }, true); });
   $('radius').addEventListener('input', function () { setSetting({ radius: +this.value }, false); });
   $('radius').addEventListener('change', function () { logEvent('setting', { radius: grid.settings.radius }); saveDraft(); });
+  $('instrument').addEventListener('change', function () {
+    var v = this.value;
+    if (v === 'flex-grid' || v.indexOf('shape-') === 0) {
+      var fig = v === 'flex-grid' ? 'grid' : v.slice(6);
+      // each figure is its own calibration: start a fresh trial when switching
+      if (!history.present.length) { setSetting({ figure: fig }, true); return; }
+      confirmDiscard().then(function (yes) {
+        if (!yes) { syncSettingsUI(); return; }
+        setSetting({ figure: fig }, true);
+        startTrial(null);
+      });
+    } else { store.setPref('tools.mode', v); this.value = grid.settings.figure && grid.settings.figure !== 'grid' ? 'shape-' + grid.settings.figure : 'flex-grid'; ctx.go('tools'); }
+  });
+  $('fixationPos').addEventListener('change', function () { setSetting({ fixationPos: this.value, fixation: true }, true); });
   ['dark', 'fixation', 'clamp', 'showOriginal', 'showControls'].forEach(function (k) {
     $(k).addEventListener('change', function () { var p = {}; p[k] = this.checked; setSetting(p, true); });
   });
@@ -211,7 +291,7 @@
       id: trial.id,
       label: trial.label,
       softwareVersion: VERSION,
-      instrument: 'flex-grid',
+      instrument: !s.figure || s.figure === 'grid' ? 'flex-grid' : 'shape-' + s.figure,
       createdAt: trial.createdAt,
       savedAt: new Date().toISOString(),
       durationMs: Date.now() - trial.startedAt,
@@ -221,7 +301,7 @@
         type: 'grid', density: s.density, margin: DA.GridInstrument.MARGIN, displayMode: s.mode,
         singleLine: s.mode === 'single' ? { orient: s.singleOrient, index: s.singleIndex } : null,
         lineWidthPx: s.lineWidth, polarity: s.dark ? 'white-on-black' : 'black-on-white',
-        fixationPoint: !!s.fixation, coordinates: 'normalized 0..1 of stimulus square, origin top-left'
+        fixationPoint: !!s.fixation, fixationPos: s.fixation ? s.fixationPos : null, figure: s.figure || 'grid', coordinates: 'normalized 0..1 of stimulus square, origin top-left'
       },
       display: {
         stimulusSizePx: S,
@@ -362,10 +442,18 @@
     applyCompare();
   }
 
+  function repeatDiff() {
+    var src = store.getTrial(trial.repeatOf);
+    if (!src || !src.model || !ops().length) return '';
+    return '<br>' + T('הבדל מהניסיון המקורי: ') + fieldDiff(ops(), src.model.ops).toFixed(1) + T(' פיקסלים בממוצע');
+  }
+
   function applyCompare() {
     var id = $('compare').value;
     var t = id ? store.getTrial(id) : null;
     grid.setCompare(t ? t.model.ops : null);
+    $('compareDiff').textContent = t && t.model ? T('הבדל ממוצע בין הכיולים: ') + fieldDiff(ops(), t.model.ops).toFixed(1) + T(' פיקסלים') +
+      (t.stimulus && t.stimulus.fixationPos ? T(' · נקודת המבט שם: ') + t.stimulus.fixationPos : '') : '';
   }
   $('compare').addEventListener('change', function () {
     applyCompare();
