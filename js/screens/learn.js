@@ -94,6 +94,7 @@
     stageLens = new DA.Lens($('learnStage'));
     $('quickGame').onclick = function () { start(quickPlan()); };
     $('customGame').onclick = function () { start(customPlan()); };
+    DA.eyePanel.bindSwitch($('learnEyes'));
     $('learnExit').onclick = function () {
       if (!sess) { ctx.go('hub'); return; }
       DA.ui.ask('לצאת מהמשחק? מה שכבר למדנו יישמר.', 'יציאה').then(function (y) { if (y) finish(true); });
@@ -120,11 +121,18 @@
     $('learnEnd').style.display = 'none';
     $('learnHasCal').style.display = ctx.opsFor(p.settings) ? 'none' : '';
     $('learnWhoAvatar').textContent = p.emoji;
+    document.querySelectorAll('#catChecks input').forEach(function (i) {
+      var def = p.kind === 'adult' ? ['letter-he', 'word-he', 'sentence-he'] : ['digit', 'line', 'word-he'];
+      i.checked = def.indexOf(i.value) >= 0;
+    });
   }
   function leave() { step = null; }
 
   function quickPlan() {
-    return { name: 'quick', prefs: ['theme', 'font', 'letterSpacing', 'warp'], categories: ['digit', 'line', 'word-he'], maxTrials: 6 };
+    var adult = ctx.profile() && ctx.profile().kind === 'adult';
+    return adult
+      ? { name: 'quick-adult', prefs: ['theme', 'font', 'letterSpacing', 'lineHeight', 'warp'], categories: ['letter-he', 'word-he', 'sentence-he'], maxTrials: 7 }
+      : { name: 'quick-child', prefs: ['theme', 'font', 'letterSpacing', 'warp'], categories: ['digit', 'line', 'word-he'], maxTrials: 6 };
   }
   function customPlan() {
     var cats = Array.prototype.map.call(document.querySelectorAll('#catChecks input:checked'), function (i) { return i.value; });

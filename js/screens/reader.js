@@ -35,6 +35,7 @@
     $('rSpeak').onclick = speak;
     $('rSettings').onclick = function () { DA.drawer.open(); };
     $('rSources').onclick = showSources;
+    DA.eyePanel.bindSwitch($('rEyes'));
     $('rMode').onchange = function () { setMode(this.value); };
     $('segPrev').onclick = function () { stepSeg(-1); };
     $('segNext').onclick = function () { stepSeg(1); };
@@ -225,6 +226,7 @@
       if (!ok) { DA.ui.tell('כתיבת טקסטים חדשים זמינה בגרסה שב־claude.ai.'); return; }
       var s = ctx.profile().settings;
       $('genNikud').checked = !!s.nikud;
+      $('genLevel').value = ctx.profile().kind === 'adult' ? 'adult' : 'g2';
       var dlg = $('genDialog');
       dlg.returnValue = '';
       dlg.onclose = function () {

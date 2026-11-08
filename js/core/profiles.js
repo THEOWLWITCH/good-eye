@@ -24,7 +24,7 @@
   };
   ProfileStore.prototype.get = function (id) { return id ? this.s._read(P + 'profile.' + id, null) : null; };
 
-  ProfileStore.prototype.create = function (name, emoji) {
+  ProfileStore.prototype.create = function (name, emoji, kind) {
     var used = {}; this.list().forEach(function (p) { used[p.code] = true; });
     var code;
     do { code = String(1000 + Math.floor(Math.random() * 9000)); } while (used[code]);
@@ -32,6 +32,7 @@
       schema: 'da.profile/1',
       id: 'P' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
       name: name, emoji: emoji || AVATARS[0], code: code,
+      kind: kind === 'adult' ? 'adult' : 'child',
       createdAt: new Date().toISOString(),
       settings: DA.settings.normalize({}),
       best: null,
@@ -86,6 +87,15 @@
     if (idx.indexOf(sess.id) < 0) { idx.push(sess.id); this.s._write(P + 'sessions.index', idx); }
     if (!fromCloud) DA.cloud.save('sessions', sess.id, sess);
     return sess;
+  };
+  ProfileStore.prototype.removeSessionsFor = function (pid) {
+    var self = this, idx = this.s._read(P + 'sessions.index', []), keep = [];
+    idx.forEach(function (id) {
+      var x = self.s._read(P + 'session.' + id, null);
+      if (x && x.profileId === pid) { self.s.b.removeItem(P + 'session.' + id); DA.cloud.remove('sessions', id); }
+      else keep.push(id);
+    });
+    this.s._write(P + 'sessions.index', keep);
   };
   ProfileStore.prototype.sessionsFor = function (pid) {
     var self = this;

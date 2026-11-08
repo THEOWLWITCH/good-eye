@@ -18,22 +18,31 @@
     <button id="whoChip" class="who-chip" title="החלפת קורא"><span id="whoEmoji"></span> <span id="whoName"></span> ⇄</button>
   </header>
 
-  <!-- ============ HOME: who is reading? ============ -->
+  <!-- ============ HOME: welcome, who is reading, registration ============ -->
   <section id="screen-home" class="screen">
-    <h1 class="big-title">מי קורא עכשיו?</h1>
-    <div id="profileGrid" class="profile-grid"></div>
-    <p id="homeEmpty" class="muted center">עוד אין קוראים. בואו ניצור את הראשון!</p>
+    <div class="welcome">
+      <h1 class="big-title">👁️ ברוכים הבאים לעין טובה</h1>
+      <p class="lead">כל קורא נרשם פעם אחת, משחק משחק קצר, והאפליקציה לומדת איך להציג לו טקסט ותמונות בצורה הכי ברורה.</p>
+    </div>
+    <div id="whoSection">
+      <h2>מי קורא עכשיו? <span class="muted small">(לחצו על הכרטיס)</span></h2>
+      <div id="profileGrid" class="profile-grid"></div>
+    </div>
+    <h2 id="registerTitle">בואו נתחיל: מי הקורא הראשון?</h2>
+    <div class="register">
+      <button id="newChildBtn" class="reg-card child"><span class="avatar">🧒</span><b>הרשמה של ילד/ה</b><small>משחק עם תמונות, מספרים ומילים</small></button>
+      <button id="newAdultBtn" class="reg-card adult"><span class="avatar">🧑</span><b>הרשמה של מבוגר/ת</b><small>אותיות, מילים ומשפטים, וגם כיול עיוות</small></button>
+    </div>
     <div class="home-actions">
-      <button id="newProfileBtn" class="profile-card add"><span class="avatar">➕</span><span class="pname">קורא/ת חדש/ה</span></button>
+      <form id="codeForm" class="code-form">
+        <label>כבר נרשמתם? הקוד האישי <input id="codeInput" inputmode="numeric" maxlength="6" placeholder="1234"></label>
+        <button class="primary">כניסה</button>
+      </form>
       <div class="backup">
         <button id="backupBtn" title="שמירת כל הנתונים במכשיר הזה לקובץ">💾 גיבוי</button>
         <button id="restoreBtn" title="טעינת נתונים מקובץ גיבוי">📥 שחזור מגיבוי</button>
         <input id="restoreFile" type="file" accept=".json,application/json" hidden>
       </div>
-      <form id="codeForm" class="code-form">
-        <label>יש לי קוד אישי <input id="codeInput" inputmode="numeric" maxlength="6" placeholder="1234"></label>
-        <button class="primary">כניסה</button>
-      </form>
     </div>
   </section>
 
@@ -43,13 +52,20 @@
       <span id="hubAvatar" class="avatar xl"></span>
       <div>
         <h1 id="hubHello" class="big-title"></h1>
-        <div class="muted">הקוד האישי: <b id="hubCode"></b> · <button id="editProfileBtn" class="linkish">עריכה</button></div>
+        <div class="muted"><span id="hubKind"></span> · הקוד האישי: <b id="hubCode"></b> · <button id="editProfileBtn" class="linkish">עריכה או מחיקה</button></div>
       </div>
     </div>
+    <h2>מה עושים היום? <span class="muted small">(בוחרים אחד)</span></h2>
+    <p id="hubTip" class="hub-tip"></p>
     <div class="tiles">
-      <button id="tileRead" class="tile read"><span class="ti">📖</span><b>לקרוא</b><small>טקסט, קובץ, תמונה או צילום</small></button>
-      <button id="tileLearn" class="tile learn"><span class="ti">🎮</span><b>משחק ההתאמה</b><small>נגלה ביחד מה הכי ברור לך</small></button>
-      <button id="tileCalibrate" class="tile cal"><span class="ti">🎯</span><b>כיול עיוות</b><small>ישור קווים ברשת — עם מבוגר</small></button>
+      <button id="tileLearn" class="tile learn"><span id="tileLearnBadge" class="badge">מתחילים כאן</span><span class="ti">🎮</span><b>משחק ההתאמה</b><small>נגלה ביחד מה הכי ברור לך (כ־5 דקות)</small><span class="cta">▶ לשחק</span></button>
+      <button id="tileCalibrate" class="tile cal"><span class="ti">🎯</span><b>כיול עיוות</b><small id="tileCalSub">למי שרואה קווים עקומים. עדיף עם מבוגר</small><span class="cta">▶ לכייל</span></button>
+      <button id="tileRead" class="tile read"><span class="ti">📖</span><b>לקרוא</b><small>טקסט, קובץ, תמונה או צילום, עם ההתאמות שלך</small><span class="cta">▶ לקרוא</span></button>
+    </div>
+    <div class="card eye-card">
+      <h3>👁️ מעקב עיניים במצלמה <span class="tag">לא חובה</span></h3>
+      <p class="muted">המצלמה מודדת את המרחק מהמסך ואת כיוון המבט, כדי להתאים את התצוגה טוב יותר. שום תמונה לא נשמרת ולא נשלחת.</p>
+      <div class="row wrap"><button id="hubEyesToggle" class="eye-switch"></button><button id="hubEyesInfo" class="linkish">מה זה, ומתי זה לא עובד?</button></div>
     </div>
     <div class="hub-cols">
       <div class="card">
@@ -59,7 +75,6 @@
           <button id="bestBtn" class="primary big">⭐ לחזור למצב שלי</button>
           <button id="pinBtn">📌 לשמור את המצב הנוכחי</button>
           <button id="settingsBtn">⚙️ הגדרות מתקדמות</button>
-          <button id="hubEyes" title="לא חובה — עוזר להתאמה מדויקת יותר">👁️ מעקב עיניים</button>
         </div>
         <p class="muted small">עכשיו: <span id="hubCurrent"></span></p>
         <div id="pinnedList" class="pinned-list"></div>
@@ -90,6 +105,7 @@
         <button id="reset" title="איפוס כל התיקונים">⟲ איפוס</button>
         <button id="save" class="primary" title="שמירת הניסיון (Ctrl+S)">💾 שמירה</button>
         <button id="fullscreen" title="מסך מלא (F)">⛶ מסך מלא</button>
+        <button id="calEyes" class="eye-switch" data-short></button>
       </div>
     </header>
 
@@ -185,6 +201,7 @@
       <h1 class="big-title"><span id="learnWhoAvatar"></span> משחק ההתאמה</h1>
       <p class="lead">נראה לך אותיות, מספרים, ציורים ומילים. את/ה רק בוחר/ת מה ראית, או מה יותר ברור. אין תשובות לא נכונות!</p>
       <button id="quickGame" class="primary huge">▶️ בואו נשחק (כ־5 דקות)</button>
+      <p><button id="learnEyes" class="eye-switch"></button></p>
       <p id="learnHasCal" class="muted small">טיפ: אחרי כיול עיוות ברשת, המשחק יבדוק גם אם התיקון עוזר.</p>
       <details class="adult">
         <summary>אפשרויות למבוגר</summary>
@@ -242,6 +259,7 @@
         <option value="sentence">➡️ משפט</option>
         <option value="word">🔎 מילה</option>
       </select>
+      <button id="rEyes" class="rb eye-switch" data-short></button>
       <button id="rSettings" class="rb" title="הגדרות מתקדמות">⚙️</button>
       <span id="readExtra"></span>
     </div>
@@ -349,10 +367,14 @@
     <form method="dialog">
       <h3 id="profileDialogTitle">קורא/ת חדש/ה</h3>
       <label>שם <input id="profileName" type="text" maxlength="24" autocomplete="off"></label>
+      <div class="kind-pick">
+        <label><input type="radio" name="pkind" value="child" checked> 🧒 ילד/ה</label>
+        <label><input type="radio" name="pkind" value="adult"> 🧑 מבוגר/ת</label>
+      </div>
       <p class="muted small">בחרו דמות:</p>
       <div id="emojiPick" class="emoji-pick"></div>
       <div class="row"><button value="ok" class="primary">שמירה</button> 
-        <button value="delete" id="profileDelete" class="danger" style="display:none">מחיקה</button>
+        <button value="delete" id="profileDelete" class="danger" style="display:none">🗑️ מחיקת הקורא</button>
         <button value="cancel">ביטול</button>
       </div>
     </form>

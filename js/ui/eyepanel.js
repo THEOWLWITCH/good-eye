@@ -54,6 +54,7 @@
     $('eyePanelClose').onclick = function () { $('eyePanel').classList.remove('open'); };
     $('eyeInfoBtn').onclick = info;
     DA.eyes.on(render);
+    DA.eyes.on(updateSwitches);
     DA.eyes.on(maybeLeanAlert);
     // resume automatically if this reader turned it on before (camera permission is asked by the browser)
     if (DA.eyes.supported() && pref()) DA.eyes.start().catch(function () { /* stays off */ });
@@ -152,5 +153,31 @@
     });
   }
 
-  DA.eyePanel = { init: init, offer: offer, info: info, open: openPanel };
+  /** A visible on/off switch for eye tracking (hub, reader, game, calibration). */
+  var switches = [];
+  function bindSwitch(btn) {
+    if (!btn) return;
+    switches.push(btn);
+    btn.onclick = function () {
+      if (!DA.eyes.supported()) { offer(); return; }
+      if (DA.eyes.state.running) {
+        DA.ui.ask('לכבות את מעקב העיניים?', 'כיבוי').then(function (y) { if (y) { DA.eyes.stop(); setPref(false); } });
+      } else offer();
+    };
+    updateSwitches(DA.eyes.state);
+  }
+  function updateSwitches(s) {
+    switches.forEach(function (b) {
+      var sup = DA.eyes.supported();
+      b.classList.toggle('on', !!s.running);
+      b.classList.toggle('unsupported', !sup);
+      var short = b.getAttribute('data-short') != null;
+      b.textContent = !sup ? (short ? '👁️' : '👁️ מעקב עיניים: זמין רק באתר העצמאי')
+        : s.running ? (short ? '👁️ פועל' : '👁️ מעקב עיניים: פועל ✓ (לחצו לכיבוי)')
+        : (short ? '👁️ כבוי' : '👁️ מעקב עיניים: כבוי (לחצו להפעלה)');
+      b.title = 'מעקב עיניים במצלמה: לא חובה, עוזר להתאמה מדויקת יותר';
+    });
+  }
+
+  DA.eyePanel = { init: init, offer: offer, info: info, open: openPanel, bindSwitch: bindSwitch };
 })(typeof window !== 'undefined' ? window : globalThis);

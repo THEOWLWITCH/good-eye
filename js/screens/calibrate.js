@@ -16,6 +16,7 @@
   function init(c) {
   ctx = c; store = c.store;
 
+  DA.eyePanel.bindSwitch($('calEyes'));
   grid = new DA.GridInstrument($('canvas'), {
     settings: store.getPref('gridSettings', {}),
     onCommit: onCommit,
